@@ -1,0 +1,19 @@
+first test
+	client and server on the same machine
+	server 256m, client default
+	OOM since using MemoryStorage
+	Create BuketOnlyStorage
+second
+	single client thread, 8 byte payload, no sleep
+	avg 165 K/minute, 0.36 ms response time on client, 0.09 ms response time on server
+third
+	single client thread, 100 byte payload, no sleep
+	avg 176 K/minute, 0.34 ms response time on client, 0.09 ms response time on server
+fourth
+	single client thread, 1024 byte payload, no sleep
+	OOM after 3 minutes
+fifth
+	server 512m
+	single client thread, 1024 byte payload, no sleep
+	avg 140 K/minute, 0.42 ms response time on client, 0.11 ms response time on server
+	rope get 3.2 s

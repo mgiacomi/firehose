@@ -1,0 +1,9 @@
+[name=metadata-versions]
+ShortTermPayloadStorage=0
+stores.xml=0
+cluster.xml=0
+BucketStorage=0
+MediumTermPayloadStorage=0
+LargeTermPayloadStorage=0
+
+
