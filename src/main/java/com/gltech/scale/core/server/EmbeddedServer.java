@@ -16,7 +16,11 @@ import com.gltech.scale.core.monitor.TimerMapPublishMetricGroup;
 import com.gltech.scale.core.rope.RopeManager;
 import com.gltech.scale.core.rope.WeightManager;
 import com.gltech.scale.core.util.Props;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.slf4j.Logger;
@@ -78,6 +82,17 @@ public class EmbeddedServer
 		// Failing to do this will cause 404 errors.
 		// This is not needed if web.xml is used instead.
 		sch.addServlet(DefaultServlet.class, "/");
+
+		// Setup Handler for html files
+		ResourceHandler resource_handler = new ResourceHandler();
+		resource_handler.setDirectoriesListed(true);
+		resource_handler.setWelcomeFiles(new String[]{"index.html"});
+
+		resource_handler.setResourceBase("public_html");
+
+		HandlerList handlers = new HandlerList();
+		handlers.setHandlers(new Handler[]{resource_handler, new DefaultHandler()});
+		server.setHandler(handlers);
 
 		// Handle all non jersey services here
 		startServices();

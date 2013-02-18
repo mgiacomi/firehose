@@ -1,5 +1,6 @@
 package com.gltech.scale.core.server;
 
+import com.gltech.scale.monitor.MonitorResource;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -57,6 +58,12 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					bind(RopeCoordinator.class).to(RopeCoordinatorImpl.class).in(Singleton.class);
 
 					// Service specific injector settings
+					if (props.get("enable.monitoring_service", true))
+					{
+						bind(MonitorResource.class);
+						//bind(EventService.class).to(EventServiceImpl.class).in(Singleton.class);
+					}
+
 					if (props.get("enable.event_service", true))
 					{
 						bind(EventResource.class);
