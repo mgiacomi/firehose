@@ -63,8 +63,14 @@
 
 	<!-- Project JS -->
 	<!--script type="text/javascript" src="/js/custom.js"></script-->
-	<script type="text/javascript" src="/js/base.js"></script>
-	<script type="text/javascript" src="/js/firehose.js"></script>
+
+	<script type="text/javascript" src="/app/firehose.js"></script>
+	<script type="text/javascript" src="/app/views/layout.js"></script>
+	<script type="text/javascript" src="/app/views/dashboard.js"></script>
+	<script type="text/javascript" src="/app/views/charts.js"></script>
+	<script type="text/javascript" src="/app/controllers/layout.js"></script>
+	<script type="text/javascript" src="/app/controllers/dashboard.js"></script>
+	<script type="text/javascript" src="/app/controllers/charts.js"></script>
 
 </head>
 <body>
@@ -75,23 +81,14 @@
 	<div class="wrapper">
 		<section id="leftnavWrapper"></section>
 		<!-- Content -->
-		<div class="content">
-			<div class="title"><h5>Dashboard</h5></div>
-		</div>
+		<div id="contentWrapper" class="content"></div>
 	</div>
 	<footer id="footerWrapper"></footer>
 
-	<script type="text/javascript" src="/views/layout.js"></script>
-	<!--
-	<script src="/js/TodoMVC.js"></script>
-	<script src="/js/TodoMVC.Todos.js"></script>
-	<script src="/js/TodoMVC.Layout.js"></script>
-	<script src="/js/TodoMVC.TodoList.Views.js"></script>
-	<script src="/js/TodoMVC.TodoList.js"></script>
-	-->
+
 	<script>
 		$(function () {
-			templateLoader.load(['topbar', 'header', 'leftnav', 'footer'], function() {
+			templateLoader.load(['topbar', 'header', 'leftnav', 'footer', 'dashboard', 'charts'], function() {
 				Firehose.start();
 			});
 		});

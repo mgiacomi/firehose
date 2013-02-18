@@ -4,30 +4,11 @@ Firehose.addRegions({
     topbar: '#topbarWrapper',
     header: '#headerWrapper',
     leftnav: '#leftnavWrapper',
-    footer: '#footerWrapper'
-});
-
-// Router
-var AppRouter = Backbone.Router.extend({
-
-    routes:{
-        "":"list"
-    },
-
-    list:function () {
-    }
-
+    footer: '#footerWrapper',
+    content: '#contentWrapper'
 });
 
 Firehose.on('initialize:after', function() {
-    var app = new AppRouter();
-
-    var header = new Firehose.Layout.Header();
-    Firehose.header.show(header);
-
-    var leftnav = new Firehose.Layout.Leftnav();
-    Firehose.leftnav.show(leftnav);
-
     Backbone.history.start();
 });
 
@@ -48,7 +29,7 @@ templateLoader = {
         var loadTemplate = function (index) {
             var name = names[index];
             console.log('Loading template: ' + name);
-            $.get('templates/' + name + '.html', function (data) {
+            $.get('/app/templates/' + name + '.html', function (data) {
                 that.templates[name] = data;
                 index++;
                 if (index < names.length) {
