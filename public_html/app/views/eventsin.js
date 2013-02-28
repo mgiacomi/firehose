@@ -1,11 +1,11 @@
-Firehose.module('Charts.Views', function(Views, App, Backbone, Marionette, $, _) {
+Firehose.module('Eventsin.Views', function(Views, App, Backbone, Marionette, $, _) {
 
     Views.Nav = Marionette.ItemView.extend({
-        template:'charts_nav'
+        template:'eventsin_nav'
     });
 
     Views.Main = Marionette.ItemView.extend({
-        template: 'charts',
+        template: 'eventsin_overview',
 
         ui: {
 //            edit: '.edit'

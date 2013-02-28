@@ -65,10 +65,10 @@
 	<script type="text/javascript" src="/app/firehose.js"></script>
 	<script type="text/javascript" src="/app/views/layout.js"></script>
 	<script type="text/javascript" src="/app/views/dashboard.js"></script>
-	<script type="text/javascript" src="/app/views/charts.js"></script>
+	<script type="text/javascript" src="/app/views/eventsin.js"></script>
 	<script type="text/javascript" src="/app/controllers/layout.js"></script>
 	<script type="text/javascript" src="/app/controllers/dashboard.js"></script>
-	<script type="text/javascript" src="/app/controllers/charts.js"></script>
+	<script type="text/javascript" src="/app/controllers/eventsin.js"></script>
 
 </head>
 <body>
@@ -89,7 +89,7 @@
 
 	<script>
 		$(function () {
-			templateLoader.load(['topbar', 'leftnav', 'footer', 'dashboard', 'dashboard_nav', 'charts', 'charts_nav'], function() {
+			templateLoader.load(['topbar', 'leftnav', 'footer', 'dashboard_nav', 'dashboard_overview', 'eventsin_nav', 'eventsin_overview'], function() {
 				Firehose.start();
 			});
 		});

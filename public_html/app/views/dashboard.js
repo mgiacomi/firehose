@@ -5,7 +5,7 @@ Firehose.module('Dashboard.Views', function(Views, App, Backbone, Marionette, $,
     });
 
     Views.Main = Marionette.ItemView.extend({
-        template: 'dashboard',
+        template: 'dashboard_overview',
 
         ui: {
 //            edit: '.edit'
