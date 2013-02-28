@@ -1,6 +1,10 @@
 Firehose.module('Dashboard.Views', function(Views, App, Backbone, Marionette, $, _) {
 
-    Views.MainView = Marionette.ItemView.extend({
+    Views.Nav = Marionette.ItemView.extend({
+        template:'dashboard_nav'
+    });
+
+    Views.Main = Marionette.ItemView.extend({
         template: 'dashboard',
 
         ui: {

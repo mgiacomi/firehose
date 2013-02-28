@@ -1,6 +1,10 @@
 Firehose.module('Charts.Views', function(Views, App, Backbone, Marionette, $, _) {
 
-    Views.MainView = Marionette.ItemView.extend({
+    Views.Nav = Marionette.ItemView.extend({
+        template:'charts_nav'
+    });
+
+    Views.Main = Marionette.ItemView.extend({
         template: 'charts',
 
         ui: {

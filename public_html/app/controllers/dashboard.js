@@ -15,7 +15,8 @@ Firehose.module('Dashboard', function (Dashboard, App, Backbone, Marionette, $, 
 
         // Default action
         index: function() {
-            App.content.show(new Dashboard.Views.MainView());
+            App.content.show(new Dashboard.Views.Main());
+            App.middlenav.show(new Dashboard.Views.Nav());
         }
     });
 

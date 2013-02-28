@@ -4,11 +4,6 @@ Firehose.module('Layout.Views', function (Views, App, Backbone, Marionette, $, _
         template:'topbar'
     });
 
-    // Layout Header View
-    Views.Header = Marionette.ItemView.extend({
-        template:'header'
-    });
-
     // Layout Leftnav View
     Views.Leftnav = Marionette.ItemView.extend({
         template:'leftnav',

@@ -2,7 +2,7 @@ var Firehose = new Backbone.Marionette.Application();
 
 Firehose.addRegions({
     topbar: '#topbarWrapper',
-    header: '#headerWrapper',
+    middlenav: '#middleNavWrapper',
     leftnav: '#leftnavWrapper',
     footer: '#footerWrapper',
     content: '#contentWrapper'

@@ -18,7 +18,6 @@
 	<script type="text/javascript" src="/lib/handlebars.min.js"></script>
 
 	<!-- Template libraries -->
-	<!--
 	<script type="text/javascript" src="/lib/plugins/flot/jquery.flot.js"></script>
 	<script type="text/javascript" src="/lib/plugins/flot/jquery.flot.orderBars.js"></script>
 	<script type="text/javascript" src="/lib/plugins/flot/jquery.flot.pie.js"></script>
@@ -59,7 +58,6 @@
 	<script type="text/javascript" src="/lib/plugins/ui/jquery.timeentry.min.js"></script>
 	<script type="text/javascript" src="/lib/plugins/ui/jquery.prettyPhoto.js"></script>
 	<script type="text/javascript" src="/lib/charts/chart.js"></script>
-	-->
 
 	<!-- Project JS -->
 	<!--script type="text/javascript" src="/js/custom.js"></script-->
@@ -75,7 +73,10 @@
 </head>
 <body>
 	<section id="topbarWrapper"></section>
-	<header id="headerWrapper"></header>
+	<div id="header" class="wrapper">
+		<div class="logo"><a href="/" title=""><img src="/images/logo.png" alt="" /></a></div>
+		<section id="middleNavWrapper"></section>
+	</div>
 
 	<!-- Content wrapper -->
 	<div class="wrapper">
@@ -88,7 +89,7 @@
 
 	<script>
 		$(function () {
-			templateLoader.load(['topbar', 'header', 'leftnav', 'footer', 'dashboard', 'charts'], function() {
+			templateLoader.load(['topbar', 'leftnav', 'footer', 'dashboard', 'dashboard_nav', 'charts', 'charts_nav'], function() {
 				Firehose.start();
 			});
 		});

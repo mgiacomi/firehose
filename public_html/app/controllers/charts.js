@@ -15,7 +15,8 @@ Firehose.module('Charts', function (Charts, App, Backbone, Marionette, $, _) {
 
         // Default action
         index: function() {
-            App.content.show(new Charts.Views.MainView());
+            App.content.show(new Charts.Views.Main());
+            App.middlenav.show(new Charts.Views.Nav());
         }
     });
 

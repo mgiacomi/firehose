@@ -7,17 +7,10 @@ Firehose.module('Layout', function (Layout, App, Backbone, Marionette, $, _) {
     _.extend(Layout.Controller.prototype, {
 
         start:function () {
-            var topbar = new App.Layout.Views.Topbar();
-            App.topbar.show(topbar);
-
-            var header = new App.Layout.Views.Header();
-            App.header.show(header);
-
-            var leftnav = new App.Layout.Views.Leftnav();
-            App.leftnav.show(leftnav);
-
-            var footer = new App.Layout.Views.Footer();
-            App.footer.show(footer);
+            App.topbar.show(new App.Layout.Views.Topbar());
+//            App.middlenav.show(new App.Dashboard.Views.Nav());
+            App.leftnav.show(new App.Layout.Views.Leftnav());
+            App.footer.show(new App.Layout.Views.Footer());
         }
     });
 
