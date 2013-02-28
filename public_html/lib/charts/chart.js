@@ -5,7 +5,6 @@ $(function () {
         cos.push([i, Math.cos(i)]);
     }
 
-/*
     var plot = $.plot($(".chart"),
         [
             { data:sin, label:"sin(x)"},
@@ -18,8 +17,8 @@ $(function () {
             grid:{ hoverable:true, clickable:true },
             yaxis:{ min:-1.1, max:1.1 },
             xaxis:{ min:0, max:20 }
-        });
-*/
+    });
+
     function showTooltip(x, y, contents) {
         $('<div id="tooltip" class="tooltip">' + contents + '</div>').css({
             position:'absolute',

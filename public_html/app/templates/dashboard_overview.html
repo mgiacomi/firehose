@@ -1,13 +1,164 @@
+<script>
+	_.defer(function(caller){
+
+		//===== Chart =====//
+		var sin = [], cos = [];
+		for (var i = 0; i < 21; i += 0.5) {
+			sin.push([i, Math.sin(i)]);
+			cos.push([i, Math.cos(i)]);
+		}
+		var plot = $.plot($(".chart"),
+		[
+			{ data:sin, label:"sin(x)"},
+			{ data:cos, label:"cos(x)" }
+		], {
+			series:{
+				lines:{ show:true },
+				points:{ show:true }
+			},
+			grid:{ hoverable:true, clickable:true },
+			yaxis:{ min:-1.1, max:1.1 },
+			xaxis:{ min:0, max:20 }
+		});
+
+		var previousPoint = null;
+		$(".chart").bind("plothover", function (event, pos, item) {
+			$("#x").text(pos.x.toFixed(2));
+			$("#y").text(pos.y.toFixed(2));
+
+			if ($(".chart").length > 0) {
+				if (item) {
+					if (previousPoint != item.dataIndex) {
+						previousPoint = item.dataIndex;
+
+						$("#tooltip").remove();
+						var x = item.datapoint[0].toFixed(2),
+								y = item.datapoint[1].toFixed(2);
+
+						showTooltip(item.pageX, item.pageY,
+								item.series.label + " of " + x + " = " + y);
+					}
+				}
+				else {
+					$("#tooltip").remove();
+					previousPoint = null;
+				}
+			}
+		});
+
+		//===== Calendar =====//
+		var date = new Date();
+		var d = date.getDate();
+		var m = date.getMonth();
+		var y = date.getFullYear();
+
+		$('#calendar').fullCalendar({
+			header: {
+				left: 'prev,next',
+				center: 'title',
+				right: 'month,basicWeek,basicDay'
+			},
+			editable: true,
+			events: [
+				{
+					title: 'All day event',
+					start: new Date(y, m, 1)
+				},
+				{
+					title: 'Long event',
+					start: new Date(y, m, 5),
+					end: new Date(y, m, 8)
+				},
+				{
+					id: 999,
+					title: 'Repeating event',
+					start: new Date(y, m, 2, 16, 0),
+					end: new Date(y, m, 3, 18, 0),
+					allDay: false
+				},
+				{
+					id: 999,
+					title: 'Repeating event',
+					start: new Date(y, m, 9, 16, 0),
+					end: new Date(y, m, 10, 18, 0),
+					allDay: false
+				},
+				{
+					title: 'Actually any color could be applied for background',
+					start: new Date(y, m, 30, 10, 30),
+					end: new Date(y, m, d+1, 14, 0),
+					allDay: false,
+					color: '#B55D5C'
+				},
+				{
+					title: 'Lunch',
+					start: new Date(y, m, 14, 12, 0),
+					end: new Date(y, m, 15, 14, 0),
+					allDay: false
+				},
+				{
+					title: 'Birthday PARTY',
+					start: new Date(y, m, 18),
+					end: new Date(y, m, 20),
+					allDay: false
+				},
+				{
+					title: 'Click for Google',
+					start: new Date(y, m, 27),
+					end: new Date(y, m, 29),
+					url: 'http://google.com/'
+				}
+			]
+		});
+
+		//===== Tabs =====//
+		$( ".tabs" ).tabs();
+
+		//===== Dynamic data table =====//
+		oTable = $('#example').dataTable({
+			"bJQueryUI": false,
+			"bAutoWidth": false,
+			"sPaginationType": "full_numbers",
+			"sDom": '<"datatable-header"fl>t<"datatable-footer"ip>',
+			"oLanguage": {
+				"sLengthMenu": "<span>Show entries:</span> _MENU_",
+				"oPaginate": { "sFirst": "First", "sLast": "Last", "sNext": ">", "sPrevious": "<" }
+			}
+		});
+
+	}, this);
+
+	function showTooltip(x, y, contents) {
+		$('<div id="tooltip" class="tooltip">' + contents + '</div>').css({
+			position:'absolute',
+			display:'none',
+			top:y + 5,
+			left:x + 5,
+			border:'1px solid #000',
+			padding:'2px 8px',
+			'z-index':'9999',
+			'background-color':'#202020',
+			'color':'#fff',
+			'font-size':'11px',
+			opacity:0.85,
+			'border-radius':'2px',
+			'-webkit-border-radius':'2px',
+			'-moz-border-radius':'2px'
+		}).appendTo("body").fadeIn(200);
+	}
+</script>
 <div class="title"><h5>Dashboard - Overview</h5></div>
 
 <!-- Statistics -->
 <div class="stats">
 	<ul>
-		<li><a href="#" class="count grey" title="">52</a><span>new pending tasks</span></li>
-
-		<li><a href="#" class="count grey" title="">520</a><span>pending orders</span></li>
-		<li><a href="#" class="count grey" title="">14</a><span>new opened tickets</span></li>
-		<li class="last"><a href="#" class="count grey" title="">48</a><span>new user registrations</span></li>
+		<li style="width:20%;"><a href="#" class="count grey" style="font-size:16px" title="">3</a><span style="font-size:14px;">Event In Listeners</span></li>
+		<li style="margin-left:0;width:20%;"><a href="#" class="count grey" style="font-size:16px" title="">2</a><span style="font-size:14px;">Event Out Listeners</span></li>
+		<li style="margin-left:0px;width:20%;"><a href="#" class="count grey" style="font-size:16px" title="">6</a><span style="font-size:14px;">Rope<br/>Managers</span></li>
+		<li style="margin-left:0px;width:20%;"><a href="#" class="count grey" style="font-size:16px" title="">14</a><span style="font-size:14px;">Time Bucket Collectors</span></li>
+		<li  style="margin-left:0px;width:20%;" class="last">
+			<a href="#" class="count grey" style="font-size:16px" title="">48</a><span style="font-size:14px;">Keystore Servers</span>
+		</li>
 	</ul>
 </div>
 
