@@ -88,7 +88,13 @@
 
 	<script>
 		$(function () {
-			templateLoader.load(['topbar', 'leftnav', 'footer', 'dashboard_nav', 'dashboard_overview', 'eventsin_nav', 'eventsin_overview'], function() {
+			var templates = [
+				'topbar','leftnav','footer',
+				'dashboard_nav','dashboard_overview','dashboard_roles','dashboard_servers','dashboard_performance',
+				'eventsin_nav','eventsin_overview'
+			];
+
+			templateLoader.load(templates, function() {
 				Firehose.start();
 			});
 		});

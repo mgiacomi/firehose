@@ -5,27 +5,19 @@ Firehose.module('Dashboard.Views', function(Views, App, Backbone, Marionette, $,
     });
 
     Views.Main = Marionette.ItemView.extend({
-        template: 'dashboard_overview',
+        template: 'dashboard_overview'
+    });
 
-        ui: {
-//            edit: '.edit'
-        },
+    Views.Roles = Marionette.ItemView.extend({
+        template: 'dashboard_roles'
+    });
 
-        events : {
-//            'click .destroy': 'destroy',
-        },
+    Views.Servers = Marionette.ItemView.extend({
+        template: 'dashboard_servers'
+    });
 
-        initialize: function() {
-//            this.bindTo(this.model, 'change', this.render, this);
-        },
-
-        onRender: function() {
-//            this.$el.removeClass('active completed');
-        }
-
-//        destroy: function() {
-//            this.model.destroy();
-//        },
+    Views.Performance = Marionette.ItemView.extend({
+        template: 'dashboard_performance'
     });
 
 });

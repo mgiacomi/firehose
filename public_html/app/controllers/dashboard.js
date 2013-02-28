@@ -3,7 +3,10 @@ Firehose.module('Dashboard', function (Dashboard, App, Backbone, Marionette, $, 
     // Router
     Dashboard.Router = Marionette.AppRouter.extend({
         appRoutes:{
-            '':'index'
+            '':'index',
+            'dashboard_roles':'roles',
+            'dashboard_servers':'servers',
+            'dashboard_performance':'performance'
         }
     });
 
@@ -17,6 +20,18 @@ Firehose.module('Dashboard', function (Dashboard, App, Backbone, Marionette, $, 
         index: function() {
             App.content.show(new Dashboard.Views.Main());
             App.middlenav.show(new Dashboard.Views.Nav());
+        },
+
+        roles: function() {
+            App.content.show(new Dashboard.Views.Roles());
+        },
+
+        servers: function() {
+            App.content.show(new Dashboard.Views.Servers());
+        },
+
+        performance: function() {
+            App.content.show(new Dashboard.Views.Performance());
         }
     });
 
