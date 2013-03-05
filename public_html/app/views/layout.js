@@ -18,8 +18,20 @@ Firehose.module('Layout.Views', function (Views, App, Backbone, Marionette, $, _
             });
 
             $(e.currentTarget).addClass('active');
-        }
+        },
 
+        onRender:function () {
+            setTimeout(function() {
+                if(Backbone.history.fragment.length > 1) {
+                    $(".leftNavLink").each(function () {
+                        $(this).removeClass('active');
+                        if('#'+Backbone.history.fragment == $(this).attr('href')) {
+                            $(this).addClass('active');
+                        }
+                    });
+                }
+            }, 0);
+        }
     });
 
     // Layout Footer View
