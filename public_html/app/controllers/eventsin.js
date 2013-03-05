@@ -3,19 +3,29 @@ Firehose.module('Eventsin', function (Eventsin, App, Backbone, Marionette, $, _)
     // Router
     Eventsin.Router = Marionette.AppRouter.extend({
         appRoutes:{
-            'eventsin':'index'
+            'events/in/overview':'overview',
+            'events/in/live/stats':'live_stats',
+            'events/in/performance':'performance'
         }
     });
 
     // Controller
-    Eventsin.Controller = function () {
-    };
+    Eventsin.Controller = function () {};
 
     _.extend(Eventsin.Controller.prototype, {
 
-        // Default action
-        index: function() {
-            App.content.show(new Eventsin.Views.Main());
+        overview: function() {
+            App.content.show(new Eventsin.Views.Overview());
+            App.middlenav.show(new Eventsin.Views.Nav());
+        },
+
+        live_stats: function() {
+            App.content.show(new Eventsin.Views.LiveStats());
+            App.middlenav.show(new Eventsin.Views.Nav());
+        },
+
+        performance: function() {
+            App.content.show(new Eventsin.Views.Performance());
             App.middlenav.show(new Eventsin.Views.Nav());
         }
     });

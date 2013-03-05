@@ -1,19 +1,19 @@
-Firehose.module('Eventsin.Views', function(Views, App, Backbone, Marionette, $, _) {
+Firehose.module('Eventsout.Views', function(Views, App, Backbone, Marionette, $, _) {
 
     Views.Nav = Marionette.ItemView.extend({
-        template:'eventsin_nav'
+        template:'eventsout_nav'
     });
 
     Views.Overview = Marionette.ItemView.extend({
-        template: 'eventsin_overview'
+        template: 'eventsout_overview'
     });
 
     Views.LiveStats = Marionette.ItemView.extend({
-        template: 'eventsin_livestats'
+        template: 'eventsout_livestats'
     });
 
     Views.Performance = Marionette.ItemView.extend({
-        template: 'eventsin_performance'
+        template: 'eventsout_performance'
     });
 
 });

@@ -4,33 +4,35 @@ Firehose.module('Dashboard', function (Dashboard, App, Backbone, Marionette, $, 
     Dashboard.Router = Marionette.AppRouter.extend({
         appRoutes:{
             '':'index',
-            'dashboard_roles':'roles',
-            'dashboard_servers':'servers',
-            'dashboard_performance':'performance'
+            'dashboard/roles':'roles',
+            'dashboard/servers':'servers',
+            'dashboard/performance':'performance'
         }
     });
 
     // Controller
-    Dashboard.Controller = function () {
-    };
+    Dashboard.Controller = function () {};
 
     _.extend(Dashboard.Controller.prototype, {
 
         // Default action
         index: function() {
-            App.content.show(new Dashboard.Views.Main());
             App.middlenav.show(new Dashboard.Views.Nav());
+            App.content.show(new Dashboard.Views.Main());
         },
 
         roles: function() {
+            App.middlenav.show(new Dashboard.Views.Nav());
             App.content.show(new Dashboard.Views.Roles());
         },
 
         servers: function() {
+            App.middlenav.show(new Dashboard.Views.Nav());
             App.content.show(new Dashboard.Views.Servers());
         },
 
         performance: function() {
+            App.middlenav.show(new Dashboard.Views.Nav());
             App.content.show(new Dashboard.Views.Performance());
         }
     });

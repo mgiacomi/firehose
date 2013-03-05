@@ -65,9 +65,11 @@
 	<script type="text/javascript" src="/app/views/layout.js"></script>
 	<script type="text/javascript" src="/app/views/dashboard.js"></script>
 	<script type="text/javascript" src="/app/views/eventsin.js"></script>
+	<script type="text/javascript" src="/app/views/eventsout.js"></script>
 	<script type="text/javascript" src="/app/controllers/layout.js"></script>
 	<script type="text/javascript" src="/app/controllers/dashboard.js"></script>
 	<script type="text/javascript" src="/app/controllers/eventsin.js"></script>
+	<script type="text/javascript" src="/app/controllers/eventsout.js"></script>
 
 </head>
 <body>
@@ -91,7 +93,8 @@
 			var templates = [
 				'topbar','leftnav','footer',
 				'dashboard_nav','dashboard_overview','dashboard_roles','dashboard_servers','dashboard_performance',
-				'eventsin_nav','eventsin_overview'
+				'eventsin_nav','eventsin_overview', 'eventsin_livestats', 'eventsin_performance',
+				'eventsout_nav','eventsout_overview', 'eventsout_livestats', 'eventsout_performance'
 			];
 
 			templateLoader.load(templates, function() {
