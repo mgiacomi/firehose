@@ -3,9 +3,9 @@ Firehose.module('Eventsin', function (Eventsin, App, Backbone, Marionette, $, _)
     // Router
     Eventsin.Router = Marionette.AppRouter.extend({
         appRoutes:{
-            'events/in/overview':'overview',
-            'events/in/live/stats':'live_stats',
-            'events/in/performance':'performance'
+            'eventsin/overview':'overview',
+            'eventsin/live/stats':'live_stats',
+            'eventsin/performance':'performance'
         }
     });
 

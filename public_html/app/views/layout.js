@@ -25,7 +25,7 @@ Firehose.module('Layout.Views', function (Views, App, Backbone, Marionette, $, _
                 if(Backbone.history.fragment.length > 1) {
                     $(".leftNavLink").each(function () {
                         $(this).removeClass('active');
-                        if('#'+Backbone.history.fragment == $(this).attr('href')) {
+                        if('#'+Backbone.history.fragment.split("/")[0] == $(this).attr('href').split("/")[0]) {
                             $(this).addClass('active');
                         }
                     });
