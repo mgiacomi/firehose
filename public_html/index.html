@@ -59,17 +59,17 @@
 	<script type="text/javascript" src="/lib/plugins/ui/jquery.prettyPhoto.js"></script>
 
 	<!-- Project JS -->
-	<!--script type="text/javascript" src="/js/custom.js"></script-->
+	<script type="text/javascript" src="/js/firehose.js"></script>
 
 	<script type="text/javascript" src="/app/firehose.js"></script>
 	<script type="text/javascript" src="/app/views/layout.js"></script>
 	<script type="text/javascript" src="/app/views/dashboard.js"></script>
-	<script type="text/javascript" src="/app/views/eventsin.js"></script>
-	<script type="text/javascript" src="/app/views/eventsout.js"></script>
+	<script type="text/javascript" src="/app/views/inbound.js"></script>
+	<script type="text/javascript" src="/app/views/outbound.js"></script>
 	<script type="text/javascript" src="/app/controllers/layout.js"></script>
 	<script type="text/javascript" src="/app/controllers/dashboard.js"></script>
-	<script type="text/javascript" src="/app/controllers/eventsin.js"></script>
-	<script type="text/javascript" src="/app/controllers/eventsout.js"></script>
+	<script type="text/javascript" src="/app/controllers/inbound.js"></script>
+	<script type="text/javascript" src="/app/controllers/outbound.js"></script>
 
 </head>
 <body>
@@ -93,8 +93,8 @@
 			var templates = [
 				'topbar','leftnav','footer',
 				'dashboard_nav','dashboard_overview','dashboard_roles','dashboard_servers','dashboard_performance',
-				'eventsin_nav','eventsin_overview', 'eventsin_livestats', 'eventsin_performance',
-				'eventsout_nav','eventsout_overview', 'eventsout_livestats', 'eventsout_performance'
+				'inbound_nav','inbound_overview', 'inbound_livestats', 'inbound_performance',
+				'outbound_nav','outbound_overview', 'outbound_livestats', 'outbound_performance'
 			];
 
 			templateLoader.load(templates, function() {
@@ -102,5 +102,6 @@
 			});
 		});
 	</script>
+	<a href="#" id="toTop" style="display: inline;"><span id="toTopHover" style="opacity: 1;"></span>To Top</a>
 </body>
 </html>

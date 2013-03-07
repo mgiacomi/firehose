@@ -1,0 +1,90 @@
+<script>
+	_.defer(function (caller) {
+		initGeneral();
+	}, this);
+</script>
+
+<div class="title"><h5>Inbound - Live Stats</h5></div>
+
+blah blah blah
+
+<div class="widget" style="margin-top:10px;">
+	<div class="head closed normal" id="toggleOpened">
+		<h5>
+			<a style="margin-left:0; padding-top:0;" href="#" title="" class="userLink">worker0</a>
+		</h5>
+		<div class="num"><span>[ 1m ago ]</span></div>
+	</div>
+	<div class="body" style="display: none; padding:0;">
+		<table cellpadding="0" cellspacing="0" width="100%" class="tableStatic">
+			<thead>
+			<tr class="noborder">
+				<td width="50%"><strong>Statistic:</strong></td>
+				<td align="right"><strong>1m</strong></td>
+				<td align="right"><strong>5m</strong></td>
+				<td align="right"><strong>30m</strong></td>
+				<td align="right"><strong>1h</strong></td>
+				<td align="right"><strong>24h</strong></td>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td>Events Recv (per second):</td>
+				<td align="right">100</td>
+				<td align="right">30</td>
+				<td align="right">10</td>
+				<td align="right">15</td>
+				<td align="right">25</td>
+			</tr>
+			<tr>
+				<td>Avg Event Size:</td>
+				<td align="right">100b</td>
+				<td align="right">30b</td>
+				<td align="right">10kb</td>
+				<td align="right">15kb</td>
+				<td align="right">25kb</td>
+			</tr>
+			<tr>
+				<td>Avg Process Time:</td>
+				<td align="right">10ms</td>
+				<td align="right">100ms</td>
+				<td align="right">1ms</td>
+				<td align="right">2ms</td>
+				<td align="right">5ms</td>
+			</tr>
+			<tr>
+				<td># Oversized Prewritten Events:</td>
+				<td align="right">0</td>
+				<td align="right">1</td>
+				<td align="right">1</td>
+				<td align="right">2</td>
+				<td align="right">5</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="widget" style="margin-top:10px;">
+	<div class="head closed normal">
+		<h5>
+			<a style="margin-left:0; padding-top:0;" href="#" title="" class="userLink">worker2</a>
+		</h5>
+		<div class="num"><span>[ 1s ago ]</span></div>
+	</div>
+	<div class="body" style="display: none;">This widget is opened by default. Works in case of adding id="opened" to
+		the widget head
+	</div>
+</div>
+
+<div class="widget" style="margin-top:10px;">
+	<div class="head closed normal">
+		<h5>
+			<a style="margin-left:0; padding-top:0;" href="#" title="" class="userLink">worker4</a>
+		</h5>
+		<div class="num"><span>[ 3s ago ]</span></div>
+	</div>
+	<div class="body" style="display: none;">This widget is opened by default. Works in case of adding id="opened" to
+		the widget head
+	</div>
+</div>
