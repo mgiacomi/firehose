@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class VoldemortStorage implements InternalStorage
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.storage.VoldemortStorage");
+	private static final Logger logger = LoggerFactory.getLogger(VoldemortStorage.class);
 
 	private StoreClient<Map<String, String>, String> bucketClient;
 	private StoreClient<Map<String, String>, byte[]> payloadClient;

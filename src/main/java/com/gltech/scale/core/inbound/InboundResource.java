@@ -17,7 +17,7 @@ import java.io.OutputStream;
 @Path("/events")
 public class InboundResource
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.event.EventResource");
+	private static final Logger logger = LoggerFactory.getLogger(InboundResource.class);
 	private BucketMetaDataCache bucketMetaDataCache;
 	private InboundService inboundService;
 	private static Props props = Props.getProps();

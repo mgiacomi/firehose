@@ -23,7 +23,7 @@ import java.util.List;
 
 public class BatchCollectorImpl implements BatchCollector
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.TimeBucketCollectorSingleAndDouble");
+	private static final Logger logger = LoggerFactory.getLogger(BatchCollectorImpl.class);
 	private DateTime nearestPeriodCeiling;
 	private ChannelMetaData channelMetaData;
 	private AggregatorRestClient aggregatorRestClient;

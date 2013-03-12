@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class StatisticsFilter implements Filter
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.monitor.StatisticsFilter");
+	private static final Logger logger = LoggerFactory.getLogger(StatisticsFilter.class);
 
 	private static final List<String> paths = new ArrayList<>();
 	private static final Map<String, String> names = new HashMap<>();

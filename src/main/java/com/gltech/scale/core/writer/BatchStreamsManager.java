@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class BatchStreamsManager
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.TimeBucketStreamsManager");
+	private static final Logger logger = LoggerFactory.getLogger(BatchStreamsManager.class);
 	private List<MessageStream> timeBucketStreams = new ArrayList<>();
 	private int totalStreams = 0;
 	private Set<String> processedEvents = new HashSet<>();

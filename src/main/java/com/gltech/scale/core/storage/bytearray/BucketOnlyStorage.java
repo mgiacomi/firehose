@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 public class BucketOnlyStorage implements InternalStorage
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.storage.BucketOnlyStorage");
+	private static final Logger logger = LoggerFactory.getLogger(BucketOnlyStorage.class);
 	InternalStorage memoryStorage = new MemoryStorage();
 	private static final long MegaBytes = 1024L * 1024L;
 

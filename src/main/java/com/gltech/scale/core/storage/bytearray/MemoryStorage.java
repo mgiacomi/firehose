@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MemoryStorage implements InternalStorage
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.storage.MemoryStorage");
+	private static final Logger logger = LoggerFactory.getLogger(MemoryStorage.class);
 
 	private ConcurrentHashMap<String, ChannelMetaData> bucketMap = new ConcurrentHashMap<>();
 

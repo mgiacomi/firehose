@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class WeightManager implements Runnable, LifeCycle
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.WeightManager");
+	private static final Logger logger = LoggerFactory.getLogger(WeightManager.class);
 	private final Aggregator aggregator;
 	private final ChannelCoordinator channelCoordinator;
 	private volatile boolean shutdown = false;

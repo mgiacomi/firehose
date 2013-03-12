@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class EmbeddedServer
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.server.EmbeddedServer");
+	private static final Logger logger = LoggerFactory.getLogger(EmbeddedServer.class);
 	private static Server server;
 	private static Props props = Props.getProps();
 	private static Injector injector;

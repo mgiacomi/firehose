@@ -17,7 +17,7 @@ import java.util.UUID;
 public class StoragePayloadPerformance
 {
 	private static final ObjectMapper mapper = new ObjectMapper();
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.storage.StoragePayloadPerformance");
+	private static final Logger logger = LoggerFactory.getLogger(StoragePayloadPerformance.class);
 	private static final JsonFactory jsonFactory = new JsonFactory();
 	//todo - gfm - 10/4/12 - write some performance tests for reading & writing StoragePayloads
 

@@ -17,7 +17,7 @@ import java.util.List;
 
 public class AggregatorRestClient
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.RopeManagerRestClient");
+	private static final Logger logger = LoggerFactory.getLogger(AggregatorRestClient.class);
 	private final Client client = ClientCreator.createCached();
 
 	public void postEvent(ServiceMetaData ropeManager, Message event)

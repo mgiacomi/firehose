@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class ChannelMetaData
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.storage.BucketMetaData");
+	private static final Logger logger = LoggerFactory.getLogger(ChannelMetaData.class);
 	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public enum BucketType

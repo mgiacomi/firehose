@@ -28,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChannelCoordinatorImpl implements ChannelCoordinator
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.coordination.RopeCoordinatorImpl");
+	private static final Logger logger = LoggerFactory.getLogger(ChannelCoordinatorImpl.class);
 	private CuratorFramework client = ZkClientCreator.createCached();
 	private RegistrationService registrationService;
 	private TimePeriodUtils timePeriodUtils;

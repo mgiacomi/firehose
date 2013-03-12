@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class InboundServiceImpl implements InboundService
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.event.EventServiceImpl");
+	private static final Logger logger = LoggerFactory.getLogger(InboundServiceImpl.class);
 	private ConcurrentMap<DateTime, AggregatorsByPeriod> ropeManagerPeriodMatrices = new ConcurrentHashMap<>();
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;

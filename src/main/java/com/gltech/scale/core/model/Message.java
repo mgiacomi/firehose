@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class Message implements Comparable<Message>
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.event.EventPayload");
+	private static final Logger logger = LoggerFactory.getLogger(Message.class);
 	private static final ObjectMapper mapper = new ObjectMapper();
 	private final String customer;
 	private final String bucket;

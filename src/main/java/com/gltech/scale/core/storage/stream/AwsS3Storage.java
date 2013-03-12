@@ -27,7 +27,7 @@ import java.util.concurrent.*;
 
 public class AwsS3Storage implements Storage
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.storage.stream.AwsS3Storage");
+	private static final Logger logger = LoggerFactory.getLogger(AwsS3Storage.class);
 	private Props props = Props.getProps();
 	private AmazonS3 s3Client;
 	private String s3BucketName;

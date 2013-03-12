@@ -17,7 +17,7 @@ import java.util.*;
 
 public class ZookeeperClusterService implements ClusterService
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.coordination.ZookeeperCoordinationService");
+	private static final Logger logger = LoggerFactory.getLogger(ZookeeperClusterService.class);
 	private CuratorFramework client = ZkClientCreator.createCached();
 	private RegistrationService registrationService;
 

@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class ChannelImpl implements Channel
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.RopeImpl");
+	private static final Logger logger = LoggerFactory.getLogger(ChannelImpl.class);
 	private final ConcurrentMap<DateTime, Batch> timeBuckets = new ConcurrentHashMap<>();
 	private final ConcurrentMap<DateTime, Batch> backupTimeBuckets = new ConcurrentHashMap<>();
 	private final ChannelMetaData channelMetaData;

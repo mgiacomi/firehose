@@ -7,7 +7,7 @@ import voldemort.server.VoldemortServer;
 
 public class VoldemortClientTest
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.voldemort.VoldemortTestUtil");
+	private static final Logger logger = LoggerFactory.getLogger(VoldemortClientTest.class);
 	private static VoldemortServer server;
 
 	public static synchronized void start()

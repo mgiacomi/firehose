@@ -17,7 +17,7 @@ import java.util.concurrent.*;
 
 public class StorageWriteManagerWithCoordination implements StorageWriteManager
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.CollectorManagerWithCoordination");
+	private static final Logger logger = LoggerFactory.getLogger(StorageWriteManagerWithCoordination.class);
 	private volatile boolean shutdown = false;
 	private volatile boolean confirmShutdown = false;
 	private Props props = Props.getProps();

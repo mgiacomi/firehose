@@ -13,7 +13,7 @@ import java.io.InputStream;
 
 public class MessageInputStream implements MessageStream
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.EventInputStream");
+	private static final Logger logger = LoggerFactory.getLogger(MessageInputStream.class);
 	private final JsonParser jp;
 	private Message currentMessage;
 	private boolean reachedEndArray = false;

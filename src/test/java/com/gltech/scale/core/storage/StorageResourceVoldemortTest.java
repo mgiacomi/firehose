@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 public class StorageResourceVoldemortTest extends StorageResourceBaseTest
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.storage.StorageResourceVoldemortTest");
+	private static final Logger logger = LoggerFactory.getLogger(StorageResourceVoldemortTest.class);
 	static private Props props;
 	static private TestingServer testingServer;
 

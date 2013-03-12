@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class AggregatorImpl implements Aggregator
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.RopeManagerSingleAndDoubleWrite");
+	private static final Logger logger = LoggerFactory.getLogger(Aggregator.class);
 	private ConcurrentMap<ChannelMetaData, Channel> ropes = new ConcurrentHashMap<>();
 	private BucketMetaDataCache bucketMetaDataCache;
 	private ClusterService clusterService;

@@ -20,7 +20,7 @@ import java.util.List;
 
 public class RegistrationServiceImpl implements RegistrationService
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.coordination.registration.RegistrationServiceImpl");
+	private static final Logger logger = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 	private ServiceAdvertiser eventServiceAdvertiser;
 	private ServiceAdvertiser collectorManagerAdvertiser;
 	private ServiceAdvertiser ropeManagerAdvertiser;

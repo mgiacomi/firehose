@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 public class TermVoldemortStorage implements InternalStorage
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.storage.VoldemortStorage");
+	private static final Logger logger = LoggerFactory.getLogger(TermVoldemortStorage.class);
 	private final VoldemortStorage shortTermPayloadStorage;
 	private final VoldemortStorage mediumTermPayloadStorage;
 	private final VoldemortStorage largeTermPayloadStorage;

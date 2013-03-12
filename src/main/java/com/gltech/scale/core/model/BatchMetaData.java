@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class BatchMetaData implements Comparable<BatchMetaData>
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.TimeBucketMetaData");
+	private static final Logger logger = LoggerFactory.getLogger(BatchMetaData.class);
 	private static final ObjectMapper mapper = new ObjectMapper();
 
 	private DateTime nearestPeriodCeiling;

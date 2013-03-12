@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Batch
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.TimeBucket");
+	private static final Logger logger = LoggerFactory.getLogger(Batch.class);
 	private DateTime nearestPeriodCeiling;
 	private DateTime firstEventTime;
 	private DateTime lastEventTime = DateTime.now();

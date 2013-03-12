@@ -33,7 +33,7 @@ import javax.ws.rs.core.MediaType;
  */
 public class LoadClient
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.load.LoadClient");
+	private static final Logger logger = LoggerFactory.getLogger(LoadClient.class);
 
 	private static Pipeline<TimedWork> pipeline;
 	private static int bytes;

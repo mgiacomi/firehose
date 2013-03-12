@@ -21,7 +21,7 @@ public class ServiceAdvertiser
 	public static final String ROPE_SERVICE = "RopeService";
 	public static final String STORAGE_SERVICE = "StorageService";
 
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.coordination.registration.CollectorManagerAdvertiser");
+	private static final Logger logger = LoggerFactory.getLogger(ServiceAdvertiser.class);
 	private final String serviceName;
 	private final CuratorFramework client = ZkClientCreator.createCached();
 

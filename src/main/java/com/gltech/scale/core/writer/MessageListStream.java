@@ -8,7 +8,7 @@ import java.util.List;
 
 public class MessageListStream implements MessageStream
 {
-	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.EventListStream");
+	private static final Logger logger = LoggerFactory.getLogger(MessageListStream.class);
 	private List<Message> events;
 	private int position = 0;
 	private String customerBucketPeriod;
