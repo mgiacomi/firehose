@@ -1,8 +1,8 @@
 package com.gltech.scale.core.storage;
 
 import com.google.inject.Inject;
-import com.gltech.scale.core.coordination.CoordinationService;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.ClusterService;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.util.Http404Exception;
 
 import javax.ws.rs.core.MediaType;
@@ -13,13 +13,13 @@ public class BucketMetaDataCache
 {
 	static private ConcurrentMap<String, BucketMetaData> bucketMetaDataCache = new ConcurrentHashMap<>();
 	private StorageServiceClient storageServiceClient;
-	private CoordinationService coordinationService;
+	private ClusterService clusterService;
 
 	@Inject
-	public BucketMetaDataCache(CoordinationService coordinationService, StorageServiceClient storageServiceClient)
+	public BucketMetaDataCache(ClusterService clusterService, StorageServiceClient storageServiceClient)
 	{
 		this.storageServiceClient = storageServiceClient;
-		this.coordinationService = coordinationService;
+		this.clusterService = clusterService;
 	}
 
 	public BucketMetaData getBucketMetaData(String customer, String bucket, boolean createIfNotExist)
@@ -30,7 +30,7 @@ public class BucketMetaDataCache
 
 		if (bucketMetaData == null)
 		{
-			ServiceMetaData storageService = coordinationService.getRegistrationService().getStorageServiceRoundRobin();
+			ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
 			BucketMetaData newBucketMetaData = null;
 
 			try

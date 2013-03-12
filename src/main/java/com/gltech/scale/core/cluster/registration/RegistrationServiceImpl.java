@@ -1,7 +1,7 @@
-package com.gltech.scale.core.coordination.registration;
+package com.gltech.scale.core.cluster.registration;
 
+import com.gltech.scale.core.cluster.ClusterException;
 import com.google.common.base.Throwables;
-import com.gltech.scale.core.coordination.CoordinationException;
 import com.gltech.scale.core.util.Props;
 import com.netflix.curator.framework.CuratorFramework;
 import com.netflix.curator.framework.state.ConnectionState;
@@ -81,7 +81,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 		catch (Exception e)
 		{
-			throw new CoordinationException("Failed to register EventService host=" + host + " port=" + port, e);
+			throw new ClusterException("Failed to register EventService host=" + host + " port=" + port, e);
 		}
 	}
 
@@ -108,7 +108,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 		catch (Exception e)
 		{
-			throw new CoordinationException("Failed to register CollectorManager host=" + host + " port=" + port, e);
+			throw new ClusterException("Failed to register CollectorManager host=" + host + " port=" + port, e);
 		}
 	}
 
@@ -130,7 +130,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 		catch (Exception e)
 		{
-			throw new CoordinationException("Failed to register RopeManager host=" + host + " port=" + port, e);
+			throw new ClusterException("Failed to register RopeManager host=" + host + " port=" + port, e);
 		}
 	}
 
@@ -170,7 +170,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 		catch (Exception e)
 		{
-			throw new CoordinationException("Failed to register StorageService host=" + host + " port=" + port, e);
+			throw new ClusterException("Failed to register StorageService host=" + host + " port=" + port, e);
 		}
 	}
 

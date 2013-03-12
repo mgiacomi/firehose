@@ -1,6 +1,6 @@
 package com.gltech.scale.core.storage;
 
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 
 import java.io.InputStream;
 

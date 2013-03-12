@@ -1,10 +1,10 @@
 package com.gltech.scale.core.writer;
 
 import com.gc.iotools.stream.is.InputStreamFromOutputStream;
+import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.google.inject.Inject;
-import com.gltech.scale.core.coordination.CoordinationService;
-import com.gltech.scale.core.coordination.RopeCoordinator;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.ClusterService;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.monitor.Timer;
 import com.gltech.scale.core.rope.PrimaryBackupSet;
 import com.gltech.scale.core.rope.RopeManagerRestClient;
@@ -28,17 +28,17 @@ public class BatchCollectorImpl implements BatchCollector
 	private BucketMetaData bucketMetaData;
 	private RopeManagerRestClient ropeManagerRestClient;
 	private StorageServiceClient storageServiceClient;
-	private CoordinationService coordinationService;
-	private RopeCoordinator ropeCoordinator;
+	private ClusterService clusterService;
+	private ChannelCoordinator channelCoordinator;
 	private Timer timer;
 
 	@Inject
-	public BatchCollectorImpl(RopeManagerRestClient ropeManagerRestClient, StorageServiceClient storageServiceClient, CoordinationService coordinationService, RopeCoordinator ropeCoordinator)
+	public BatchCollectorImpl(RopeManagerRestClient ropeManagerRestClient, StorageServiceClient storageServiceClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
 	{
 		this.ropeManagerRestClient = ropeManagerRestClient;
 		this.storageServiceClient = storageServiceClient;
-		this.coordinationService = coordinationService;
-		this.ropeCoordinator = ropeCoordinator;
+		this.clusterService = clusterService;
+		this.channelCoordinator = channelCoordinator;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class BatchCollectorImpl implements BatchCollector
 
 			List<ServiceMetaData> ropeManagers = new ArrayList<>();
 
-			RopeManagersByPeriod ropeManagersByPeriod = ropeCoordinator.getRopeManagerPeriodMatrix(nearestPeriodCeiling);
+			RopeManagersByPeriod ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(nearestPeriodCeiling);
 
 			for (PrimaryBackupSet primaryBackupSet : ropeManagersByPeriod.getPrimaryBackupSets())
 			{
@@ -115,12 +115,12 @@ public class BatchCollectorImpl implements BatchCollector
 			};
 
 			// Write the stream to the storage service.
-			ServiceMetaData storageService = coordinationService.getRegistrationService().getStorageServiceRoundRobin();
+			ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
 			storageServiceClient.put(storageService, customer, bucket, nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), inputStream);
 			inputStream.close();
 
 			// Remove time bucket references from the coordination service.
-			coordinationService.clearTimeBucketMetaData(bucketMetaData, nearestPeriodCeiling);
+			clusterService.clearTimeBucketMetaData(bucketMetaData, nearestPeriodCeiling);
 
 			// Data has been written so remove it from all active rope managers.
 			for (ServiceMetaData ropeManager : ropeManagers)
@@ -141,7 +141,7 @@ public class BatchCollectorImpl implements BatchCollector
 		catch (Exception e)
 		{
 			logger.error("Failed to collect TimeBucket. " + nearestPeriodCeiling + ", " + bucketMetaData.toString(), e);
-			coordinationService.clearCollectorLock(bucketMetaData, nearestPeriodCeiling);
+			clusterService.clearCollectorLock(bucketMetaData, nearestPeriodCeiling);
 		}
 
 		return null;

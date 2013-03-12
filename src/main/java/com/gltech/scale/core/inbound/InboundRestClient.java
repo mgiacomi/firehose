@@ -1,6 +1,6 @@
 package com.gltech.scale.core.inbound;
 
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.util.ClientCreator;
 import com.gltech.scale.core.util.Http404Exception;

@@ -1,7 +1,7 @@
 package com.gltech.scale.core.inbound;
 
-import com.gltech.scale.core.coordination.TimePeriodUtils;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.TimePeriodUtils;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.StorageServiceRestClient;

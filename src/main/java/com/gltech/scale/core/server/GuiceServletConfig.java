@@ -1,5 +1,6 @@
 package com.gltech.scale.core.server;
 
+import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.inbound.InboundServiceImpl;
 import com.gltech.scale.monitor.MonitorResource;
 import com.google.inject.Guice;
@@ -10,12 +11,10 @@ import com.google.inject.name.Names;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.util.Modules;
 import com.gltech.scale.core.writer.*;
-import com.gltech.scale.core.coordination.CoordinationService;
-import com.gltech.scale.core.coordination.RopeCoordinator;
-import com.gltech.scale.core.coordination.RopeCoordinatorImpl;
-import com.gltech.scale.core.coordination.ZookeeperCoordinationService;
-import com.gltech.scale.core.coordination.registration.RegistrationService;
-import com.gltech.scale.core.coordination.registration.RegistrationServiceImpl;
+import com.gltech.scale.core.cluster.ChannelCoordinator;
+import com.gltech.scale.core.cluster.ChannelCoordinatorImpl;
+import com.gltech.scale.core.cluster.registration.RegistrationService;
+import com.gltech.scale.core.cluster.registration.RegistrationServiceImpl;
 import com.gltech.scale.core.inbound.InboundResource;
 import com.gltech.scale.core.inbound.InboundService;
 import com.gltech.scale.core.rope.*;
@@ -53,9 +52,9 @@ public class GuiceServletConfig extends GuiceServletContextListener
 				protected void configureServlets()
 				{
 					// Global injector settings
-					bind(CoordinationService.class).to(ZookeeperCoordinationService.class).in(Singleton.class);
+					bind(ClusterService.class).to(ZookeeperClusterService.class).in(Singleton.class);
 					bind(RegistrationService.class).to(RegistrationServiceImpl.class).in(Singleton.class);
-					bind(RopeCoordinator.class).to(RopeCoordinatorImpl.class).in(Singleton.class);
+					bind(ChannelCoordinator.class).to(ChannelCoordinatorImpl.class).in(Singleton.class);
 
 					// Service specific injector settings
 					if (props.get("enable.monitoring_service", true))

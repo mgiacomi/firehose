@@ -2,7 +2,7 @@ package com.gltech.scale.core.rope;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import org.joda.time.DateTime;
 import org.junit.Test;
 

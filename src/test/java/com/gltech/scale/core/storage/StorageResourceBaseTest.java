@@ -1,6 +1,6 @@
 package com.gltech.scale.core.storage;
 
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;
 import com.gltech.scale.core.util.ClientCreator;

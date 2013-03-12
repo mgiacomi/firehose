@@ -1,7 +1,7 @@
-package com.gltech.scale.core.coordination;
+package com.gltech.scale.core.cluster;
 
-import com.gltech.scale.core.coordination.registration.RegistrationService;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.RegistrationService;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.rope.PrimaryBackupSet;
 import com.gltech.scale.core.rope.RopeManagersByPeriod;
 import com.gltech.scale.core.util.Props;
@@ -70,7 +70,7 @@ public class RopeCoordinatorRegression
 		when(registrationService.getRopeManagerMetaDataById(rm8.getWorkerId().toString())).thenReturn(rm8);
 		when(registrationService.getRopeManagerMetaDataById(rm9.getWorkerId().toString())).thenReturn(rm9);
 
-		RopeCoordinator ropeCoordinator = new RopeCoordinatorImpl(registrationService, new TimePeriodUtils());
+		ChannelCoordinator channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
 
 		FakeRopeManager frm0 = new FakeRopeManager(rm0);
 		FakeRopeManager frm1 = new FakeRopeManager(rm1);
@@ -108,7 +108,7 @@ public class RopeCoordinatorRegression
 
 		while (true)
 		{
-			RopeManagersByPeriod ropeManagersByPeriod = ropeCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
+			RopeManagersByPeriod ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
 			if (ropeManagersByPeriod != null)
 			{
 				for (PrimaryBackupSet primaryBackupSet : ropeManagersByPeriod.getPrimaryBackupSets())
@@ -133,13 +133,13 @@ public class RopeCoordinatorRegression
 	class FakeRopeManager implements Runnable
 	{
 		private DateTime nearestPeriodCeiling;
-		private RopeCoordinator ropeCoordinator;
+		private ChannelCoordinator channelCoordinator;
 		private boolean primary;
 
 		FakeRopeManager(ServiceMetaData serviceMetaData)
 		{
 			RegistrationService registrationService = mock(RegistrationService.class);
-			ropeCoordinator = new RopeCoordinatorImpl(registrationService, new TimePeriodUtils());
+			channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
 			when(registrationService.getLocalRopeManagerMetaData()).thenReturn(serviceMetaData);
 		}
 
@@ -154,7 +154,7 @@ public class RopeCoordinatorRegression
 		{
 			try
 			{
-				ropeCoordinator.registerWeight(false, 0, 0, 0);
+				channelCoordinator.registerWeight(false, 0, 0, 0);
 
 				int tick = 1;
 				while (true)
@@ -163,28 +163,28 @@ public class RopeCoordinatorRegression
 					{
 						if (DateTime.now().isAfter(nearestPeriodCeiling.plusSeconds(3)))
 						{
-							ropeCoordinator.registerWeight(false, 0, 0, 999 - (tick++));
+							channelCoordinator.registerWeight(false, 0, 0, 999 - (tick++));
 						}
 						else if (DateTime.now().isAfter(nearestPeriodCeiling))
 						{
 							if (primary)
 							{
-								ropeCoordinator.registerWeight(false, 3, 2, 999);
+								channelCoordinator.registerWeight(false, 3, 2, 999);
 							}
 							else
 							{
-								ropeCoordinator.registerWeight(true, 1, 3, 999);
+								channelCoordinator.registerWeight(true, 1, 3, 999);
 							}
 						}
 						else
 						{
 							if (primary)
 							{
-								ropeCoordinator.registerWeight(false, 3, 2, 999);
+								channelCoordinator.registerWeight(false, 3, 2, 999);
 							}
 							else
 							{
-								ropeCoordinator.registerWeight(true, 1, 3, 999);
+								channelCoordinator.registerWeight(true, 1, 3, 999);
 							}
 						}
 					}

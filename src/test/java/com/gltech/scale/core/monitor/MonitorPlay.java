@@ -2,7 +2,7 @@ package com.gltech.scale.core.monitor;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.*;
 import com.gltech.scale.core.storage.bytearray.MemoryStorage;

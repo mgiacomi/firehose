@@ -1,7 +1,7 @@
 package com.gltech.scale.core.rope;
 
-import com.gltech.scale.core.coordination.CoordinationService;
-import com.gltech.scale.core.coordination.TimePeriodUtils;
+import com.gltech.scale.core.cluster.ClusterService;
+import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
@@ -21,13 +21,13 @@ public class RopeImpl implements Rope
 	private final ConcurrentMap<DateTime, TimeBucket> timeBuckets = new ConcurrentHashMap<>();
 	private final ConcurrentMap<DateTime, TimeBucket> backupTimeBuckets = new ConcurrentHashMap<>();
 	private final BucketMetaData bucketMetaData;
-	private final CoordinationService coordinationService;
+	private final ClusterService clusterService;
 	private final TimePeriodUtils timePeriodUtils;
 
-	public RopeImpl(BucketMetaData bucketMetaData, CoordinationService coordinationService, TimePeriodUtils timePeriodUtils)
+	public RopeImpl(BucketMetaData bucketMetaData, ClusterService clusterService, TimePeriodUtils timePeriodUtils)
 	{
 		this.bucketMetaData = bucketMetaData;
-		this.coordinationService = coordinationService;
+		this.clusterService = clusterService;
 		this.timePeriodUtils = timePeriodUtils;
 	}
 
@@ -39,7 +39,7 @@ public class RopeImpl implements Rope
 		if (timeBucket == null)
 		{
 			// Register TimeBucket for collection
-			coordinationService.addTimeBucket(bucketMetaData, nearestPeriodCeiling);
+			clusterService.addTimeBucket(bucketMetaData, nearestPeriodCeiling);
 
 			TimeBucket newTimeBucket = new TimeBucket(bucketMetaData, nearestPeriodCeiling);
 			timeBucket = timeBuckets.putIfAbsent(nearestPeriodCeiling, newTimeBucket);
@@ -83,7 +83,7 @@ public class RopeImpl implements Rope
 			logger.info("Creating Backup TimeBucket " + bucketMetaData.getCustomer() + "|" + bucketMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 
 			// A coordinationId will be assigned to passed in timeBucketMetaData.
-			coordinationService.addTimeBucket(bucketMetaData, nearestPeriodCeiling);
+			clusterService.addTimeBucket(bucketMetaData, nearestPeriodCeiling);
 
 			TimeBucket newTimeBucket = new TimeBucket(bucketMetaData, nearestPeriodCeiling);
 			timeBucket = backupTimeBuckets.putIfAbsent(nearestPeriodCeiling, newTimeBucket);

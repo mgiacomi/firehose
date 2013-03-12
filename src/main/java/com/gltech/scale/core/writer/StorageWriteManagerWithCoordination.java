@@ -2,8 +2,8 @@ package com.gltech.scale.core.writer;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.gltech.scale.core.coordination.BucketPeriodMapper;
-import com.gltech.scale.core.coordination.CoordinationService;
+import com.gltech.scale.core.cluster.BatchPeriodMapper;
+import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.monitor.*;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
@@ -21,16 +21,16 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 	private volatile boolean confirmShutdown = false;
 	private Props props = Props.getProps();
 	private Injector injector;
-	private CoordinationService coordinationService;
+	private ClusterService clusterService;
 	private BucketMetaDataCache bucketMetaDataCache;
 	private Timer collectTimeBucketTimer = new Timer();
 	private TimerMap timerMap = new TimerMap();
 	private int periodSeconds;
 
 	@Inject
-	public StorageWriteManagerWithCoordination(CoordinationService coordinationService, BucketMetaDataCache bucketMetaDataCache)
+	public StorageWriteManagerWithCoordination(ClusterService clusterService, BucketMetaDataCache bucketMetaDataCache)
 	{
-		this.coordinationService = coordinationService;
+		this.clusterService = clusterService;
 		this.bucketMetaDataCache = bucketMetaDataCache;
 		this.periodSeconds = props.get("coordination.period_seconds", 5);
 
@@ -40,7 +40,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 		MonitoringPublisher.getInstance().register(new TimerMapPublishMetricGroup(groupName, timerMap));
 
 		// Register the event service with the coordination service
-		coordinationService.getRegistrationService().registerAsCollectorManager();
+		clusterService.getRegistrationService().registerAsCollectorManager();
 	}
 
 	@Override
@@ -59,30 +59,30 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 			{
 				if (threadPoolExecutor.getActiveCount() < activeCollectors)
 				{
-					BucketPeriodMapper bucketPeriodMapper = coordinationService.getOldestCollectibleTimeBucket();
+					BatchPeriodMapper batchPeriodMapper = clusterService.getOldestCollectibleTimeBucket();
 
-					if (bucketPeriodMapper != null)
+					if (batchPeriodMapper != null)
 					{
 						try
 						{
-							BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(bucketPeriodMapper.getCustomer(), bucketPeriodMapper.getBucket(), true);
+							BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(batchPeriodMapper.getCustomer(), batchPeriodMapper.getBucket(), true);
 
 							BatchCollector batchCollector = injector.getInstance(BatchCollector.class);
-							batchCollector.assign(bucketMetaData, bucketPeriodMapper.getNearestPeriodCeiling());
+							batchCollector.assign(bucketMetaData, batchPeriodMapper.getNearestPeriodCeiling());
 
 							// Get a Timer from the timermap based on the bucket being collected.
-							String timerName = bucketPeriodMapper.getCustomer() + "/" + bucketPeriodMapper.getBucket() + "/" + Integer.toString(periodSeconds);
+							String timerName = batchPeriodMapper.getCustomer() + "/" + batchPeriodMapper.getBucket() + "/" + Integer.toString(periodSeconds);
 							batchCollector.setTimer(timerMap.get(timerName));
 
 							threadPoolExecutor.submit(batchCollector);
 						}
 						catch (Exception e)
 						{
-							logger.error("Collection error: {}|{}|{}", bucketPeriodMapper.getCustomer(), bucketPeriodMapper.getBucket(), bucketPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), e);
+							logger.error("Collection error: {}|{}|{}", batchPeriodMapper.getCustomer(), batchPeriodMapper.getBucket(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), e);
 							continue;
 						}
 
-						logger.debug("TimeBucketMataData submitted for collection: {}|{}|{}", bucketPeriodMapper.getCustomer(), bucketPeriodMapper.getBucket(), bucketPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+						logger.debug("TimeBucketMataData submitted for collection: {}|{}|{}", batchPeriodMapper.getCustomer(), batchPeriodMapper.getBucket(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 
 						continue;
 					}
@@ -122,7 +122,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 	{
 		shutdown = true;
 
-		coordinationService.getRegistrationService().unRegisterAsCollectorManager();
+		clusterService.getRegistrationService().unRegisterAsCollectorManager();
 
 		if (props.get("collector.manager.clean_shutdown", false))
 		{

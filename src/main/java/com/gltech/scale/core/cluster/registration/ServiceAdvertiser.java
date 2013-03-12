@@ -1,4 +1,4 @@
-package com.gltech.scale.core.coordination.registration;
+package com.gltech.scale.core.cluster.registration;
 
 import com.google.common.base.Throwables;
 import com.gltech.scale.core.util.ZkClientCreator;

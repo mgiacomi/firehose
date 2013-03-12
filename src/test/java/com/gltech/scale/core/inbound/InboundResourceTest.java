@@ -1,9 +1,9 @@
 package com.gltech.scale.core.inbound;
 
-import com.gltech.scale.core.coordination.*;
+import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.rope.RopeManagersByPeriod;
-import com.gltech.scale.core.coordination.registration.RegistrationService;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.RegistrationService;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.rope.RopeManagerRestClient;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
@@ -25,12 +25,12 @@ public class InboundResourceTest
 	StorageServiceRestClient storageServiceRestClient;
 	RopeManagerRestClient ropeManagerRestClient;
 	BucketMetaDataCache bucketMetaDataCache;
-	RopeCoordinator ropeCoordinator;
+	ChannelCoordinator channelCoordinator;
 
 	@Before
 	public void setUp()
 	{
-		CoordinationService coordinationService = new CoordinationService()
+		ClusterService clusterService = new ClusterService()
 		{
 			public DateTime nearestPeriodCeiling(DateTime dateTime)
 			{
@@ -47,7 +47,7 @@ public class InboundResourceTest
 				return mock(RegistrationService.class);
 			}
 
-			public BucketPeriodMapper getOldestCollectibleTimeBucket()
+			public BatchPeriodMapper getOldestCollectibleTimeBucket()
 			{
 				return null;
 			}
@@ -72,8 +72,8 @@ public class InboundResourceTest
 		storageServiceRestClient = mock(StorageServiceRestClient.class);
 		ropeManagerRestClient = mock(RopeManagerRestClient.class);
 		bucketMetaDataCache = mock(BucketMetaDataCache.class);
-		ropeCoordinator = mock(RopeCoordinator.class);
-		inboundService = new InboundServiceImpl(coordinationService, ropeCoordinator, storageServiceRestClient, ropeManagerRestClient, bucketMetaDataCache, new TimePeriodUtils());
+		channelCoordinator = mock(ChannelCoordinator.class);
+		inboundService = new InboundServiceImpl(clusterService, channelCoordinator, storageServiceRestClient, ropeManagerRestClient, bucketMetaDataCache, new TimePeriodUtils());
 	}
 
 	@Test

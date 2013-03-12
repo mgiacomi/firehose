@@ -2,7 +2,7 @@ package com.gltech.scale.core.rope;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import org.joda.time.DateTime;
 
 import java.util.*;

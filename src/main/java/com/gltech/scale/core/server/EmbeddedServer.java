@@ -1,11 +1,11 @@
 package com.gltech.scale.core.server;
 
+import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
 import com.gltech.scale.core.writer.StorageWriteManager;
-import com.gltech.scale.core.coordination.CoordinationService;
-import com.gltech.scale.core.coordination.RopeCoordinator;
+import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.inbound.InboundService;
 import com.gltech.scale.core.lifecycle.LifeCycle;
 import com.gltech.scale.core.lifecycle.LifeCycleManager;
@@ -105,8 +105,8 @@ public class EmbeddedServer
 	private static void startServices()
 	{
 		// Registered CoordinationService for shutdown
-		final CoordinationService coordinationService = injector.getInstance(CoordinationService.class);
-		LifeCycleManager.getInstance().add(coordinationService, LifeCycle.Priority.FINAL);
+		final ClusterService clusterService = injector.getInstance(ClusterService.class);
+		LifeCycleManager.getInstance().add(clusterService, LifeCycle.Priority.FINAL);
 
 		if (props.get("enable.event_service", true))
 		{
@@ -136,21 +136,21 @@ public class EmbeddedServer
 			LifeCycleManager.getInstance().add(storageWriteManager, LifeCycle.Priority.INITIAL);
 
 			// Start the RopeCoordinator and register it for shutdown
-			RopeCoordinator ropeCoordinator = injector.getInstance(RopeCoordinator.class);
-			new Thread(ropeCoordinator, "RopeCoordinator").start();
-			LifeCycleManager.getInstance().add(ropeCoordinator, LifeCycle.Priority.INITIAL);
+			ChannelCoordinator channelCoordinator = injector.getInstance(ChannelCoordinator.class);
+			new Thread(channelCoordinator, "RopeCoordinator").start();
+			LifeCycleManager.getInstance().add(channelCoordinator, LifeCycle.Priority.INITIAL);
 		}
 
 		if (props.get("enable.storage_service", true))
 		{
 			// Register the storage service with the coordination service and register for shutdown
-			coordinationService.getRegistrationService().registerAsStorageService();
+			clusterService.getRegistrationService().registerAsStorageService();
 
 			LifeCycleManager.getInstance().add(new LifeCycle()
 			{
 				public void shutdown()
 				{
-					coordinationService.getRegistrationService().unRegisterAsStorageService();
+					clusterService.getRegistrationService().unRegisterAsStorageService();
 				}
 			}, LifeCycle.Priority.INITIAL);
 		}

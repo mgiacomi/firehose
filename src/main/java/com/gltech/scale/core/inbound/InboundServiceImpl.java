@@ -4,14 +4,14 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Message;
 import com.google.inject.Inject;
-import com.gltech.scale.core.coordination.CoordinationService;
-import com.gltech.scale.core.coordination.RopeCoordinator;
-import com.gltech.scale.core.coordination.TimePeriodUtils;
+import com.gltech.scale.core.cluster.ClusterService;
+import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.rope.PrimaryBackupSet;
 import com.gltech.scale.core.rope.RopeManagersByPeriod;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.rope.RopeManagerRestClient;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
@@ -33,8 +33,8 @@ public class InboundServiceImpl implements InboundService
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.event.EventServiceImpl");
 	private ConcurrentMap<DateTime, RopeManagersByPeriod> ropeManagerPeriodMatrices = new ConcurrentHashMap<>();
-	private CoordinationService coordinationService;
-	private RopeCoordinator ropeCoordinator;
+	private ClusterService clusterService;
+	private ChannelCoordinator channelCoordinator;
 	private StorageServiceClient storageServiceClient;
 	private RopeManagerRestClient ropeManagerRestClient;
 	private BucketMetaDataCache bucketMetaDataCache;
@@ -42,17 +42,17 @@ public class InboundServiceImpl implements InboundService
 	private Props props = Props.getProps();
 
 	@Inject
-	public InboundServiceImpl(CoordinationService coordinationService, RopeCoordinator ropeCoordinator, StorageServiceClient storageServiceClient, RopeManagerRestClient ropeManagerRestClient, BucketMetaDataCache bucketMetaDataCache, TimePeriodUtils timePeriodUtils)
+	public InboundServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, StorageServiceClient storageServiceClient, RopeManagerRestClient ropeManagerRestClient, BucketMetaDataCache bucketMetaDataCache, TimePeriodUtils timePeriodUtils)
 	{
-		this.coordinationService = coordinationService;
-		this.ropeCoordinator = ropeCoordinator;
+		this.clusterService = clusterService;
+		this.channelCoordinator = channelCoordinator;
 		this.storageServiceClient = storageServiceClient;
 		this.ropeManagerRestClient = ropeManagerRestClient;
 		this.bucketMetaDataCache = bucketMetaDataCache;
 		this.timePeriodUtils = timePeriodUtils;
 
 		// Register the event service with the coordination service
-		coordinationService.getRegistrationService().registerAsEventService();
+		clusterService.getRegistrationService().registerAsEventService();
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class InboundServiceImpl implements InboundService
 		if (payload.length > maxPayLoadSize)
 		{
 			message = new Message(customer, bucket);
-			ServiceMetaData storageService = coordinationService.getRegistrationService().getStorageServiceRoundRobin();
+			ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
 			storageServiceClient.put(storageService, customer, bucket, message.getUuid(), payload);
 			logger.debug("Pre-storing event payload data to storage service: customer={} bucket={} uuid={} bytes={}", message.getCustomer(), message.getBucket(), message.getUuid(), payload.length);
 		}
@@ -77,7 +77,7 @@ public class InboundServiceImpl implements InboundService
 
 		if (ropeManagersByPeriod == null)
 		{
-			RopeManagersByPeriod newRopeManagersByPeriod = ropeCoordinator.getRopeManagerPeriodMatrix(nearestPeriodCeiling);
+			RopeManagersByPeriod newRopeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(nearestPeriodCeiling);
 			ropeManagersByPeriod = ropeManagerPeriodMatrices.putIfAbsent(nearestPeriodCeiling, newRopeManagersByPeriod);
 			if (ropeManagersByPeriod == null)
 			{
@@ -115,7 +115,7 @@ public class InboundServiceImpl implements InboundService
 	public int writeEventsToOutputStream(BucketMetaData bucketMetaData, DateTime dateTime, OutputStream outputStream, int recordsWritten)
 	{
 		String id = timePeriodUtils.nearestPeriodCeiling(dateTime).toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
-		ServiceMetaData storageService = coordinationService.getRegistrationService().getStorageServiceRoundRobin();
+		ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
 
 		String customer = bucketMetaData.getCustomer();
 		String bucket = bucketMetaData.getBucket();
@@ -178,6 +178,6 @@ public class InboundServiceImpl implements InboundService
 	@Override
 	public void shutdown()
 	{
-		coordinationService.getRegistrationService().unRegisterAsEventService();
+		clusterService.getRegistrationService().unRegisterAsEventService();
 	}
 }

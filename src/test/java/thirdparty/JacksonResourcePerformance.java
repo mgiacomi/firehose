@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.smile.SmileFactory;
-import com.gltech.scale.core.coordination.TimePeriodUtils;
+import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.rope.TimeBucket;
 import com.gltech.scale.core.storage.BucketMetaData;

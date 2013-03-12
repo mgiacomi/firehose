@@ -1,7 +1,7 @@
 package com.gltech.scale.core.rope;
 
+import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.google.inject.Inject;
-import com.gltech.scale.core.coordination.RopeCoordinator;
 import com.gltech.scale.core.lifecycle.LifeCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,14 +10,14 @@ public class WeightManager implements Runnable, LifeCycle
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.WeightManager");
 	private final RopeManager ropeManager;
-	private final RopeCoordinator ropeCoordinator;
+	private final ChannelCoordinator channelCoordinator;
 	private volatile boolean shutdown = false;
 
 	@Inject
-	public WeightManager(RopeManager ropeManager, RopeCoordinator ropeCoordinator)
+	public WeightManager(RopeManager ropeManager, ChannelCoordinator channelCoordinator)
 	{
 		this.ropeManager = ropeManager;
-		this.ropeCoordinator = ropeCoordinator;
+		this.channelCoordinator = channelCoordinator;
 	}
 
 	public void run()
@@ -39,7 +39,7 @@ public class WeightManager implements Runnable, LifeCycle
 						rested--;
 					}
 
-					ropeCoordinator.registerWeight(active, primaries, backups, rested);
+					channelCoordinator.registerWeight(active, primaries, backups, rested);
 					logger.trace("Registering weight with RopeCoordinator. active={}, primaries={}, backups={}, rested={}", active, primaries, backups, rested);
 				}
 				catch (Exception e)

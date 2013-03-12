@@ -1,6 +1,6 @@
 package com.gltech.scale.core.load;
 
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.inbound.InboundRestClient;
 import com.gltech.scale.core.processor.Pipeline;
 import com.gltech.scale.core.processor.PipelineBuilder;

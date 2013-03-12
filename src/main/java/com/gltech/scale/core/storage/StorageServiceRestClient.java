@@ -1,7 +1,7 @@
 package com.gltech.scale.core.storage;
 
 import com.google.common.base.Throwables;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.util.ClientCreator;
 import com.gltech.scale.core.util.Http404Exception;
 import com.gltech.scale.core.util.UrlEncoder;

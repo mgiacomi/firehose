@@ -1,6 +1,6 @@
 package com.gltech.scale.core.writer;
 
-import com.gltech.scale.core.coordination.TimePeriodUtils;
+import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.rope.TimeBucket;
 import com.gltech.scale.core.storage.BucketMetaData;

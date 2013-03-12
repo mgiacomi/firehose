@@ -5,7 +5,7 @@ import com.gltech.scale.core.model.Message;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;

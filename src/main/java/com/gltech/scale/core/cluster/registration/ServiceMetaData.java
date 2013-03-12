@@ -1,4 +1,4 @@
-package com.gltech.scale.core.coordination.registration;
+package com.gltech.scale.core.cluster.registration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

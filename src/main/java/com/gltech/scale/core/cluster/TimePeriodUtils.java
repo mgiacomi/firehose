@@ -1,4 +1,4 @@
-package com.gltech.scale.core.coordination;
+package com.gltech.scale.core.cluster;
 
 import com.gltech.scale.core.util.Props;
 import org.joda.time.DateTime;

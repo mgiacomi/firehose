@@ -2,7 +2,7 @@ package com.gltech.scale.core.storage;
 
 import com.gc.iotools.stream.is.InputStreamFromOutputStream;
 import com.google.inject.Inject;
-import com.gltech.scale.core.coordination.registration.ServiceMetaData;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

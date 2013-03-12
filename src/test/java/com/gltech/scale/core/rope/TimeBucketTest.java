@@ -1,6 +1,6 @@
 package com.gltech.scale.core.rope;
 
-import com.gltech.scale.core.coordination.TimePeriodUtils;
+import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;

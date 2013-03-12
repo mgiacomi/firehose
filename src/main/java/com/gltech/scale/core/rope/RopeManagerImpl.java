@@ -2,8 +2,8 @@ package com.gltech.scale.core.rope;
 
 import com.gltech.scale.core.model.Message;
 import com.google.inject.Inject;
-import com.gltech.scale.core.coordination.CoordinationService;
-import com.gltech.scale.core.coordination.TimePeriodUtils;
+import com.gltech.scale.core.cluster.ClusterService;
+import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
 import org.joda.time.DateTime;
@@ -22,18 +22,18 @@ public class RopeManagerImpl implements RopeManager
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.RopeManagerSingleAndDoubleWrite");
 	private ConcurrentMap<BucketMetaData, Rope> ropes = new ConcurrentHashMap<>();
 	private BucketMetaDataCache bucketMetaDataCache;
-	private CoordinationService coordinationService;
+	private ClusterService clusterService;
 	private TimePeriodUtils timePeriodUtils;
 
 	@Inject
-	public RopeManagerImpl(BucketMetaDataCache bucketMetaDataCache, CoordinationService coordinationService, TimePeriodUtils timePeriodUtils)
+	public RopeManagerImpl(BucketMetaDataCache bucketMetaDataCache, ClusterService clusterService, TimePeriodUtils timePeriodUtils)
 	{
 		this.bucketMetaDataCache = bucketMetaDataCache;
-		this.coordinationService = coordinationService;
+		this.clusterService = clusterService;
 		this.timePeriodUtils = timePeriodUtils;
 
 		// Register the rope manager with the coordination service, so that collectors can find us
-		coordinationService.getRegistrationService().registerAsRopeManager();
+		clusterService.getRegistrationService().registerAsRopeManager();
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public class RopeManagerImpl implements RopeManager
 
 		if (rope == null)
 		{
-			Rope newRope = new RopeStats(new RopeImpl(bucketMetaData, coordinationService, timePeriodUtils));
+			Rope newRope = new RopeStats(new RopeImpl(bucketMetaData, clusterService, timePeriodUtils));
 			rope = ropes.putIfAbsent(bucketMetaData, newRope);
 			if (rope == null)
 			{
@@ -66,7 +66,7 @@ public class RopeManagerImpl implements RopeManager
 		if (rope == null)
 		{
 			logger.info("Creating Rope {customer=" + message.getCustomer() + ", bucket=" + message.getBucket() + "}");
-			Rope newRope = new RopeStats(new RopeImpl(bucketMetaData, coordinationService, timePeriodUtils));
+			Rope newRope = new RopeStats(new RopeImpl(bucketMetaData, clusterService, timePeriodUtils));
 			rope = ropes.putIfAbsent(bucketMetaData, newRope);
 			if (rope == null)
 			{
@@ -194,6 +194,6 @@ public class RopeManagerImpl implements RopeManager
 	@Override
 	public void shutdown()
 	{
-		coordinationService.getRegistrationService().unRegisterAsRopeManager();
+		clusterService.getRegistrationService().unRegisterAsRopeManager();
 	}
 }
