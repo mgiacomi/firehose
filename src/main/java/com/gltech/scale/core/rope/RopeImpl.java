@@ -2,7 +2,7 @@ package com.gltech.scale.core.rope;
 
 import com.gltech.scale.core.coordination.CoordinationService;
 import com.gltech.scale.core.coordination.TimePeriodUtils;
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -31,9 +31,9 @@ public class RopeImpl implements Rope
 		this.timePeriodUtils = timePeriodUtils;
 	}
 
-	public void addEvent(EventPayload eventPayload)
+	public void addEvent(Message message)
 	{
-		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(eventPayload.getReceived_at());
+		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
 		TimeBucket timeBucket = timeBuckets.get(nearestPeriodCeiling);
 
 		if (timeBucket == null)
@@ -55,27 +55,27 @@ public class RopeImpl implements Rope
 		{
 			if (bucketMetaData.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE))
 			{
-				if (eventPayload.isStored())
+				if (message.isStored())
 				{
 					logger.trace("Add event customer={} bucket={} key={} payload=stored", bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nearestPeriodCeiling);
 				}
 				else
 				{
-					logger.trace("Add event customer={} bucket={} key={} payload={}", bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nearestPeriodCeiling, new String(eventPayload.getPayload()));
+					logger.trace("Add event customer={} bucket={} key={} payload={}", bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nearestPeriodCeiling, new String(message.getPayload()));
 				}
 			}
 			else
 			{
-				logger.trace("Add event customer={} bucket={} key={} payload_size={}", bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nearestPeriodCeiling, eventPayload.getPayload().length);
+				logger.trace("Add event customer={} bucket={} key={} payload_size={}", bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nearestPeriodCeiling, message.getPayload().length);
 			}
 		}
 
-		timeBucket.addEvent(eventPayload);
+		timeBucket.addEvent(message);
 	}
 
-	public void addBackupEvent(EventPayload eventPayload)
+	public void addBackupEvent(Message message)
 	{
-		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(eventPayload.getReceived_at());
+		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
 		TimeBucket timeBucket = backupTimeBuckets.get(nearestPeriodCeiling);
 
 		if (timeBucket == null)
@@ -98,15 +98,15 @@ public class RopeImpl implements Rope
 		{
 			if (bucketMetaData.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE))
 			{
-				logger.trace("Add backup event customer={} bucket={} key={} payload={}", bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nearestPeriodCeiling, new String(eventPayload.getPayload()));
+				logger.trace("Add backup event customer={} bucket={} key={} payload={}", bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nearestPeriodCeiling, new String(message.getPayload()));
 			}
 			else
 			{
-				logger.trace("Add backup event customer={} bucket={} key={} payload_size={}", bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nearestPeriodCeiling, eventPayload.getPayload().length);
+				logger.trace("Add backup event customer={} bucket={} key={} payload_size={}", bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nearestPeriodCeiling, message.getPayload().length);
 			}
 		}
 
-		timeBucket.addEvent(eventPayload);
+		timeBucket.addEvent(message);
 	}
 
 	public BucketMetaData getBucketMetaData()

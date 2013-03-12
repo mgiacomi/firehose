@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.smile.SmileFactory;
 import com.gltech.scale.core.coordination.TimePeriodUtils;
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.rope.TimeBucket;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
@@ -29,7 +29,7 @@ public class JacksonResourcePerformance
 		for (int i = 0; i < numEvents; i++)
 		{
 			String payload = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			bigTimeBucket.addEvent(new EventPayload("1", "2", payload.getBytes()));
+			bigTimeBucket.addEvent(new Message("1", "2", payload.getBytes()));
 		}
 
 		return bigTimeBucket;
@@ -57,9 +57,9 @@ public class JacksonResourcePerformance
 
 		ArrayNode dataNode = objectNode.putArray("data");
 
-		for (EventPayload eventPayload : timeBucket.getEvents())
+		for (Message message : timeBucket.getEvents())
 		{
-			dataNode.add(eventPayload.toJson());
+			dataNode.add(message.toJson());
 		}
 		System.out.println(timeBucket.getEvents().size() + " items to JsonNode in " + (System.currentTimeMillis() - timer) + "ms");
 		timer = System.currentTimeMillis();
@@ -85,9 +85,9 @@ public class JacksonResourcePerformance
 
 		ArrayNode dataNode = objectNode.putArray("data");
 
-		for (EventPayload eventPayload : timeBucket.getEvents())
+		for (Message message : timeBucket.getEvents())
 		{
-			dataNode.add(eventPayload.toJson());
+			dataNode.add(message.toJson());
 		}
 		System.out.println(timeBucket.getEvents().size() + " items to JsonNode in " + (System.currentTimeMillis() - timer) + "ms");
 		timer = System.currentTimeMillis();
@@ -123,7 +123,7 @@ public class JacksonResourcePerformance
 
 		g.writeFieldName("data");
 		g.writeStartArray();
-		for (EventPayload event : timeBucket.getEvents())
+		for (Message event : timeBucket.getEvents())
 		{
 			g.writeStartObject();
 			g.writeStringField("customer", event.getCustomer());
@@ -168,7 +168,7 @@ public class JacksonResourcePerformance
 		for (int i = 0; i < 100000000; i++)
 		{
 			String payload = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			EventPayload event = new EventPayload("1", "2", payload.getBytes());
+			Message event = new Message("1", "2", payload.getBytes());
 
 			g.writeStartObject();
 			g.writeStringField("customer", event.getCustomer());
@@ -211,7 +211,7 @@ public class JacksonResourcePerformance
 
 			g.writeFieldName("data");
 			g.writeStartArray();
-			for (EventPayload event : timeBucket.getEvents())
+			for (Message event : timeBucket.getEvents())
 			{
 				g.writeStartObject();
 				g.writeStringField("customer", event.getCustomer());

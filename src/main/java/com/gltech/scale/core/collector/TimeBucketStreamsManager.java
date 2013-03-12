@@ -1,6 +1,6 @@
 package com.gltech.scale.core.collector;
 
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -35,7 +35,7 @@ public class TimeBucketStreamsManager
 		totalStreams++;
 	}
 
-	public void registerEventList(List<EventPayload> events)
+	public void registerEventList(List<Message> events)
 	{
 		timeBucketStreams.add(new EventListStream(customerBucketPeriod, events));
 		totalStreams++;
@@ -59,7 +59,7 @@ public class TimeBucketStreamsManager
 				for (EventStream eventStream : new ArrayList<>(timeBucketStreams))
 				{
 					// If the stream is out of records then remove it from the list and continue loop.
-					if (eventStream.getCurrentEventPayload() == null)
+					if (eventStream.getCurrentMessage() == null)
 					{
 						timeBucketStreams.remove(eventStream);
 						eventStream.close();
@@ -74,21 +74,21 @@ public class TimeBucketStreamsManager
 					else
 					{
 						// Is this record has already been processed (because of doublewrite), then ignore it and advance the stream.
-						if (processedEvents.contains(eventStream.getCurrentEventPayload().getUuid()))
+						if (processedEvents.contains(eventStream.getCurrentMessage().getUuid()))
 						{
 							eventStream.nextRecord();
 							recordsReceived++;
 						}
 
 						// Is this record the same as the candidateNextRecord (because of doublewrite), then ignore it and advance the stream.
-						else if (eventStream.getCurrentEventPayload().equals(candidateNextRecord.getCurrentEventPayload()))
+						else if (eventStream.getCurrentMessage().equals(candidateNextRecord.getCurrentMessage()))
 						{
 							eventStream.nextRecord();
 							recordsReceived++;
 						}
 
 						// If this record older then the current candidateNextRecord then it is the candidate
-						else if (eventStream.getCurrentEventPayload().getReceived_at().isBefore(candidateNextRecord.getCurrentEventPayload().getReceived_at()))
+						else if (eventStream.getCurrentMessage().getReceived_at().isBefore(candidateNextRecord.getCurrentMessage().getReceived_at()))
 						{
 							candidateNextRecord = eventStream;
 						}
@@ -106,10 +106,10 @@ public class TimeBucketStreamsManager
 
 					}
 
-					byte[] data = candidateNextRecord.getCurrentEventPayload().toJson().toString().getBytes();
+					byte[] data = candidateNextRecord.getCurrentMessage().toJson().toString().getBytes();
 					outputStream.write(data);
 					bytesWritten = bytesWritten + data.length;
-					processedEvents.add(candidateNextRecord.getCurrentEventPayload().getUuid());
+					processedEvents.add(candidateNextRecord.getCurrentMessage().getUuid());
 					candidateNextRecord.nextRecord();
 					recordsReceived++;
 				}

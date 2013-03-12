@@ -1,7 +1,7 @@
 package com.gltech.scale.core.rope;
 
+import com.gltech.scale.core.model.Message;
 import com.google.inject.Inject;
-import com.gltech.scale.core.event.EventPayload;
 import com.gltech.scale.core.util.Http404Exception;
 import org.joda.time.DateTime;
 
@@ -28,7 +28,7 @@ public class RopeResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postEvent(byte[] data)
 	{
-		EventPayload event = new EventPayload(new String(data));
+		Message event = new Message(new String(data));
 		ropeManager.addEvent(event);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
@@ -38,7 +38,7 @@ public class RopeResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postBackupEvent(byte[] data)
 	{
-		EventPayload event = new EventPayload(new String(data));
+		Message event = new Message(new String(data));
 		ropeManager.addBackupEvent(event);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}

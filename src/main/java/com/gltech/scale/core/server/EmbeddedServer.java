@@ -6,7 +6,7 @@ import com.google.inject.servlet.GuiceFilter;
 import com.gltech.scale.core.collector.CollectorManager;
 import com.gltech.scale.core.coordination.CoordinationService;
 import com.gltech.scale.core.coordination.RopeCoordinator;
-import com.gltech.scale.core.event.EventService;
+import com.gltech.scale.core.inbound.InboundService;
 import com.gltech.scale.core.lifecycle.LifeCycle;
 import com.gltech.scale.core.lifecycle.LifeCycleManager;
 import com.gltech.scale.core.monitor.MonitoringPublisher;
@@ -111,8 +111,8 @@ public class EmbeddedServer
 		if (props.get("enable.event_service", true))
 		{
 			// Registered EventService for shutdown
-			EventService eventService = injector.getInstance(EventService.class);
-			LifeCycleManager.getInstance().add(eventService, LifeCycle.Priority.INITIAL);
+			InboundService inboundService = injector.getInstance(InboundService.class);
+			LifeCycleManager.getInstance().add(inboundService, LifeCycle.Priority.INITIAL);
 		}
 
 		if (props.get("enable.rope_manager", true))

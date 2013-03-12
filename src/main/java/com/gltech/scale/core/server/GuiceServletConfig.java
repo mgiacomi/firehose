@@ -1,5 +1,6 @@
 package com.gltech.scale.core.server;
 
+import com.gltech.scale.core.inbound.InboundServiceImpl;
 import com.gltech.scale.monitor.MonitorResource;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -15,9 +16,8 @@ import com.gltech.scale.core.coordination.RopeCoordinatorImpl;
 import com.gltech.scale.core.coordination.ZookeeperCoordinationService;
 import com.gltech.scale.core.coordination.registration.RegistrationService;
 import com.gltech.scale.core.coordination.registration.RegistrationServiceImpl;
-import com.gltech.scale.core.event.EventResource;
-import com.gltech.scale.core.event.EventService;
-import com.gltech.scale.core.event.EventServiceImpl;
+import com.gltech.scale.core.inbound.InboundResource;
+import com.gltech.scale.core.inbound.InboundService;
 import com.gltech.scale.core.rope.*;
 import com.gltech.scale.core.storage.*;
 import com.gltech.scale.core.storage.bytearray.*;
@@ -66,8 +66,8 @@ public class GuiceServletConfig extends GuiceServletContextListener
 
 					if (props.get("enable.event_service", true))
 					{
-						bind(EventResource.class);
-						bind(EventService.class).to(EventServiceImpl.class).in(Singleton.class);
+						bind(InboundResource.class);
+						bind(InboundService.class).to(InboundServiceImpl.class).in(Singleton.class);
 					}
 
 					if (props.get("enable.rope_manager", true))

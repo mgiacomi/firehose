@@ -1,7 +1,7 @@
 package com.gltech.scale.core.collector;
 
 import com.gltech.scale.core.coordination.TimePeriodUtils;
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.rope.TimeBucket;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
@@ -21,23 +21,23 @@ public class TimeBucketStreamsManagerTest
 	{
 		BucketMetaData bucketMetaData = new BucketMetaData("1", "2", BucketMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, BucketMetaData.LifeTime.medium, BucketMetaData.Redundancy.doublewritesync);
 
-		EventPayload e1 = new EventPayload("C1", "B", "testdata0".getBytes());
+		Message e1 = new Message("C1", "B", "testdata0".getBytes());
 		Thread.sleep(10);
-		EventPayload e2 = new EventPayload("C2", "B", "testdata1".getBytes());
+		Message e2 = new Message("C2", "B", "testdata1".getBytes());
 		Thread.sleep(10);
-		EventPayload e3 = new EventPayload("C3", "B", "testdata2".getBytes());
+		Message e3 = new Message("C3", "B", "testdata2".getBytes());
 		Thread.sleep(10);
-		EventPayload e4 = new EventPayload("C4", "B", "testdata3".getBytes());
+		Message e4 = new Message("C4", "B", "testdata3".getBytes());
 		Thread.sleep(10);
-		EventPayload e5 = new EventPayload("C5", "B", "testdata4".getBytes());
+		Message e5 = new Message("C5", "B", "testdata4".getBytes());
 		Thread.sleep(10);
-		EventPayload e6 = new EventPayload("C6", "B", "testdata5".getBytes());
+		Message e6 = new Message("C6", "B", "testdata5".getBytes());
 		Thread.sleep(10);
-		EventPayload e7 = new EventPayload("C7", "B", "testdata6".getBytes());
+		Message e7 = new Message("C7", "B", "testdata6".getBytes());
 		Thread.sleep(10);
-		EventPayload e8 = new EventPayload("C8", "B", "testdata7".getBytes());
+		Message e8 = new Message("C8", "B", "testdata7".getBytes());
 		Thread.sleep(10);
-		EventPayload e9 = new EventPayload("C9", "B", "testdata8".getBytes());
+		Message e9 = new Message("C9", "B", "testdata8".getBytes());
 
 		DateTime period = DateTime.now();
 
@@ -88,7 +88,7 @@ public class TimeBucketStreamsManagerTest
 		timeBucketStreamsManager.writeEvents(storageStream);
 
 		ByteArrayInputStream eventsStream = new ByteArrayInputStream(storageStream.toByteArray());
-		List<EventPayload> events = TimeBucket.jsonToEvents(eventsStream);
+		List<Message> events = TimeBucket.jsonToEvents(eventsStream);
 
 		for (int i = 0; i < 9; i++)
 		{

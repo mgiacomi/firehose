@@ -1,6 +1,6 @@
 package com.gltech.scale.core.rope;
 
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.lifecycle.LifeCycle;
 import org.joda.time.DateTime;
 
@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface RopeManager extends LifeCycle
 {
-	void addEvent(EventPayload eventPayload);
+	void addEvent(Message message);
 
-	void addBackupEvent(EventPayload eventPayload);
+	void addBackupEvent(Message message);
 
 	void clear(String customer, String bucket, DateTime dateTime);
 

@@ -1,7 +1,7 @@
 package com.gltech.scale.core.rope;
 
 import com.gltech.scale.core.coordination.TimePeriodUtils;
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -26,8 +26,8 @@ public class TimeBucketTest
 		bucketMetaData = new BucketMetaData("1", "2", BucketMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, BucketMetaData.LifeTime.medium, BucketMetaData.Redundancy.doublewritesync);
 
 		timeBucket = new TimeBucket(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
-		timeBucket.addEvent(new EventPayload("1", "2", "testdata".getBytes()));
-		timeBucket.addEvent(new EventPayload("3", "4", "testdata2".getBytes()));
+		timeBucket.addEvent(new Message("1", "2", "testdata".getBytes()));
+		timeBucket.addEvent(new Message("3", "4", "testdata2".getBytes()));
 	}
 
 
@@ -49,8 +49,8 @@ public class TimeBucketTest
 
 		for (int i = 0; i < timeBucket.getEvents().size(); i++)
 		{
-			EventPayload e1 = timeBucket.getEvents().get(i);
-			EventPayload e2 = tb1.getEvents().get(i);
+			Message e1 = timeBucket.getEvents().get(i);
+			Message e2 = tb1.getEvents().get(i);
 			assertEquals(e1.getCustomer(), e2.getCustomer());
 			assertEquals(e1.getBucket(), e2.getBucket());
 			assertEquals(e1.getUuid(), e2.getUuid());
@@ -68,7 +68,7 @@ public class TimeBucketTest
 		for (int i = 0; i < 100000; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			bigTimeBucket.addEvent(new EventPayload("1", "2", testString.getBytes()));
+			bigTimeBucket.addEvent(new Message("1", "2", testString.getBytes()));
 		}
 
 		long timer = System.currentTimeMillis();

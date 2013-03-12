@@ -1,7 +1,7 @@
 package com.gltech.scale.core.collector;
 
 import com.gltech.scale.core.coordination.TimePeriodUtils;
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.rope.TimeBucket;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
@@ -22,9 +22,9 @@ public class EventStreamTest
 		BucketMetaData bucketMetaData = new BucketMetaData("1", "2", BucketMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, BucketMetaData.LifeTime.medium, BucketMetaData.Redundancy.doublewritesync);
 
 		TimeBucket timeBucket = new TimeBucket(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
-		timeBucket.addEvent(new EventPayload("1", "2", "testdata".getBytes()));
+		timeBucket.addEvent(new Message("1", "2", "testdata".getBytes()));
 		Thread.sleep(5);
-		timeBucket.addEvent(new EventPayload("3", "4", "testdata2".getBytes()));
+		timeBucket.addEvent(new Message("3", "4", "testdata2".getBytes()));
 
 		assertEquals("testdata", new String(timeBucket.getEvents().get(0).getPayload()));
 		assertEquals("testdata2", new String(timeBucket.getEvents().get(1).getPayload()));
@@ -34,10 +34,10 @@ public class EventStreamTest
 
 		EventStream eventStream = new EventInputStream("test", new ByteArrayInputStream(bos.toByteArray()));
 
-		assertEquals("testdata", new String(eventStream.getCurrentEventPayload().getPayload()));
+		assertEquals("testdata", new String(eventStream.getCurrentMessage().getPayload()));
 		eventStream.nextRecord();
-		assertEquals("testdata2", new String(eventStream.getCurrentEventPayload().getPayload()));
+		assertEquals("testdata2", new String(eventStream.getCurrentMessage().getPayload()));
 		eventStream.nextRecord();
-		assertNull(eventStream.getCurrentEventPayload());
+		assertNull(eventStream.getCurrentMessage());
 	}
 }

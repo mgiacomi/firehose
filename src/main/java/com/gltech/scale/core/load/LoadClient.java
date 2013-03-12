@@ -1,7 +1,7 @@
 package com.gltech.scale.core.load;
 
 import com.gltech.scale.core.coordination.registration.ServiceMetaData;
-import com.gltech.scale.core.event.EventCollectorRestClient;
+import com.gltech.scale.core.inbound.InboundRestClient;
 import com.gltech.scale.core.processor.Pipeline;
 import com.gltech.scale.core.processor.PipelineBuilder;
 import com.gltech.scale.core.processor.Processor;
@@ -37,7 +37,7 @@ public class LoadClient
 
 	private static Pipeline<TimedWork> pipeline;
 	private static int bytes;
-	private static EventCollectorRestClient restClient;
+	private static InboundRestClient restClient;
 	private static String bucketName;
 	private static String payload;
 
@@ -59,7 +59,7 @@ public class LoadClient
 		props.loadFromFile(System.getProperty("user.dir") + "/load_client.properties");
 
 		bucketName = "LoadBucket";
-		restClient = new EventCollectorRestClient();
+		restClient = new InboundRestClient();
 
 		ServiceMetaData storageService = new ServiceMetaData();
 		storageService.setListenAddress(props.get("storage_service.rest_host", "localhost"));

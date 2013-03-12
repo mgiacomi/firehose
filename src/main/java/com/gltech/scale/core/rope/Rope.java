@@ -1,6 +1,6 @@
 package com.gltech.scale.core.rope;
 
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
 
@@ -10,9 +10,9 @@ public interface Rope
 {
 	BucketMetaData getBucketMetaData();
 
-	void addEvent(EventPayload eventPayload);
+	void addEvent(Message message);
 
-	void addBackupEvent(EventPayload eventPayload);
+	void addBackupEvent(Message message);
 
 	Collection<TimeBucket> getTimeBuckets();
 

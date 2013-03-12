@@ -1,6 +1,6 @@
 package com.gltech.scale.core.collector;
 
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,17 +9,17 @@ import java.util.List;
 public class EventListStream implements EventStream
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.EventListStream");
-	private List<EventPayload> events;
+	private List<Message> events;
 	private int position = 0;
 	private String customerBucketPeriod;
 
-	public EventListStream(String customerBucketPeriod, List<EventPayload> events)
+	public EventListStream(String customerBucketPeriod, List<Message> events)
 	{
 		this.customerBucketPeriod = customerBucketPeriod;
 		this.events = events;
 	}
 
-	public EventPayload getCurrentEventPayload()
+	public Message getCurrentMessage()
 	{
 		if (events.size() > position)
 		{

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,7 @@ public class EventInputStream implements EventStream
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.EventInputStream");
 	private final JsonParser jp;
-	private EventPayload currentEventPayload;
+	private Message currentMessage;
 	private boolean reachedEndArray = false;
 	private final InputStream inputStream;
 	private int counter = 0;
@@ -40,14 +40,14 @@ public class EventInputStream implements EventStream
 		}
 	}
 
-	public EventPayload getCurrentEventPayload()
+	public Message getCurrentMessage()
 	{
-		if (currentEventPayload == null)
+		if (currentMessage == null)
 		{
 			nextRecord();
 		}
 
-		return currentEventPayload;
+		return currentMessage;
 	}
 
 	public void nextRecord()
@@ -56,7 +56,7 @@ public class EventInputStream implements EventStream
 		{
 			try
 			{
-				currentEventPayload = EventPayload.jsonToEvent(jp);
+				currentMessage = Message.jsonToEvent(jp);
 
 				if (jp.nextToken() == JsonToken.END_ARRAY)
 				{
@@ -73,7 +73,7 @@ public class EventInputStream implements EventStream
 		}
 		else
 		{
-			currentEventPayload = null;
+			currentMessage = null;
 		}
 	}
 

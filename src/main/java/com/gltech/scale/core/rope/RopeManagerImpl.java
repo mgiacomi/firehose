@@ -1,9 +1,9 @@
 package com.gltech.scale.core.rope;
 
+import com.gltech.scale.core.model.Message;
 import com.google.inject.Inject;
 import com.gltech.scale.core.coordination.CoordinationService;
 import com.gltech.scale.core.coordination.TimePeriodUtils;
-import com.gltech.scale.core.event.EventPayload;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
 import org.joda.time.DateTime;
@@ -37,9 +37,9 @@ public class RopeManagerImpl implements RopeManager
 	}
 
 	@Override
-	public void addEvent(EventPayload eventPayload)
+	public void addEvent(Message message)
 	{
-		BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(eventPayload.getCustomer(), eventPayload.getBucket(), true);
+		BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(message.getCustomer(), message.getBucket(), true);
 		Rope rope = ropes.get(bucketMetaData);
 
 		if (rope == null)
@@ -49,23 +49,23 @@ public class RopeManagerImpl implements RopeManager
 			if (rope == null)
 			{
 				rope = newRope;
-				logger.info("Creating Rope {customer=" + eventPayload.getCustomer() + ", bucket=" + eventPayload.getBucket() + "}");
+				logger.info("Creating Rope {customer=" + message.getCustomer() + ", bucket=" + message.getBucket() + "}");
 			}
 		}
 
-		rope.addEvent(eventPayload);
+		rope.addEvent(message);
 	}
 
 	@Override
-	public void addBackupEvent(EventPayload eventPayload)
+	public void addBackupEvent(Message message)
 	{
-		BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(eventPayload.getCustomer(), eventPayload.getBucket(), true);
+		BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(message.getCustomer(), message.getBucket(), true);
 
 		Rope rope = ropes.get(bucketMetaData);
 
 		if (rope == null)
 		{
-			logger.info("Creating Rope {customer=" + eventPayload.getCustomer() + ", bucket=" + eventPayload.getBucket() + "}");
+			logger.info("Creating Rope {customer=" + message.getCustomer() + ", bucket=" + message.getBucket() + "}");
 			Rope newRope = new RopeStats(new RopeImpl(bucketMetaData, coordinationService, timePeriodUtils));
 			rope = ropes.putIfAbsent(bucketMetaData, newRope);
 			if (rope == null)
@@ -74,7 +74,7 @@ public class RopeManagerImpl implements RopeManager
 			}
 		}
 
-		rope.addBackupEvent(eventPayload);
+		rope.addBackupEvent(message);
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package com.gltech.scale.core.rope;
 
 import com.gltech.scale.core.coordination.registration.ServiceMetaData;
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.util.ClientCreator;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -18,7 +18,7 @@ public class RopeManagerRestClient
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.RopeManagerRestClient");
 	private final Client client = ClientCreator.createCached();
 
-	public void postEvent(ServiceMetaData ropeManager, EventPayload event)
+	public void postEvent(ServiceMetaData ropeManager, Message event)
 	{
 		String url = "http://" + ropeManager.getListenAddress() + ":" + ropeManager.getListenPort() + "/ropes/event";
 		WebResource webResource = client.resource(url);
@@ -30,7 +30,7 @@ public class RopeManagerRestClient
 		}
 	}
 
-	public void postBackupEvent(ServiceMetaData ropeManager, EventPayload event)
+	public void postBackupEvent(ServiceMetaData ropeManager, Message event)
 	{
 		String url = "http://" + ropeManager.getListenAddress() + ":" + ropeManager.getListenPort() + "/ropes/backup/event";
 		WebResource webResource = client.resource(url);
@@ -42,7 +42,7 @@ public class RopeManagerRestClient
 		}
 	}
 
-	public List<EventPayload> getTimeBucketEvents(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
+	public List<Message> getTimeBucketEvents(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
 	{
 		String url = "http://" + ropeManager.getListenAddress() + ":" + ropeManager.getListenPort() + "/ropes/" + customer + "/" + bucket + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/timebucket/events";
 		WebResource webResource = client.resource(url);
@@ -77,7 +77,7 @@ public class RopeManagerRestClient
 		}
 	}
 
-	public List<EventPayload> getBackupTimeBucketEvents(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
+	public List<Message> getBackupTimeBucketEvents(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
 	{
 		String url = "http://" + ropeManager.getListenAddress() + ":" + ropeManager.getListenPort() + "/ropes/" + customer + "/" + bucket + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/backup/timebucket/events";
 		WebResource webResource = client.resource(url);

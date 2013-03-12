@@ -2,7 +2,7 @@ package com;
 
 import com.gltech.scale.core.coordination.TimePeriodUtils;
 import com.gltech.scale.core.coordination.registration.ServiceMetaData;
-import com.gltech.scale.core.event.EventCollectorRestClient;
+import com.gltech.scale.core.inbound.InboundRestClient;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.*;
 import com.gltech.scale.core.util.ClientCreator;
@@ -126,11 +126,11 @@ public class CoreManualRegression
 			eventService.setListenAddress(props.get("event_service.rest_host", "localhost"));
 			eventService.setListenPort(props.get("event_service.rest_port", 9090));
 
-			EventCollectorRestClient eventCollectorRestClient = new EventCollectorRestClient();
+			InboundRestClient inboundRestClient = new InboundRestClient();
 
-			System.out.println("1s: " + eventCollectorRestClient.getEvents(eventService, "Matt", "1s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
-			System.out.println("2s: " + eventCollectorRestClient.getEvents(eventService, "Matt", "2s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
-			System.out.println("3d: " + eventCollectorRestClient.getEvents(eventService, "Matt", "3d", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("1s: " + inboundRestClient.getEvents(eventService, "Matt", "1s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("2s: " + inboundRestClient.getEvents(eventService, "Matt", "2s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("3d: " + inboundRestClient.getEvents(eventService, "Matt", "3d", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
 		}
 	}
 }

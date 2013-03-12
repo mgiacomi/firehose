@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class TimeBucket
 	private DateTime nearestPeriodCeiling;
 	private DateTime firstEventTime;
 	private DateTime lastEventTime = DateTime.now();
-	private LinkedBlockingQueue<EventPayload> data = new LinkedBlockingQueue<>();
+	private LinkedBlockingQueue<Message> data = new LinkedBlockingQueue<>();
 	private AtomicLong bytes = new AtomicLong(0);
 	private BucketMetaData bucketMetaData;
 
@@ -88,21 +88,21 @@ public class TimeBucket
 		}
 	}
 
-	static private List<EventPayload> jsonToEvents(JsonParser jp) throws IOException
+	static private List<Message> jsonToEvents(JsonParser jp) throws IOException
 	{
-		List<EventPayload> events = new ArrayList<>();
+		List<Message> events = new ArrayList<>();
 
 		while (jp.nextToken() != JsonToken.END_ARRAY)
 		{
-			events.add(EventPayload.jsonToEvent(jp));
+			events.add(Message.jsonToEvent(jp));
 		}
 
 		return events;
 	}
 
-	static public List<EventPayload> jsonToEvents(InputStream in)
+	static public List<Message> jsonToEvents(InputStream in)
 	{
-		List<EventPayload> events;
+		List<Message> events;
 
 		try
 		{
@@ -171,7 +171,7 @@ public class TimeBucket
 		}
 	}
 
-	static public void eventsToJson(List<EventPayload> events, OutputStream outputStream) throws IOException
+	static public void eventsToJson(List<Message> events, OutputStream outputStream) throws IOException
 	{
 		try
 		{
@@ -186,10 +186,10 @@ public class TimeBucket
 		}
 	}
 
-	static private void eventsToJson(JsonGenerator g, List<EventPayload> events) throws IOException
+	static private void eventsToJson(JsonGenerator g, List<Message> events) throws IOException
 	{
 		g.writeStartArray();
-		for (EventPayload event : events)
+		for (Message event : events)
 		{
 			g.writeStartObject();
 			g.writeStringField("customer", event.getCustomer());
@@ -203,11 +203,11 @@ public class TimeBucket
 		g.writeEndArray();
 	}
 
-	public void addEvent(EventPayload eventPayload)
+	public void addEvent(Message message)
 	{
-		data.add(eventPayload);
+		data.add(message);
 		lastEventTime = DateTime.now();
-		bytes.addAndGet(eventPayload.getPayload().length);
+		bytes.addAndGet(message.getPayload().length);
 
 		if (firstEventTime == null)
 		{
@@ -220,7 +220,7 @@ public class TimeBucket
 		return bucketMetaData;
 	}
 
-	public List<EventPayload> getEvents()
+	public List<Message> getEvents()
 	{
 		return Collections.unmodifiableList(new ArrayList<>(data));
 	}

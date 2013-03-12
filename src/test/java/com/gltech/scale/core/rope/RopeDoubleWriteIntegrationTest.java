@@ -1,11 +1,11 @@
 package com.gltech.scale.core.rope;
 
+import com.gltech.scale.core.inbound.InboundRestClient;
+import com.gltech.scale.core.model.Message;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.gltech.scale.core.coordination.registration.ServiceMetaData;
-import com.gltech.scale.core.event.EventCollectorRestClient;
-import com.gltech.scale.core.event.EventPayload;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;
@@ -81,7 +81,7 @@ public class RopeDoubleWriteIntegrationTest
 		requests2.add("{\"singer\":\"AC/DC2\",\"title\":\"Back In Black2\"}");
 		requests2.add("{\"singer\":\"Tori Amos2\",\"title\":\"Little Earthquakes2\"}");
 
-		EventCollectorRestClient ecrc = new EventCollectorRestClient();
+		InboundRestClient ecrc = new InboundRestClient();
 
 		for (String json : requests)
 		{
@@ -91,8 +91,8 @@ public class RopeDoubleWriteIntegrationTest
 
 		// Test injecting fake events to the rope manager to make sure they are collected too.
 		RopeManagerRestClient rrc = new RopeManagerRestClient();
-		EventPayload backupEventPayload = new EventPayload("customer1", "bucket1", "event from failed server".getBytes());
-		rrc.postBackupEvent(ropeManager, backupEventPayload);
+		Message backupMessage = new Message("customer1", "bucket1", "event from failed server".getBytes());
+		rrc.postBackupEvent(ropeManager, backupMessage);
 
 		Thread.sleep(5000);
 
@@ -103,13 +103,13 @@ public class RopeDoubleWriteIntegrationTest
 		DateTime second = DateTime.now();
 
 		RopeManagerRestClient ropeClient = new RopeManagerRestClient();
-		List<EventPayload> events = ropeClient.getTimeBucketEvents(ropeManager, "customer1", "bucket1", first);
+		List<Message> events = ropeClient.getTimeBucketEvents(ropeManager, "customer1", "bucket1", first);
 		assertEquals(3, events.size());
 
 		for (int i = 0; i < events.size(); i++)
 		{
-			EventPayload eventPayload = events.get(i);
-			assertEquals(requests.get(i), new String(eventPayload.getPayload()));
+			Message message = events.get(i);
+			assertEquals(requests.get(i), new String(message.getPayload()));
 		}
 
 		events = ropeClient.getTimeBucketEvents(ropeManager, "customer1", "bucket1", second);
@@ -117,11 +117,11 @@ public class RopeDoubleWriteIntegrationTest
 
 		for (int i = 0; i < events.size(); i++)
 		{
-			EventPayload eventPayload = events.get(i);
-			assertEquals(requests2.get(i), new String(eventPayload.getPayload()));
+			Message message = events.get(i);
+			assertEquals(requests2.get(i), new String(message.getPayload()));
 		}
 
-		List<EventPayload> backupsEvents = ropeClient.getBackupTimeBucketEvents(ropeManager, "customer1", "bucket1", first);
+		List<Message> backupsEvents = ropeClient.getBackupTimeBucketEvents(ropeManager, "customer1", "bucket1", first);
 		assertEquals(1, backupsEvents.size());
 		assertEquals("event from failed server", new String(backupsEvents.get(0).getPayload()));
 	}

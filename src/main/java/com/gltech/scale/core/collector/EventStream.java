@@ -1,10 +1,10 @@
 package com.gltech.scale.core.collector;
 
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 
 public interface EventStream
 {
-	EventPayload getCurrentEventPayload();
+	Message getCurrentMessage();
 
 	void nextRecord();
 

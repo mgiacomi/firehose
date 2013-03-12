@@ -1,6 +1,6 @@
 package com.gltech.scale.core.rope;
 
-import com.gltech.scale.core.event.EventPayload;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.monitor.*;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.util.Props;
@@ -107,16 +107,16 @@ public class RopeStats implements Rope
 		return rope.getBucketMetaData();
 	}
 
-	public void addEvent(EventPayload eventPayload)
+	public void addEvent(Message message)
 	{
-		rope.addEvent(eventPayload);
-		addEventTimer.add(eventPayload.getPayload().length);
+		rope.addEvent(message);
+		addEventTimer.add(message.getPayload().length);
 	}
 
-	public void addBackupEvent(EventPayload eventPayload)
+	public void addBackupEvent(Message message)
 	{
-		rope.addBackupEvent(eventPayload);
-		addBackupEventTimer.add(eventPayload.getPayload().length);
+		rope.addBackupEvent(message);
+		addBackupEventTimer.add(message.getPayload().length);
 	}
 
 	public Collection<TimeBucket> getTimeBuckets()
