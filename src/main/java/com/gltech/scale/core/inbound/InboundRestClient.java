@@ -1,7 +1,7 @@
 package com.gltech.scale.core.inbound;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.util.ClientCreator;
 import com.gltech.scale.util.Http404Exception;
 import com.sun.jersey.api.client.Client;
@@ -15,7 +15,7 @@ public class InboundRestClient
 {
 	private final Client client = ClientCreator.createCached();
 
-	public BucketMetaData getBucketMetaData(ServiceMetaData eventService, String customer, String bucket)
+	public ChannelMetaData getBucketMetaData(ServiceMetaData eventService, String customer, String bucket)
 	{
 		String url = "http://" + eventService.getListenAddress() + ":" + eventService.getListenPort() + "/events/" + customer + "/" + bucket;
 		WebResource webResource = client.resource(url);
@@ -31,7 +31,7 @@ public class InboundRestClient
 			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus());
 		}
 
-		return new BucketMetaData(customer, bucket, response.getEntity(String.class));
+		return new ChannelMetaData(customer, bucket, response.getEntity(String.class));
 	}
 
 	public void postEvent(ServiceMetaData eventService, String customer, String bucket, String json)

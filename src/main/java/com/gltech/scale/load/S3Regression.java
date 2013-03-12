@@ -2,7 +2,7 @@ package com.gltech.scale.load;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.stream.AwsS3Storage;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +17,12 @@ public class S3Regression
 
 		String json = "{\"customer\":\"matt\", \"bucket\":\"testb\", \"bucketType\":\"EvEntSet\", \"redundancy\":\"singlewrite\", \"mediaType\":\"application/json\"}";
 
-		BucketMetaData bucketMetaData = new BucketMetaData(json);
+		ChannelMetaData channelMetaData = new ChannelMetaData(json);
 
-		s3Storage.putBucket(bucketMetaData);
-		BucketMetaData bucketMetaData1 = s3Storage.getBucket("matt", "testb");
+		s3Storage.putBucket(channelMetaData);
+		ChannelMetaData channelMetaData1 = s3Storage.getBucket("matt", "testb");
 
-		if (bucketMetaData.equals(bucketMetaData1))
+		if (channelMetaData.equals(channelMetaData1))
 		{
 			System.out.println("Yay they are equal!");
 		}

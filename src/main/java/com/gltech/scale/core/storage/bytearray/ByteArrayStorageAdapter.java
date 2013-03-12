@@ -2,7 +2,7 @@ package com.gltech.scale.core.storage.bytearray;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.Storage;
 import org.apache.commons.io.IOUtils;
 
@@ -23,12 +23,12 @@ public class ByteArrayStorageAdapter implements Storage
 		this.byteArrayStorage = byteArrayStorage;
 	}
 
-	public void putBucket(BucketMetaData bucketMetaData)
+	public void putBucket(ChannelMetaData channelMetaData)
 	{
-		byteArrayStorage.putBucket(bucketMetaData);
+		byteArrayStorage.putBucket(channelMetaData);
 	}
 
-	public BucketMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String customer, String bucket)
 	{
 		return byteArrayStorage.getBucket(customer, bucket);
 	}

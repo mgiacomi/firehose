@@ -1,6 +1,6 @@
 package com.gltech.scale.core.cluster;
 
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -12,10 +12,10 @@ public class BatchPeriodMapper implements Comparable<BatchPeriodMapper>
 	private final String bucket;
 	private final DateTime nearestPeriodCeiling;
 
-	public BatchPeriodMapper(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+	public BatchPeriodMapper(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
-		this.customer = bucketMetaData.getCustomer();
-		this.bucket = bucketMetaData.getBucket();
+		this.customer = channelMetaData.getCustomer();
+		this.bucket = channelMetaData.getBucket();
 		this.nearestPeriodCeiling = nearestPeriodCeiling;
 	}
 

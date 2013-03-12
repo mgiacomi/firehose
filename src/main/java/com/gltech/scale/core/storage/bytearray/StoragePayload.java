@@ -3,7 +3,7 @@ package com.gltech.scale.core.storage.bytearray;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.joda.time.DateTime;
 
@@ -22,7 +22,7 @@ public class StoragePayload
 	private byte[] payload;
 	private String id;
 
-	private transient BucketMetaData bucketMetaData;
+	private transient ChannelMetaData channelMetaData;
 	private transient List<String> previousVersions = Collections.emptyList();
 
 	public StoragePayload(String id, String customer, String bucket, byte[] payload)
@@ -87,14 +87,14 @@ public class StoragePayload
 		return DigestUtils.md5Hex(payload);
 	}
 
-	public BucketMetaData getBucketMetaData()
+	public ChannelMetaData getChannelMetaData()
 	{
-		return bucketMetaData;
+		return channelMetaData;
 	}
 
-	public void setBucketMetaData(BucketMetaData bucketMetaData)
+	public void setChannelMetaData(ChannelMetaData channelMetaData)
 	{
-		this.bucketMetaData = bucketMetaData;
+		this.channelMetaData = channelMetaData;
 	}
 
 	public byte[] convert() throws IOException

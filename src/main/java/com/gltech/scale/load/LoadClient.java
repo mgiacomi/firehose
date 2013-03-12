@@ -6,7 +6,7 @@ import com.gltech.scale.pipeline.Pipeline;
 import com.gltech.scale.pipeline.PipelineBuilder;
 import com.gltech.scale.pipeline.Processor;
 import com.gltech.scale.pipeline.Timed;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.StorageServiceRestClient;
 import com.gltech.scale.util.Props;
 import org.apache.commons.lang.StringUtils;
@@ -68,12 +68,12 @@ public class LoadClient
 		try
 		{
 			new StorageServiceRestClient().putBucketMetaData(storageService,
-					new BucketMetaData("LoadClient", bucketName,
-							BucketMetaData.BucketType.eventset,
+					new ChannelMetaData("LoadClient", bucketName,
+							ChannelMetaData.BucketType.eventset,
 							10,
 							MediaType.APPLICATION_JSON_TYPE,
-							BucketMetaData.LifeTime.small,
-							BucketMetaData.Redundancy.singlewrite));
+							ChannelMetaData.LifeTime.small,
+							ChannelMetaData.Redundancy.singlewrite));
 		}
 		catch (Exception e)
 		{

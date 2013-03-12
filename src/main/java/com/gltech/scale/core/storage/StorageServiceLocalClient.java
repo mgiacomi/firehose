@@ -1,6 +1,7 @@
 package com.gltech.scale.core.storage;
 
 import com.gc.iotools.stream.is.InputStreamFromOutputStream;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 
@@ -21,14 +22,14 @@ public class StorageServiceLocalClient implements StorageServiceClient
 		this.storage = storage;
 	}
 
-	public BucketMetaData getBucketMetaData(ServiceMetaData storageService, String customer, String bucket)
+	public ChannelMetaData getBucketMetaData(ServiceMetaData storageService, String customer, String bucket)
 	{
 		return storage.getBucket(customer, bucket);
 	}
 
-	public void putBucketMetaData(ServiceMetaData storageService, BucketMetaData bucketMetaData)
+	public void putBucketMetaData(ServiceMetaData storageService, ChannelMetaData channelMetaData)
 	{
-		storage.putBucket(bucketMetaData);
+		storage.putBucket(channelMetaData);
 	}
 
 	public InputStream getEventStream(ServiceMetaData storageService, final String customer, final String bucket, final String id)

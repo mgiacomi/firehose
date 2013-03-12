@@ -1,6 +1,6 @@
 package com.gltech.scale.core.storage.bytearray;
 
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.DuplicateBucketException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,32 +11,32 @@ public class MemoryStorage implements InternalStorage
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.storage.MemoryStorage");
 
-	private ConcurrentHashMap<String, BucketMetaData> bucketMap = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<String, ChannelMetaData> bucketMap = new ConcurrentHashMap<>();
 
-	private ConcurrentHashMap<BucketMetaData, ConcurrentHashMap<String, StoragePayload>> payloadsMap =
-			new ConcurrentHashMap<BucketMetaData, ConcurrentHashMap<String, StoragePayload>>();
+	private ConcurrentHashMap<ChannelMetaData, ConcurrentHashMap<String, StoragePayload>> payloadsMap =
+			new ConcurrentHashMap<ChannelMetaData, ConcurrentHashMap<String, StoragePayload>>();
 
 	/**
-	 * @param bucket
+	 * @param channel
 	 * @throws com.gltech.scale.core.storage.StorageException
 	 *          is bucket already exists
 	 */
 	@Override
-	public void putBucket(BucketMetaData bucket)
+	public void putBucket(ChannelMetaData channel)
 	{
-		String key = createBucketKey(bucket);
-		logger.debug("creating {}", bucket);
+		String key = createBucketKey(channel);
+		logger.debug("creating {}", channel);
 		if (bucketMap.containsKey(key))
 		{
-			throw new DuplicateBucketException("Bucket already exists " + bucket.getCustomer() + " " + bucket.getBucket());
+			throw new DuplicateBucketException("Bucket already exists " + channel.getCustomer() + " " + channel.getBucket());
 		}
-		bucketMap.put(key, bucket);
-		payloadsMap.putIfAbsent(bucket, new ConcurrentHashMap<String, StoragePayload>());
+		bucketMap.put(key, channel);
+		payloadsMap.putIfAbsent(channel, new ConcurrentHashMap<String, StoragePayload>());
 	}
 
-	private String createBucketKey(BucketMetaData bucket)
+	private String createBucketKey(ChannelMetaData channel)
 	{
-		return createBucketKey(bucket.getCustomer(), bucket.getBucket());
+		return createBucketKey(channel.getCustomer(), channel.getBucket());
 	}
 
 	private String createBucketKey(String customer, String bucket)
@@ -45,7 +45,7 @@ public class MemoryStorage implements InternalStorage
 	}
 
 	@Override
-	public BucketMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String customer, String bucket)
 	{
 		return bucketMap.get(createBucketKey(customer, bucket));
 	}
@@ -54,29 +54,29 @@ public class MemoryStorage implements InternalStorage
 	public void putPayload(StoragePayload storagePayload)
 	{
 		logger.debug("putting payload {}", storagePayload);
-		BucketMetaData bucketMetaData = getBucket(storagePayload.getCustomer(), storagePayload.getBucket());
-		internalPutPayload(bucketMetaData, storagePayload);
+		ChannelMetaData channelMetaData = getBucket(storagePayload.getCustomer(), storagePayload.getBucket());
+		internalPutPayload(channelMetaData, storagePayload);
 	}
 
 	@Override
 	public StoragePayload getPayload(String customer, String bucket, String id)
 	{
-		BucketMetaData bucketMetaData = getBucket(customer, bucket);
-		StoragePayload payload = internalGetPayload(bucketMetaData, id);
+		ChannelMetaData channelMetaData = getBucket(customer, bucket);
+		StoragePayload payload = internalGetPayload(channelMetaData, id);
 		if (payload != null)
 		{
-			payload.setBucketMetaData(bucketMetaData);
+			payload.setChannelMetaData(channelMetaData);
 		}
 		return payload;
 	}
 
-	public StoragePayload internalGetPayload(BucketMetaData bucketMetaData, String id)
+	public StoragePayload internalGetPayload(ChannelMetaData channelMetaData, String id)
 	{
-		return payloadsMap.get(bucketMetaData).get(id);
+		return payloadsMap.get(channelMetaData).get(id);
 	}
 
-	public void internalPutPayload(BucketMetaData bucketMetaData, StoragePayload storagePayload)
+	public void internalPutPayload(ChannelMetaData channelMetaData, StoragePayload storagePayload)
 	{
-		payloadsMap.get(bucketMetaData).put(storagePayload.getId(), storagePayload);
+		payloadsMap.get(channelMetaData).put(storagePayload.getId(), storagePayload);
 	}
 }

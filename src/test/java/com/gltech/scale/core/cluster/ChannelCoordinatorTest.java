@@ -2,9 +2,9 @@ package com.gltech.scale.core.cluster;
 
 import static org.junit.Assert.*;
 
+import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.rope.RopeManagersByPeriod;
 import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 import org.joda.time.DateTime;
@@ -88,17 +88,17 @@ public class ChannelCoordinatorTest
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm1);
 		channelCoordinator.registerWeight(true, 2, 2, 0);
 
-		RopeManagersByPeriod ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(2));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 0);
+		AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(2));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 0);
 
 		channelCoordinator.registerWeight(true, 4, 2, 0);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(1));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 0);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 1);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(1));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 0);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 1);
 	}
 
 	@Test
@@ -132,93 +132,93 @@ public class ChannelCoordinatorTest
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm1);
 		channelCoordinator.registerWeight(true, 2, 2, 0);
 
-		RopeManagersByPeriod ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(1));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
-		assertNull(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup());
+		AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(1));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
+		assertNull(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup());
 
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm0);
 		channelCoordinator.registerWeight(true, 3, 2, 0);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(2));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 0);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(2));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 0);
 
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm5);
 		channelCoordinator.registerWeight(false, 0, 0, 111);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(3));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 1);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(3));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 1);
 
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm2);
 		channelCoordinator.registerWeight(true, 1, 2, 0);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(4));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 2);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(4));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 2);
 
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm3);
 		channelCoordinator.registerWeight(true, 0, 1, 0);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(5));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 3);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(5));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 3);
 
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm7);
 		channelCoordinator.registerWeight(false, 0, 0, 12);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(6));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 7);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 5);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(6));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 7);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 5);
 
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm4);
 		channelCoordinator.registerWeight(true, 0, 0, 0);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(7));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 7);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 5);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(7));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 7);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 5);
 
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm9);
 		channelCoordinator.registerWeight(false, 0, 0, 1);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(8));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 1);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 7);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(8));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 7);
 
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm6);
 		channelCoordinator.registerWeight(false, 0, 0, 21);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(9));
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 2);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 7);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(1).getPrimary().getListenPort(), 6);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(1).getBackup().getListenPort(), 5);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(9));
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 2);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 7);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getPrimary().getListenPort(), 6);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getBackup().getListenPort(), 5);
 
 		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm8);
 		channelCoordinator.registerWeight(false, 0, 0, 2);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 2);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 8);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(1).getPrimary().getListenPort(), 7);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(1).getBackup().getListenPort(), 6);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 2);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 8);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getPrimary().getListenPort(), 7);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getBackup().getListenPort(), 6);
 
-		ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().size(), 2);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 8);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(1).getPrimary().getListenPort(), 7);
-		assertEquals(ropeManagersByPeriod.getPrimaryBackupSets().get(1).getBackup().getListenPort(), 6);
+		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 2);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 8);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getPrimary().getListenPort(), 7);
+		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getBackup().getListenPort(), 6);
 	}
 
 	@Test

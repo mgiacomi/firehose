@@ -1,5 +1,6 @@
 package com.gltech.scale.core.storage;
 
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.google.common.base.Throwables;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.util.ClientCreator;
@@ -17,7 +18,7 @@ public class StorageServiceRestClient implements StorageServiceClient
 {
 	private final Client client = ClientCreator.createCached();
 
-	public BucketMetaData getBucketMetaData(ServiceMetaData storageService, String customer, String bucket)
+	public ChannelMetaData getBucketMetaData(ServiceMetaData storageService, String customer, String bucket)
 	{
 		WebResource webResource = getResource(storageService, customer, bucket);
 		ClientResponse response = webResource.get(ClientResponse.class);
@@ -32,7 +33,7 @@ public class StorageServiceRestClient implements StorageServiceClient
 			throw new BucketMetaDataException("Failed : HTTP error code: " + response.getStatus());
 		}
 
-		return new BucketMetaData(customer, bucket, response.getEntity(String.class));
+		return new ChannelMetaData(customer, bucket, response.getEntity(String.class));
 	}
 
 	private WebResource getResource(ServiceMetaData storageService, String customer, String bucket)
@@ -47,10 +48,10 @@ public class StorageServiceRestClient implements StorageServiceClient
 		return client.resource(url);
 	}
 
-	public void putBucketMetaData(ServiceMetaData storageService, BucketMetaData bucketMetaData)
+	public void putBucketMetaData(ServiceMetaData storageService, ChannelMetaData channelMetaData)
 	{
-		WebResource webResource = getResource(storageService, bucketMetaData.getCustomer(), bucketMetaData.getBucket());
-		ClientResponse response = webResource.put(ClientResponse.class, bucketMetaData.toJson().toString());
+		WebResource webResource = getResource(storageService, channelMetaData.getCustomer(), channelMetaData.getBucket());
+		ClientResponse response = webResource.put(ClientResponse.class, channelMetaData.toJson().toString());
 
 		if (response.getStatus() == 403)
 		{

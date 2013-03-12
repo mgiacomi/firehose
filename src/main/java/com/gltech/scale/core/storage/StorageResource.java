@@ -1,5 +1,6 @@
 package com.gltech.scale.core.storage;
 
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.google.inject.Inject;
 import com.gltech.scale.core.storage.bytearray.InvalidVersionException;
 import org.apache.commons.io.IOUtils;
@@ -41,8 +42,8 @@ public class StorageResource
 			{
 				return Response.status(Response.Status.BAD_REQUEST).entity("Customer and Bucket can not contain '|' aka pipes").build();
 			}
-			BucketMetaData bucketMetaData = new BucketMetaData(customer, bucket, json);
-			storage.putBucket(bucketMetaData);
+			ChannelMetaData channelMetaData = new ChannelMetaData(customer, bucket, json);
+			storage.putBucket(channelMetaData);
 			return Response.created(uriInfo.getRequestUri()).build();
 		}
 		catch (BucketMetaDataException e)
@@ -61,12 +62,12 @@ public class StorageResource
 	public Response getBucket(@PathParam("customer") String customer,
 							  @PathParam("bucket") String bucket)
 	{
-		BucketMetaData bucketMetaData = storage.getBucket(customer, bucket);
-		if (bucketMetaData == null)
+		ChannelMetaData channelMetaData = storage.getBucket(customer, bucket);
+		if (channelMetaData == null)
 		{
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		return Response.ok(bucketMetaData.toJson().toString()).build();
+		return Response.ok(channelMetaData.toJson().toString()).build();
 	}
 
 	@Path("/{customer}/{bucket}/{id}")
@@ -102,13 +103,13 @@ public class StorageResource
 			}
 		};
 
-		BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
 
 		Response.ResponseBuilder builder = Response.ok(out);
 
-		if (null != bucketMetaData)
+		if (null != channelMetaData)
 		{
-			builder.type(bucketMetaData.getMediaType());
+			builder.type(channelMetaData.getMediaType());
 		}
 
 		return builder.build();

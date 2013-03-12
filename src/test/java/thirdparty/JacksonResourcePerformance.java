@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.smile.SmileFactory;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.Message;
-import com.gltech.scale.core.rope.TimeBucket;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.Batch;
+import com.gltech.scale.core.model.ChannelMetaData;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.core.MediaType;
@@ -22,17 +22,17 @@ public class JacksonResourcePerformance
 {
 	private static final ObjectMapper textMapper = new ObjectMapper();
 
-	private TimeBucket getTimeBucket(int numEvents)
+	private Batch getTimeBucket(int numEvents)
 	{
-		BucketMetaData bucketMetaData = new BucketMetaData("1", "2", BucketMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, BucketMetaData.LifeTime.medium, BucketMetaData.Redundancy.doublewritesync);
-		TimeBucket bigTimeBucket = new TimeBucket(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
+		ChannelMetaData channelMetaData = new ChannelMetaData("1", "2", ChannelMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.doublewritesync);
+		Batch bigBatch = new Batch(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
 		for (int i = 0; i < numEvents; i++)
 		{
 			String payload = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			bigTimeBucket.addEvent(new Message("1", "2", payload.getBytes()));
+			bigBatch.addEvent(new Message("1", "2", payload.getBytes()));
 		}
 
-		return bigTimeBucket;
+		return bigBatch;
 	}
 
 	private void printJVMMemStats()
@@ -45,51 +45,51 @@ public class JacksonResourcePerformance
 	public void testJsonObjectMapperToString75000() throws Exception
 	{
 		printJVMMemStats();
-		TimeBucket timeBucket = getTimeBucket(75000);
-		System.out.println("TimeBucket with " + timeBucket.getEvents().size() + " created.");
+		Batch batch = getTimeBucket(75000);
+		System.out.println("TimeBucket with " + batch.getEvents().size() + " created.");
 		long timer = System.currentTimeMillis();
 		printJVMMemStats();
 
 		ObjectNode objectNode = textMapper.createObjectNode();
-		objectNode.put("bucketMetaData", timeBucket.getBucketMetaData().toJson());
-		objectNode.put("bytes", timeBucket.getBytes());
-		objectNode.put("lastEventTime", timeBucket.getLastEventTime().toString());
+		objectNode.put("bucketMetaData", batch.getChannelMetaData().toJson());
+		objectNode.put("bytes", batch.getBytes());
+		objectNode.put("lastEventTime", batch.getLastEventTime().toString());
 
 		ArrayNode dataNode = objectNode.putArray("data");
 
-		for (Message message : timeBucket.getEvents())
+		for (Message message : batch.getEvents())
 		{
 			dataNode.add(message.toJson());
 		}
-		System.out.println(timeBucket.getEvents().size() + " items to JsonNode in " + (System.currentTimeMillis() - timer) + "ms");
+		System.out.println(batch.getEvents().size() + " items to JsonNode in " + (System.currentTimeMillis() - timer) + "ms");
 		timer = System.currentTimeMillis();
 		printJVMMemStats();
 
 		objectNode.toString();
-		System.out.println(timeBucket.getEvents().size() + " JsonNode to string in " + (System.currentTimeMillis() - timer) + "ms");
+		System.out.println(batch.getEvents().size() + " JsonNode to string in " + (System.currentTimeMillis() - timer) + "ms");
 		printJVMMemStats();
 	}
 
 	public void testObjectMapperOutputStream330000() throws Exception
 	{
 		printJVMMemStats();
-		TimeBucket timeBucket = getTimeBucket(310000);
-		System.out.println("TimeBucket with " + timeBucket.getEvents().size() + " created.");
+		Batch batch = getTimeBucket(310000);
+		System.out.println("TimeBucket with " + batch.getEvents().size() + " created.");
 		long timer = System.currentTimeMillis();
 		printJVMMemStats();
 
 		ObjectNode objectNode = textMapper.createObjectNode();
-		objectNode.put("bucketMetaData", timeBucket.getBucketMetaData().toJson());
-		objectNode.put("bytes", timeBucket.getBytes());
-		objectNode.put("lastEventTime", timeBucket.getLastEventTime().toString());
+		objectNode.put("bucketMetaData", batch.getChannelMetaData().toJson());
+		objectNode.put("bytes", batch.getBytes());
+		objectNode.put("lastEventTime", batch.getLastEventTime().toString());
 
 		ArrayNode dataNode = objectNode.putArray("data");
 
-		for (Message message : timeBucket.getEvents())
+		for (Message message : batch.getEvents())
 		{
 			dataNode.add(message.toJson());
 		}
-		System.out.println(timeBucket.getEvents().size() + " items to JsonNode in " + (System.currentTimeMillis() - timer) + "ms");
+		System.out.println(batch.getEvents().size() + " items to JsonNode in " + (System.currentTimeMillis() - timer) + "ms");
 		timer = System.currentTimeMillis();
 		printJVMMemStats();
 
@@ -97,15 +97,15 @@ public class JacksonResourcePerformance
 		JsonGenerator g = f.createJsonGenerator(new FileOutputStream(new File("stream.json")));
 		g.writeTree(objectNode);
 		g.close();
-		System.out.println(timeBucket.getEvents().size() + " JsonNode to Stream to file " + (System.currentTimeMillis() - timer) + "ms");
+		System.out.println(batch.getEvents().size() + " JsonNode to Stream to file " + (System.currentTimeMillis() - timer) + "ms");
 		printJVMMemStats();
 	}
 
 	public void testJsonOutputStream650000() throws Exception
 	{
 		printJVMMemStats();
-		TimeBucket timeBucket = getTimeBucket(650000);
-		System.out.println("TimeBucket with " + timeBucket.getEvents().size() + " created.");
+		Batch batch = getTimeBucket(650000);
+		System.out.println("TimeBucket with " + batch.getEvents().size() + " created.");
 		long timer = System.currentTimeMillis();
 		printJVMMemStats();
 
@@ -116,14 +116,14 @@ public class JacksonResourcePerformance
 		g.writeFieldName("bucketMetaData");
 		// You have to use write number to pipe in raw json see:
 		// http://markmail.org/thread/xv26gqctvtee4uoo#query:+page:1+mid:m7ggc4syaj3vuwmq+state:results
-		g.writeNumber(timeBucket.getBucketMetaData().toJson().toString());
+		g.writeNumber(batch.getChannelMetaData().toJson().toString());
 		g.writeFieldName("bytes");
-		g.writeNumber(timeBucket.getBytes());
-		g.writeStringField("lastEventTime", timeBucket.getLastEventTime().toString());
+		g.writeNumber(batch.getBytes());
+		g.writeStringField("lastEventTime", batch.getLastEventTime().toString());
 
 		g.writeFieldName("data");
 		g.writeStartArray();
-		for (Message event : timeBucket.getEvents())
+		for (Message event : batch.getEvents())
 		{
 			g.writeStartObject();
 			g.writeStringField("customer", event.getCustomer());
@@ -137,7 +137,7 @@ public class JacksonResourcePerformance
 
 		g.writeEndObject();
 		g.close();
-		System.out.println(timeBucket.getEvents().size() + " items to OutputStream in " + (System.currentTimeMillis() - timer) + "ms");
+		System.out.println(batch.getEvents().size() + " items to OutputStream in " + (System.currentTimeMillis() - timer) + "ms");
 		printJVMMemStats();
 	}
 
@@ -145,8 +145,8 @@ public class JacksonResourcePerformance
 	public void testJsonOutputStream100000000() throws Exception
 	{
 		printJVMMemStats();
-		TimeBucket timeBucket = getTimeBucket(0);
-		System.out.println("TimeBucket with " + timeBucket.getEvents().size() + " created.");
+		Batch batch = getTimeBucket(0);
+		System.out.println("TimeBucket with " + batch.getEvents().size() + " created.");
 		long timer = System.currentTimeMillis();
 		printJVMMemStats();
 
@@ -157,10 +157,10 @@ public class JacksonResourcePerformance
 		g.writeFieldName("bucketMetaData");
 		// You have to use write number to pipe in raw json see:
 		// http://markmail.org/thread/xv26gqctvtee4uoo#query:+page:1+mid:m7ggc4syaj3vuwmq+state:results
-		g.writeNumber(timeBucket.getBucketMetaData().toJson().toString());
+		g.writeNumber(batch.getChannelMetaData().toJson().toString());
 		g.writeFieldName("bytes");
-		g.writeNumber(timeBucket.getBytes());
-		g.writeStringField("lastEventTime", timeBucket.getLastEventTime().toString());
+		g.writeNumber(batch.getBytes());
+		g.writeStringField("lastEventTime", batch.getLastEventTime().toString());
 
 		g.writeFieldName("data");
 		g.writeStartArray();
@@ -182,15 +182,15 @@ public class JacksonResourcePerformance
 
 		g.writeEndObject();
 		g.close();
-		System.out.println(timeBucket.getEvents().size() + " items to OutputStream in " + (System.currentTimeMillis() - timer) + "ms");
+		System.out.println(batch.getEvents().size() + " items to OutputStream in " + (System.currentTimeMillis() - timer) + "ms");
 		printJVMMemStats();
 	}
 
 	public void testJsonOutputStreamBinaryVsText1000000() throws Exception
 	{
 		printJVMMemStats();
-		TimeBucket timeBucket = getTimeBucket(500000);
-		System.out.println("TimeBucket with " + timeBucket.getEvents().size() + " created.");
+		Batch batch = getTimeBucket(500000);
+		System.out.println("TimeBucket with " + batch.getEvents().size() + " created.");
 		long timer = System.currentTimeMillis();
 		printJVMMemStats();
 
@@ -206,12 +206,12 @@ public class JacksonResourcePerformance
 		{
 			g.writeStartObject();
 			g.writeFieldName("bytes");
-			g.writeNumber(timeBucket.getBytes());
-			g.writeStringField("lastEventTime", timeBucket.getLastEventTime().toString());
+			g.writeNumber(batch.getBytes());
+			g.writeStringField("lastEventTime", batch.getLastEventTime().toString());
 
 			g.writeFieldName("data");
 			g.writeStartArray();
-			for (Message event : timeBucket.getEvents())
+			for (Message event : batch.getEvents())
 			{
 				g.writeStartObject();
 				g.writeStringField("customer", event.getCustomer());
@@ -225,7 +225,7 @@ public class JacksonResourcePerformance
 
 			g.writeEndObject();
 			g.close();
-			System.out.println(g.getClass().getSimpleName() + " : " + timeBucket.getEvents().size() + " items to OutputStream in " + (System.currentTimeMillis() - timer) + "ms");
+			System.out.println(g.getClass().getSimpleName() + " : " + batch.getEvents().size() + " items to OutputStream in " + (System.currentTimeMillis() - timer) + "ms");
 			printJVMMemStats();
 		}
 	}

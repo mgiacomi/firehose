@@ -1,4 +1,4 @@
-package com.gltech.scale.core.rope;
+package com.gltech.scale.core.aggregator;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

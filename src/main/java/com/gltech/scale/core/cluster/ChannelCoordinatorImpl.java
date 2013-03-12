@@ -2,11 +2,11 @@ package com.gltech.scale.core.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.rope.PrimaryBackupSet;
-import com.gltech.scale.core.rope.RopeManagersByPeriod;
+import com.gltech.scale.core.aggregator.PrimaryBackupSet;
 import com.gltech.scale.util.Props;
 import com.gltech.scale.util.ZkClientCreator;
 import com.netflix.curator.framework.CuratorFramework;
@@ -125,28 +125,28 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		}
 	}
 
-	public RopeManagersByPeriod getRopeManagerPeriodMatrix(DateTime nearestPeriodCeiling)
+	public AggregatorsByPeriod getRopeManagerPeriodMatrix(DateTime nearestPeriodCeiling)
 	{
 		nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(nearestPeriodCeiling);
 
-		RopeManagersByPeriod ropeManagersByPeriod = readRopeManagersByPeriod(nearestPeriodCeiling);
+		AggregatorsByPeriod aggregatorsByPeriod = readRopeManagersByPeriod(nearestPeriodCeiling);
 
-		if (ropeManagersByPeriod == null)
+		if (aggregatorsByPeriod == null)
 		{
-			ropeManagersByPeriod = writeRopeManagerByPeriod(nearestPeriodCeiling);
+			aggregatorsByPeriod = writeRopeManagerByPeriod(nearestPeriodCeiling);
 		}
 
-		return ropeManagersByPeriod;
+		return aggregatorsByPeriod;
 	}
 
-	RopeManagersByPeriod readRopeManagersByPeriod(DateTime nearestPeriodCeiling)
+	AggregatorsByPeriod readRopeManagersByPeriod(DateTime nearestPeriodCeiling)
 	{
 		String period = nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
 
 		try
 		{
 			byte[] data = client.getData().forPath("/rope_manager/periods/" + period);
-			return mapper.readValue(new String(data), RopeManagersByPeriod.class);
+			return mapper.readValue(new String(data), AggregatorsByPeriod.class);
 		}
 		catch (KeeperException.NoNodeException e)
 		{
@@ -158,7 +158,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		}
 	}
 
-	RopeManagersByPeriod writeRopeManagerByPeriod(DateTime nearestPeriodCeiling)
+	AggregatorsByPeriod writeRopeManagerByPeriod(DateTime nearestPeriodCeiling)
 	{
 		// You can't schedule anything more then one time period into the future.
 		int periodSeconds = props.get("coordination.period_seconds", 5);
@@ -261,9 +261,9 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 				try
 				{
 					String period = nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
-					RopeManagersByPeriod ropeManagersByPeriod = new RopeManagersByPeriod(nearestPeriodCeiling, primaryBackupSets);
+					AggregatorsByPeriod aggregatorsByPeriod = new AggregatorsByPeriod(nearestPeriodCeiling, primaryBackupSets);
 
-					client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/rope_manager/periods/" + period, mapper.writeValueAsString(ropeManagersByPeriod).getBytes());
+					client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/rope_manager/periods/" + period, mapper.writeValueAsString(aggregatorsByPeriod).getBytes());
 					logger.info("Registering " + primaryBackupSets.size() + " RopeManager set(s) for period: " + period);
 
 					// Add assign set count to the history, but only keep history of the last three
@@ -273,7 +273,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 						registeredSetsHist.remove(0);
 					}
 
-					return ropeManagersByPeriod;
+					return aggregatorsByPeriod;
 				}
 				catch (KeeperException.NodeExistsException e)
 				{

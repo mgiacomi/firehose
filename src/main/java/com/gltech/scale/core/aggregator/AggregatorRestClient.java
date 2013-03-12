@@ -1,7 +1,9 @@
-package com.gltech.scale.core.rope;
+package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
+import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.util.ClientCreator;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -13,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.List;
 
-public class RopeManagerRestClient
+public class AggregatorRestClient
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.RopeManagerRestClient");
 	private final Client client = ClientCreator.createCached();
@@ -53,7 +55,7 @@ public class RopeManagerRestClient
 			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus());
 		}
 
-		return TimeBucket.jsonToEvents(response.getEntityInputStream());
+		return Batch.jsonToEvents(response.getEntityInputStream());
 	}
 
 	public InputStream getTimeBucketEventsStream(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
@@ -88,7 +90,7 @@ public class RopeManagerRestClient
 			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus());
 		}
 
-		return TimeBucket.jsonToEvents(response.getEntityInputStream());
+		return Batch.jsonToEvents(response.getEntityInputStream());
 	}
 
 	public InputStream getBackupTimeBucketEventsStream(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
@@ -117,7 +119,7 @@ public class RopeManagerRestClient
 		}
 	}
 
-	public TimeBucketMetaData getTimeBucketMetaData(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
+	public BatchMetaData getTimeBucketMetaData(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
 	{
 		String url = "http://" + ropeManager.getListenAddress() + ":" + ropeManager.getListenPort() + "/ropes/" + customer + "/" + bucket + "/timebucket/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/metadata";
 		WebResource webResource = client.resource(url);
@@ -128,10 +130,10 @@ public class RopeManagerRestClient
 			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus());
 		}
 
-		return new TimeBucketMetaData(response.getEntity(String.class));
+		return new BatchMetaData(response.getEntity(String.class));
 	}
 
-	public TimeBucketMetaData getBackupTimeBucketMetaData(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
+	public BatchMetaData getBackupTimeBucketMetaData(ServiceMetaData ropeManager, String customer, String bucket, DateTime dateTime)
 	{
 		String url = "http://" + ropeManager.getListenAddress() + ":" + ropeManager.getListenPort() + "/ropes/" + customer + "/" + bucket + "/backup/timebucket/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/metadata";
 		WebResource webResource = client.resource(url);
@@ -142,6 +144,6 @@ public class RopeManagerRestClient
 			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus());
 		}
 
-		return new TimeBucketMetaData(response.getEntity(String.class));
+		return new BatchMetaData(response.getEntity(String.class));
 	}
 }

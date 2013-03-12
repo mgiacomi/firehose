@@ -1,12 +1,12 @@
 package com.gltech.scale.core.storage.bytearray;
 
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 
 public interface ByteArrayStorage
 {
-	void putBucket(BucketMetaData bucketMetaData);
+	void putBucket(ChannelMetaData channelMetaData);
 
-	BucketMetaData getBucket(String customer, String bucket);
+	ChannelMetaData getBucket(String customer, String bucket);
 
 	void putPayload(StoragePayload storagePayload);
 

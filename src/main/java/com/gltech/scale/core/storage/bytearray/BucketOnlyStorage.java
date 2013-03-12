@@ -1,6 +1,6 @@
 package com.gltech.scale.core.storage.bytearray;
 
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,12 +10,12 @@ public class BucketOnlyStorage implements InternalStorage
 	InternalStorage memoryStorage = new MemoryStorage();
 	private static final long MegaBytes = 1024L * 1024L;
 
-	public void putBucket(BucketMetaData bucketMetaData)
+	public void putBucket(ChannelMetaData channelMetaData)
 	{
-		memoryStorage.putBucket(bucketMetaData);
+		memoryStorage.putBucket(channelMetaData);
 	}
 
-	public BucketMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String customer, String bucket)
 	{
 		return memoryStorage.getBucket(customer, bucket);
 	}
@@ -37,13 +37,13 @@ public class BucketOnlyStorage implements InternalStorage
 		return null;
 	}
 
-	public StoragePayload internalGetPayload(BucketMetaData bucketMetaData, String id)
+	public StoragePayload internalGetPayload(ChannelMetaData channelMetaData, String id)
 	{
 		//do nothing
 		return null;
 	}
 
-	public void internalPutPayload(BucketMetaData bucketMetaData, StoragePayload storagePayload)
+	public void internalPutPayload(ChannelMetaData channelMetaData, StoragePayload storagePayload)
 	{
 		try
 		{

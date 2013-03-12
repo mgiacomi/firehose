@@ -4,16 +4,16 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Message;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
-import com.gltech.scale.core.rope.PrimaryBackupSet;
-import com.gltech.scale.core.rope.RopeManagersByPeriod;
+import com.gltech.scale.core.aggregator.PrimaryBackupSet;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.rope.RopeManagerRestClient;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.aggregator.AggregatorRestClient;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
 import com.gltech.scale.core.storage.StorageServiceClient;
 import com.gltech.scale.util.Http404Exception;
@@ -32,22 +32,22 @@ import java.util.concurrent.ConcurrentMap;
 public class InboundServiceImpl implements InboundService
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.event.EventServiceImpl");
-	private ConcurrentMap<DateTime, RopeManagersByPeriod> ropeManagerPeriodMatrices = new ConcurrentHashMap<>();
+	private ConcurrentMap<DateTime, AggregatorsByPeriod> ropeManagerPeriodMatrices = new ConcurrentHashMap<>();
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;
 	private StorageServiceClient storageServiceClient;
-	private RopeManagerRestClient ropeManagerRestClient;
+	private AggregatorRestClient aggregatorRestClient;
 	private BucketMetaDataCache bucketMetaDataCache;
 	private TimePeriodUtils timePeriodUtils;
 	private Props props = Props.getProps();
 
 	@Inject
-	public InboundServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, StorageServiceClient storageServiceClient, RopeManagerRestClient ropeManagerRestClient, BucketMetaDataCache bucketMetaDataCache, TimePeriodUtils timePeriodUtils)
+	public InboundServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, StorageServiceClient storageServiceClient, AggregatorRestClient aggregatorRestClient, BucketMetaDataCache bucketMetaDataCache, TimePeriodUtils timePeriodUtils)
 	{
 		this.clusterService = clusterService;
 		this.channelCoordinator = channelCoordinator;
 		this.storageServiceClient = storageServiceClient;
-		this.ropeManagerRestClient = ropeManagerRestClient;
+		this.aggregatorRestClient = aggregatorRestClient;
 		this.bucketMetaDataCache = bucketMetaDataCache;
 		this.timePeriodUtils = timePeriodUtils;
 
@@ -73,36 +73,36 @@ public class InboundServiceImpl implements InboundService
 			logger.debug("Pre-storing event payload data to storage service: customer={} bucket={} uuid={} bytes={}", message.getCustomer(), message.getBucket(), message.getUuid(), payload.length);
 		}
 
-		RopeManagersByPeriod ropeManagersByPeriod = ropeManagerPeriodMatrices.get(nearestPeriodCeiling);
+		AggregatorsByPeriod aggregatorsByPeriod = ropeManagerPeriodMatrices.get(nearestPeriodCeiling);
 
-		if (ropeManagersByPeriod == null)
+		if (aggregatorsByPeriod == null)
 		{
-			RopeManagersByPeriod newRopeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(nearestPeriodCeiling);
-			ropeManagersByPeriod = ropeManagerPeriodMatrices.putIfAbsent(nearestPeriodCeiling, newRopeManagersByPeriod);
-			if (ropeManagersByPeriod == null)
+			AggregatorsByPeriod newAggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(nearestPeriodCeiling);
+			aggregatorsByPeriod = ropeManagerPeriodMatrices.putIfAbsent(nearestPeriodCeiling, newAggregatorsByPeriod);
+			if (aggregatorsByPeriod == null)
 			{
-				ropeManagersByPeriod = newRopeManagersByPeriod;
+				aggregatorsByPeriod = newAggregatorsByPeriod;
 			}
 		}
 
-		BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(message.getCustomer(), message.getBucket(), true);
+		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(message.getCustomer(), message.getBucket(), true);
 
-		if (bucketMetaData.getRedundancy().equals(BucketMetaData.Redundancy.singlewrite))
+		if (channelMetaData.getRedundancy().equals(ChannelMetaData.Redundancy.singlewrite))
 		{
 			// This gets a rope manager.  Each call with round robin though all (primary and backup) rope managers.
-			ServiceMetaData ropeManager = ropeManagersByPeriod.next();
-			ropeManagerRestClient.postEvent(ropeManager, message);
+			ServiceMetaData ropeManager = aggregatorsByPeriod.next();
+			aggregatorRestClient.postEvent(ropeManager, message);
 		}
 
-		if (bucketMetaData.getRedundancy().equals(BucketMetaData.Redundancy.doublewritesync))
+		if (channelMetaData.getRedundancy().equals(ChannelMetaData.Redundancy.doublewritesync))
 		{
 			// This gets a primary and backup rope manager.  Each call with round robin though available sets.
-			PrimaryBackupSet primaryBackupSet = ropeManagersByPeriod.nextPrimaryBackupSet();
-			ropeManagerRestClient.postEvent(primaryBackupSet.getPrimary(), message);
+			PrimaryBackupSet primaryBackupSet = aggregatorsByPeriod.nextPrimaryBackupSet();
+			aggregatorRestClient.postEvent(primaryBackupSet.getPrimary(), message);
 
 			if (primaryBackupSet.getBackup() != null)
 			{
-				ropeManagerRestClient.postBackupEvent(primaryBackupSet.getBackup(), message);
+				aggregatorRestClient.postBackupEvent(primaryBackupSet.getBackup(), message);
 			}
 			else
 			{
@@ -112,13 +112,13 @@ public class InboundServiceImpl implements InboundService
 	}
 
 	@Override
-	public int writeEventsToOutputStream(BucketMetaData bucketMetaData, DateTime dateTime, OutputStream outputStream, int recordsWritten)
+	public int writeEventsToOutputStream(ChannelMetaData channelMetaData, DateTime dateTime, OutputStream outputStream, int recordsWritten)
 	{
 		String id = timePeriodUtils.nearestPeriodCeiling(dateTime).toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
 		ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
 
-		String customer = bucketMetaData.getCustomer();
-		String bucket = bucketMetaData.getBucket();
+		String customer = channelMetaData.getCustomer();
+		String bucket = channelMetaData.getBucket();
 
 		try
 		{

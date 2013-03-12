@@ -1,13 +1,13 @@
 package com.gltech.scale.core.storage.bytearray;
 
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 
 /**
  * This interface exposes some convenience methods to save on (potentially) remote calls.
  */
 public interface InternalStorage extends ByteArrayStorage
 {
-	StoragePayload internalGetPayload(BucketMetaData bucketMetaData, String id);
+	StoragePayload internalGetPayload(ChannelMetaData channelMetaData, String id);
 
-	void internalPutPayload(BucketMetaData bucketMetaData, StoragePayload storagePayload);
+	void internalPutPayload(ChannelMetaData channelMetaData, StoragePayload storagePayload);
 }

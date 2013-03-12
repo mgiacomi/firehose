@@ -1,7 +1,7 @@
 package com.gltech.scale.core.inbound;
 
 import com.google.inject.Inject;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
 import com.gltech.scale.util.Http404Exception;
 import com.gltech.scale.util.Props;
@@ -50,8 +50,8 @@ public class InboundResource
 	{
 		try
 		{
-			BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
-			return Response.ok(bucketMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
+			ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+			return Response.ok(channelMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
 		}
 		catch (Http404Exception e)
 		{
@@ -102,7 +102,7 @@ public class InboundResource
 		try
 		{
 			// Get bucket for customer to determine event group interval.
-			final BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+			final ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
 
 			StreamingOutput out = new StreamingOutput()
 			{
@@ -117,7 +117,7 @@ public class InboundResource
 						// If our period is less the 60 and a time with seconds was requested, then make a single request.
 						if (sec > -1)
 						{
-							recordsWritten = inboundService.writeEventsToOutputStream(bucketMetaData, new DateTime(year, month, day, hour, min, sec), outputStream, recordsWritten);
+							recordsWritten = inboundService.writeEventsToOutputStream(channelMetaData, new DateTime(year, month, day, hour, min, sec), outputStream, recordsWritten);
 						}
 
 						// If our period is less the 60 and a time with no secs, but minutes was requested, then query all periods for this minute.
@@ -129,7 +129,7 @@ public class InboundResource
 
 								if (dateTime.isBeforeNow())
 								{
-									recordsWritten = inboundService.writeEventsToOutputStream(bucketMetaData, dateTime, outputStream, recordsWritten);
+									recordsWritten = inboundService.writeEventsToOutputStream(channelMetaData, dateTime, outputStream, recordsWritten);
 								}
 							}
 						}
@@ -145,7 +145,7 @@ public class InboundResource
 
 									if (dateTime.isBeforeNow())
 									{
-										recordsWritten = inboundService.writeEventsToOutputStream(bucketMetaData, dateTime, outputStream, recordsWritten);
+										recordsWritten = inboundService.writeEventsToOutputStream(channelMetaData, dateTime, outputStream, recordsWritten);
 									}
 								}
 							}
@@ -163,7 +163,7 @@ public class InboundResource
 										DateTime dateTime = new DateTime(year, month, day, h, m, s);
 										if (dateTime.isBeforeNow())
 										{
-											recordsWritten = inboundService.writeEventsToOutputStream(bucketMetaData, dateTime, outputStream, recordsWritten);
+											recordsWritten = inboundService.writeEventsToOutputStream(channelMetaData, dateTime, outputStream, recordsWritten);
 										}
 									}
 								}
@@ -182,7 +182,7 @@ public class InboundResource
 			};
 
 
-			if (bucketMetaData.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE))
+			if (channelMetaData.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE))
 			{
 				return Response.ok(out, MediaType.APPLICATION_JSON).build();
 			}

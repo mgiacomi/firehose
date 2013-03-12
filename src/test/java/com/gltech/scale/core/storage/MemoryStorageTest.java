@@ -1,5 +1,6 @@
 package com.gltech.scale.core.storage;
 
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.bytearray.MemoryStorage;
 import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;
 import com.gltech.scale.core.storage.bytearray.StoragePayload;
@@ -11,25 +12,25 @@ import static org.junit.Assert.assertArrayEquals;
 public class MemoryStorageTest
 {
 	private ByteArrayStorage byteArrayStorage;
-	private BucketMetaData bucketC1B1;
-	private BucketMetaData bucketC1B2;
-	private BucketMetaData bucketC2B1;
+	private ChannelMetaData channelC1B1;
+	private ChannelMetaData channelC1B2;
+	private ChannelMetaData channelC2B1;
 
 	@Before
 	public void setUp() throws Exception
 	{
 		byteArrayStorage = new MemoryStorage();
-		bucketC1B1 = BucketMetaDataTest.createEventSetBucket("C1", "B1");
-		bucketC1B2 = BucketMetaDataTest.createEventSetBucket("C1", "B2");
-		bucketC2B1 = BucketMetaDataTest.createEventSetBucket("C2", "B1");
+		channelC1B1 = BucketMetaDataTest.createEventSetBucket("C1", "B1");
+		channelC1B2 = BucketMetaDataTest.createEventSetBucket("C1", "B2");
+		channelC2B1 = BucketMetaDataTest.createEventSetBucket("C2", "B1");
 	}
 
 	@Test
 	public void testMultiples()
 	{
-		byteArrayStorage.putBucket(bucketC1B1);
-		byteArrayStorage.putBucket(bucketC1B2);
-		byteArrayStorage.putBucket(bucketC2B1);
+		byteArrayStorage.putBucket(channelC1B1);
+		byteArrayStorage.putBucket(channelC1B2);
+		byteArrayStorage.putBucket(channelC2B1);
 
 		StoragePayload A_C1_B1 = new StoragePayload("A", "C1", "B1", "payload A".getBytes());
 		byteArrayStorage.putPayload(A_C1_B1);
@@ -53,8 +54,8 @@ public class MemoryStorageTest
 	@Test(expected = StorageException.class)
 	public void testMultipleBucketCreation()
 	{
-		BucketMetaData bucketC1B1 = BucketMetaDataTest.createEventSetBucket("C1", "B1");
-		byteArrayStorage.putBucket(bucketC1B1);
-		byteArrayStorage.putBucket(bucketC1B1);
+		ChannelMetaData channelC1B1 = BucketMetaDataTest.createEventSetBucket("C1", "B1");
+		byteArrayStorage.putBucket(channelC1B1);
+		byteArrayStorage.putBucket(channelC1B1);
 	}
 }

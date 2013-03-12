@@ -1,6 +1,6 @@
 package com.gltech.scale.core.storage.bytearray;
 
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 
 import java.util.List;
 
@@ -16,28 +16,28 @@ public class ValidatingStorage implements ByteArrayStorage
 		this.delegate = delegate;
 	}
 
-	public void putBucket(BucketMetaData bucketMetaData)
+	public void putBucket(ChannelMetaData channelMetaData)
 	{
-		delegate.putBucket(bucketMetaData);
+		delegate.putBucket(channelMetaData);
 	}
 
-	public BucketMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String customer, String bucket)
 	{
 		return delegate.getBucket(customer, bucket);
 	}
 
 	public void putPayload(StoragePayload storagePayload)
 	{
-		BucketMetaData bucketMetaData = getBucket(storagePayload.getCustomer(), storagePayload.getBucket());
+		ChannelMetaData channelMetaData = getBucket(storagePayload.getCustomer(), storagePayload.getBucket());
 
 		List<String> previousVersions = storagePayload.getPreviousVersions();
 
 		if (previousVersions.isEmpty())
 		{
-			delegate.internalPutPayload(bucketMetaData, storagePayload);
+			delegate.internalPutPayload(channelMetaData, storagePayload);
 			return;
 		}
-		StoragePayload payload = delegate.internalGetPayload(bucketMetaData, storagePayload.getId());
+		StoragePayload payload = delegate.internalGetPayload(channelMetaData, storagePayload.getId());
 		if (null == payload)
 		{
 			throw new InvalidVersionException("payload does not yet exist");
@@ -47,7 +47,7 @@ public class ValidatingStorage implements ByteArrayStorage
 		{
 			if (currentVersion.equals(previousVersion) || previousVersion.equals("*"))
 			{
-				delegate.internalPutPayload(bucketMetaData, storagePayload);
+				delegate.internalPutPayload(channelMetaData, storagePayload);
 				return;
 			}
 		}

@@ -1,6 +1,7 @@
 package com.gltech.scale.core.storage;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;
 import com.gltech.scale.util.ClientCreator;
@@ -38,14 +39,14 @@ public abstract class StorageResourceBaseTest
 	{
 		String customer = "testCustomer";
 		String bucket = "testBucket";
-		BucketMetaData eventSetBucket = BucketMetaDataTest.createEventSetBucket(customer, bucket);
+		ChannelMetaData eventSetChannel = BucketMetaDataTest.createEventSetBucket(customer, bucket);
 		WebResource resource = client.resource("http://localhost:9090/storage/" + customer + "/" + bucket);
-		ClientResponse putResponse = resource.put(ClientResponse.class, eventSetBucket.toJson().toString());
+		ClientResponse putResponse = resource.put(ClientResponse.class, eventSetChannel.toJson().toString());
 		assertEquals(201, putResponse.getStatus());
 		assertEquals(resource.getURI().toString(), putResponse.getLocation().toString());
 		ClientResponse getResponse = resource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		assertEquals(200, getResponse.getStatus());
-		assertEquals(eventSetBucket.toJson().toString(), getResponse.getEntity(String.class));
+		assertEquals(eventSetChannel.toJson().toString(), getResponse.getEntity(String.class));
 	}
 
 	private void simpleCreate(String customer, String bucket)
@@ -54,10 +55,10 @@ public abstract class StorageResourceBaseTest
 		storageService.setListenAddress(Props.getProps().get("event_service.rest_host", "localhost"));
 		storageService.setListenPort(Props.getProps().get("event_service.rest_port", 9090));
 
-		BucketMetaData eventSetBucket = BucketMetaDataTest.createEventSetBucket(customer, bucket);
-		restClient.putBucketMetaData(storageService, eventSetBucket);
-		BucketMetaData bucketMetaData = restClient.getBucketMetaData(storageService, customer, bucket);
-		assertNotNull(bucketMetaData);
+		ChannelMetaData eventSetChannel = BucketMetaDataTest.createEventSetBucket(customer, bucket);
+		restClient.putBucketMetaData(storageService, eventSetChannel);
+		ChannelMetaData channelMetaData = restClient.getBucketMetaData(storageService, customer, bucket);
+		assertNotNull(channelMetaData);
 	}
 
 	@Test
@@ -87,11 +88,11 @@ public abstract class StorageResourceBaseTest
 	{
 		String customer = "testCustomer";
 		String bucket = "testExistingBucket";
-		BucketMetaData eventSetBucket = BucketMetaDataTest.createEventSetBucket(customer, bucket);
+		ChannelMetaData eventSetChannel = BucketMetaDataTest.createEventSetBucket(customer, bucket);
 		WebResource resource = client.resource("http://localhost:9090/storage/" + customer + "/" + bucket);
-		ClientResponse putResponse = resource.put(ClientResponse.class, eventSetBucket.toJson().toString());
+		ClientResponse putResponse = resource.put(ClientResponse.class, eventSetChannel.toJson().toString());
 		assertEquals(201, putResponse.getStatus());
-		putResponse = resource.put(ClientResponse.class, eventSetBucket.toJson().toString());
+		putResponse = resource.put(ClientResponse.class, eventSetChannel.toJson().toString());
 		assertEquals(403, putResponse.getStatus());
 		assertTrue(putResponse.getEntity(String.class).contains(bucket));
 	}
@@ -136,9 +137,9 @@ public abstract class StorageResourceBaseTest
 	{
 		String customer = "testCustomer";
 		String bucket = "payloadBucket";
-		BucketMetaData eventSetBucket = BucketMetaDataTest.createEventSetBucket(customer, bucket);
+		ChannelMetaData eventSetChannel = BucketMetaDataTest.createEventSetBucket(customer, bucket);
 		WebResource resource = client.resource("http://localhost:9090/storage/" + customer + "/" + bucket);
-		resource.put(ClientResponse.class, eventSetBucket.toJson().toString());
+		resource.put(ClientResponse.class, eventSetChannel.toJson().toString());
 		return resource;
 	}
 
@@ -155,9 +156,9 @@ public abstract class StorageResourceBaseTest
 	{
 		String customer = "testCustomer";
 		String bucket = "payloadBucket";
-		BucketMetaData eventSetBucket = BucketMetaDataTest.createEventSetBucket(customer, bucket);
+		ChannelMetaData eventSetChannel = BucketMetaDataTest.createEventSetBucket(customer, bucket);
 		WebResource resource = client.resource("http://localhost:9090/storage/" + customer + "/" + bucket);
-		resource.put(ClientResponse.class, eventSetBucket.toJson().toString());
+		resource.put(ClientResponse.class, eventSetChannel.toJson().toString());
 		ClientResponse response = resource.get(ClientResponse.class);
 		assertEquals(200, response.getStatus());
 		assertEquals(MediaType.APPLICATION_JSON, response.getType().toString());

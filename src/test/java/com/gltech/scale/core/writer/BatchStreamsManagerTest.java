@@ -2,8 +2,8 @@ package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.Message;
-import com.gltech.scale.core.rope.TimeBucket;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.Batch;
+import com.gltech.scale.core.model.ChannelMetaData;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ public class BatchStreamsManagerTest
 	@Test
 	public void nextMultiStreamTest() throws Exception
 	{
-		BucketMetaData bucketMetaData = new BucketMetaData("1", "2", BucketMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, BucketMetaData.LifeTime.medium, BucketMetaData.Redundancy.doublewritesync);
+		ChannelMetaData channelMetaData = new ChannelMetaData("1", "2", ChannelMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.doublewritesync);
 
 		Message e1 = new Message("C1", "B", "testdata0".getBytes());
 		Thread.sleep(10);
@@ -41,21 +41,21 @@ public class BatchStreamsManagerTest
 
 		DateTime period = DateTime.now();
 
-		TimeBucket timeBucket1 = new TimeBucket(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
-		TimeBucket timeBucket2 = new TimeBucket(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
-		TimeBucket timeBucketb1 = new TimeBucket(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
-		TimeBucket timeBucketb2 = new TimeBucket(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
+		Batch batch1 = new Batch(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
+		Batch batch2 = new Batch(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
+		Batch timeBucketb1 = new Batch(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
+		Batch timeBucketb2 = new Batch(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
 
-		timeBucket1.addEvent(e3);
-		timeBucket1.addEvent(e5);
-		timeBucket1.addEvent(e6);
-		timeBucket1.addEvent(e9);
+		batch1.addEvent(e3);
+		batch1.addEvent(e5);
+		batch1.addEvent(e6);
+		batch1.addEvent(e9);
 
-		timeBucket2.addEvent(e1);
-		timeBucket2.addEvent(e2);
-		timeBucket2.addEvent(e4);
-		timeBucket2.addEvent(e7);
-		timeBucket2.addEvent(e8);
+		batch2.addEvent(e1);
+		batch2.addEvent(e2);
+		batch2.addEvent(e4);
+		batch2.addEvent(e7);
+		batch2.addEvent(e8);
 
 		timeBucketb1.addEvent(e2);
 		timeBucketb1.addEvent(e3);
@@ -73,12 +73,12 @@ public class BatchStreamsManagerTest
 		ByteArrayOutputStream bos3 = new ByteArrayOutputStream();
 		ByteArrayOutputStream bos4 = new ByteArrayOutputStream();
 
-		timeBucket1.eventsToJson(bos1);
-		timeBucket2.eventsToJson(bos2);
+		batch1.eventsToJson(bos1);
+		batch2.eventsToJson(bos2);
 		timeBucketb1.eventsToJson(bos3);
 		timeBucketb2.eventsToJson(bos4);
 
-		BatchStreamsManager batchStreamsManager = new BatchStreamsManager(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
+		BatchStreamsManager batchStreamsManager = new BatchStreamsManager(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
 		batchStreamsManager.registerInputStream(new ByteArrayInputStream(bos1.toByteArray()));
 		batchStreamsManager.registerInputStream(new ByteArrayInputStream(bos2.toByteArray()));
 		batchStreamsManager.registerInputStream(new ByteArrayInputStream(bos3.toByteArray()));
@@ -88,7 +88,7 @@ public class BatchStreamsManagerTest
 		batchStreamsManager.writeEvents(storageStream);
 
 		ByteArrayInputStream eventsStream = new ByteArrayInputStream(storageStream.toByteArray());
-		List<Message> events = TimeBucket.jsonToEvents(eventsStream);
+		List<Message> events = Batch.jsonToEvents(eventsStream);
 
 		for (int i = 0; i < 9; i++)
 		{

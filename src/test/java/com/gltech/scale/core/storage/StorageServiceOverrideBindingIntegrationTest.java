@@ -1,5 +1,6 @@
 package com.gltech.scale.core.storage;
 
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
@@ -69,12 +70,12 @@ public class StorageServiceOverrideBindingIntegrationTest
 	static class LameStorage implements ByteArrayStorage
 	{
 		@Override
-		public void putBucket(BucketMetaData bucketMetaData)
+		public void putBucket(ChannelMetaData channelMetaData)
 		{
 		}
 
 		@Override
-		public BucketMetaData getBucket(String customer, String bucket)
+		public ChannelMetaData getBucket(String customer, String bucket)
 		{
 			throw new RuntimeException("Sorry I'm just really lame.");
 		}

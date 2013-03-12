@@ -13,8 +13,8 @@ import com.gltech.scale.ganglia.MonitoringPublisher;
 import com.gltech.scale.ganglia.StatisticsFilter;
 import com.gltech.scale.ganglia.TimerMap;
 import com.gltech.scale.ganglia.TimerMapPublishMetricGroup;
-import com.gltech.scale.core.rope.RopeManager;
-import com.gltech.scale.core.rope.WeightManager;
+import com.gltech.scale.core.aggregator.Aggregator;
+import com.gltech.scale.core.aggregator.WeightManager;
 import com.gltech.scale.util.Props;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -118,8 +118,8 @@ public class EmbeddedServer
 		if (props.get("enable.rope_manager", true))
 		{
 			// Registered RopeManager for shutdown
-			RopeManager ropeManager = injector.getInstance(RopeManager.class);
-			LifeCycleManager.getInstance().add(ropeManager, LifeCycle.Priority.INITIAL);
+			Aggregator aggregator = injector.getInstance(Aggregator.class);
+			LifeCycleManager.getInstance().add(aggregator, LifeCycle.Priority.INITIAL);
 
 			// Start WeightManager and registered it for shutdown
 			WeightManager weightManager = injector.getInstance(WeightManager.class);

@@ -1,4 +1,4 @@
-package com.gltech.scale.core.rope;
+package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.inbound.InboundRestClient;
 import com.gltech.scale.core.model.Message;
@@ -7,7 +7,7 @@ import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;
 import com.gltech.scale.core.storage.bytearray.StoragePayload;
 import com.gltech.scale.util.Props;
@@ -21,7 +21,7 @@ import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 
-public class RopeDoubleWriteIntegrationTest
+public class AggregatorIntegrationTest
 {
 	static private Props props;
 	private TestingServer testingServer;
@@ -90,7 +90,7 @@ public class RopeDoubleWriteIntegrationTest
 		DateTime first = DateTime.now();
 
 		// Test injecting fake events to the rope manager to make sure they are collected too.
-		RopeManagerRestClient rrc = new RopeManagerRestClient();
+		AggregatorRestClient rrc = new AggregatorRestClient();
 		Message backupMessage = new Message("customer1", "bucket1", "event from failed server".getBytes());
 		rrc.postBackupEvent(ropeManager, backupMessage);
 
@@ -102,7 +102,7 @@ public class RopeDoubleWriteIntegrationTest
 		}
 		DateTime second = DateTime.now();
 
-		RopeManagerRestClient ropeClient = new RopeManagerRestClient();
+		AggregatorRestClient ropeClient = new AggregatorRestClient();
 		List<Message> events = ropeClient.getTimeBucketEvents(ropeManager, "customer1", "bucket1", first);
 		assertEquals(3, events.size());
 
@@ -130,14 +130,14 @@ public class RopeDoubleWriteIntegrationTest
 	static class VerySimpleStorage implements ByteArrayStorage
 	{
 		@Override
-		public void putBucket(BucketMetaData bucketMetaData)
+		public void putBucket(ChannelMetaData channelMetaData)
 		{
 		}
 
 		@Override
-		public BucketMetaData getBucket(String customer, String bucket)
+		public ChannelMetaData getBucket(String customer, String bucket)
 		{
-			return new BucketMetaData("customer1", "bucket1", BucketMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.doublewritesync);
+			return new ChannelMetaData("customer1", "bucket1", ChannelMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.doublewritesync);
 		}
 
 		@Override

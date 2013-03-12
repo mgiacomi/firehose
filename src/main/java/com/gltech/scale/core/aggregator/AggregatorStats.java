@@ -1,6 +1,8 @@
-package com.gltech.scale.core.rope;
+package com.gltech.scale.core.aggregator;
 
+import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.ganglia.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -10,11 +12,11 @@ import org.joda.time.DateTime;
 import java.io.OutputStream;
 import java.util.List;
 
-public class RopeManagerStats implements RopeManager
+public class AggregatorStats implements Aggregator
 {
 	public static final String BASE = "RopeManagerStats";
 
-	private final RopeManager ropeManager;
+	private final Aggregator aggregator;
 	private Timer addEventTimer = new Timer();
 	private Timer addBackupEventTimer = new Timer();
 	private Timer clearTimer = new Timer();
@@ -22,9 +24,9 @@ public class RopeManagerStats implements RopeManager
 	private Timer writtenBackupEventsTimer = new Timer();
 
 	@Inject
-	public RopeManagerStats(@Named(BASE) final RopeManager ropeManager)
+	public AggregatorStats(@Named(BASE) final Aggregator aggregator)
 	{
-		this.ropeManager = ropeManager;
+		this.aggregator = aggregator;
 
 		String groupName = "Loki Rope Manager";
 		MonitoringPublisher.getInstance().register(new PublishMetric("AddEvent.Count", groupName, "count", new TimerCountPublisher("", addEventTimer)));
@@ -41,7 +43,7 @@ public class RopeManagerStats implements RopeManager
 		{
 			public String getValue()
 			{
-				return Integer.toString(ropeManager.getActiveTimeBuckets().size());
+				return Integer.toString(aggregator.getActiveTimeBuckets().size());
 			}
 		}));
 
@@ -49,37 +51,37 @@ public class RopeManagerStats implements RopeManager
 
 	public void addEvent(Message message)
 	{
-		ropeManager.addEvent(message);
+		aggregator.addEvent(message);
 		addEventTimer.add(message.getPayload().length);
 	}
 
 	public void addBackupEvent(Message message)
 	{
-		ropeManager.addBackupEvent(message);
+		aggregator.addBackupEvent(message);
 		addBackupEventTimer.add(message.getPayload().length);
 	}
 
 	public void clear(String customer, String bucket, DateTime dateTime)
 	{
 		clearTimer.start();
-		ropeManager.clear(customer, bucket, dateTime);
+		aggregator.clear(customer, bucket, dateTime);
 		clearTimer.stop();
 	}
 
-	public List<TimeBucket> getActiveTimeBuckets()
+	public List<Batch> getActiveTimeBuckets()
 	{
-		return ropeManager.getActiveTimeBuckets();
+		return aggregator.getActiveTimeBuckets();
 	}
 
-	public List<TimeBucket> getActiveBackupTimeBuckets()
+	public List<Batch> getActiveBackupTimeBuckets()
 	{
-		return ropeManager.getActiveBackupTimeBuckets();
+		return aggregator.getActiveBackupTimeBuckets();
 	}
 
 	public long writeTimeBucketEvents(OutputStream outputStream, String customer, String bucket, DateTime dateTime)
 	{
 		long start = System.nanoTime();
-		long processed = ropeManager.writeTimeBucketEvents(outputStream, customer, bucket, dateTime);
+		long processed = aggregator.writeTimeBucketEvents(outputStream, customer, bucket, dateTime);
 		writtenEventsTimer.add(System.nanoTime() - start, processed);
 		return processed;
 	}
@@ -87,23 +89,23 @@ public class RopeManagerStats implements RopeManager
 	public long writeBackupTimeBucketEvents(OutputStream outputStream, String customer, String bucket, DateTime dateTime)
 	{
 		long start = System.nanoTime();
-		long processed = ropeManager.writeBackupTimeBucketEvents(outputStream, customer, bucket, dateTime);
+		long processed = aggregator.writeBackupTimeBucketEvents(outputStream, customer, bucket, dateTime);
 		writtenBackupEventsTimer.add(System.nanoTime() - start, processed);
 		return processed;
 	}
 
-	public TimeBucketMetaData getTimeBucketMetaData(String customer, String bucket, DateTime dateTime)
+	public BatchMetaData getTimeBucketMetaData(String customer, String bucket, DateTime dateTime)
 	{
-		return ropeManager.getTimeBucketMetaData(customer, bucket, dateTime);
+		return aggregator.getTimeBucketMetaData(customer, bucket, dateTime);
 	}
 
-	public TimeBucketMetaData getBackupTimeBucketMetaData(String customer, String bucket, DateTime dateTime)
+	public BatchMetaData getBackupTimeBucketMetaData(String customer, String bucket, DateTime dateTime)
 	{
-		return ropeManager.getBackupTimeBucketMetaData(customer, bucket, dateTime);
+		return aggregator.getBackupTimeBucketMetaData(customer, bucket, dateTime);
 	}
 
 	public void shutdown()
 	{
-		ropeManager.shutdown();
+		aggregator.shutdown();
 	}
 }

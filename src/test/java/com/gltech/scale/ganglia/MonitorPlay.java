@@ -1,5 +1,6 @@
 package com.gltech.scale.ganglia;
 
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
@@ -37,9 +38,9 @@ public class MonitorPlay
 		});
 
 		StorageServiceRestClient restClient = new StorageServiceRestClient();
-		BucketMetaData bucketMetaData = new BucketMetaData("MonitorPlay", "one", BucketMetaData.BucketType.bytes, 10,
-				MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		restClient.putBucketMetaData(storageService, bucketMetaData);
+		ChannelMetaData channelMetaData = new ChannelMetaData("MonitorPlay", "one", ChannelMetaData.BucketType.bytes, 10,
+				MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		restClient.putBucketMetaData(storageService, channelMetaData);
 		for (int i = 0; i < 180; i++)
 		{
 			String id = i + " ";

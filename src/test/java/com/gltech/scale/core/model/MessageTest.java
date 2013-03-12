@@ -1,4 +1,4 @@
-package com.gltech.scale.core.inbound;
+package com.gltech.scale.core.model;
 
 import com.gltech.scale.core.model.Message;
 import org.junit.Test;

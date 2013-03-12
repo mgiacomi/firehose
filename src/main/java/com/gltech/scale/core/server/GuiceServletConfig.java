@@ -17,7 +17,7 @@ import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.RegistrationServiceImpl;
 import com.gltech.scale.core.inbound.InboundResource;
 import com.gltech.scale.core.inbound.InboundService;
-import com.gltech.scale.core.rope.*;
+import com.gltech.scale.core.aggregator.*;
 import com.gltech.scale.core.storage.*;
 import com.gltech.scale.core.storage.bytearray.*;
 import com.gltech.scale.core.storage.stream.AwsS3Storage;
@@ -71,11 +71,11 @@ public class GuiceServletConfig extends GuiceServletContextListener
 
 					if (props.get("enable.rope_manager", true))
 					{
-						bind(RopeResource.class);
+						bind(AggregatorResource.class);
 
 						// The two bindings below show how to implement decorator pattern in Guice
-						bind(RopeManager.class).to(RopeManagerStats.class).in(Singleton.class);
-						bind(RopeManager.class).annotatedWith(Names.named(RopeManagerStats.BASE)).to(RopeManagerImpl.class).in(Singleton.class);
+						bind(Aggregator.class).to(AggregatorStats.class).in(Singleton.class);
+						bind(Aggregator.class).annotatedWith(Names.named(AggregatorStats.BASE)).to(AggregatorImpl.class).in(Singleton.class);
 					}
 
 					if (props.get("enable.collector_manager", true))

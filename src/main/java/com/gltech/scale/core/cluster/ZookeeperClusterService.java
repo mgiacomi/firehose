@@ -3,7 +3,7 @@ package com.gltech.scale.core.cluster;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.util.ZkClientCreator;
 import com.netflix.curator.framework.CuratorFramework;
 import com.netflix.curator.utils.ZKPaths;
@@ -34,11 +34,11 @@ public class ZookeeperClusterService implements ClusterService
 	}
 
 	@Override
-	public void addTimeBucket(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+	public void addTimeBucket(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
 		try
 		{
-			BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(bucketMetaData, nearestPeriodCeiling);
+			BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(channelMetaData, nearestPeriodCeiling);
 
 			if (client.checkExists().forPath("/rope/timebuckets/" + batchPeriodMapper.getNodeName()) == null)
 			{
@@ -160,9 +160,9 @@ public class ZookeeperClusterService implements ClusterService
 	}
 
 	@Override
-	public void clearCollectorLock(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+	public void clearCollectorLock(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
-		BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(bucketMetaData, nearestPeriodCeiling);
+		BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(channelMetaData, nearestPeriodCeiling);
 
 		try
 		{
@@ -176,9 +176,9 @@ public class ZookeeperClusterService implements ClusterService
 	}
 
 	@Override
-	public void clearTimeBucketMetaData(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+	public void clearTimeBucketMetaData(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
-		BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(bucketMetaData, nearestPeriodCeiling);
+		BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(channelMetaData, nearestPeriodCeiling);
 
 		try
 		{

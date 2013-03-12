@@ -1,7 +1,7 @@
 package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.model.Message;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -24,9 +24,9 @@ public class BatchStreamsManager
 	private String customerBucketPeriod;
 	private long bytesWritten;
 
-	public BatchStreamsManager(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+	public BatchStreamsManager(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
-		customerBucketPeriod = bucketMetaData.getCustomer() + "|" + bucketMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + "|" + bucketMetaData.getRedundancy();
+		customerBucketPeriod = channelMetaData.getCustomer() + "|" + channelMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + "|" + channelMetaData.getRedundancy();
 	}
 
 	public void registerInputStream(InputStream ropeStream)

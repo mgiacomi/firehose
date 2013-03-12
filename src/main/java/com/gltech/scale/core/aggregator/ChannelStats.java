@@ -1,27 +1,28 @@
-package com.gltech.scale.core.rope;
+package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.monitor.*;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.ganglia.*;
 import com.gltech.scale.util.Props;
 import org.joda.time.DateTime;
 
 import java.util.Collection;
 
-public class RopeStats implements Rope
+public class ChannelStats implements Channel
 {
 	private static final long KBytes = 1024L;
 	private Props props = Props.getProps();
-	private final Rope rope;
+	private final Channel channel;
 	private Timer addEventTimer = new Timer();
 	private Timer addBackupEventTimer = new Timer();
 
-	public RopeStats(final Rope rope)
+	public ChannelStats(final Channel channel)
 	{
-		this.rope = rope;
+		this.channel = channel;
 
-		String prefix = rope.getBucketMetaData().getCustomer() + "/" + rope.getBucketMetaData().getBucket() + "/" + props.get("coordination.period_seconds", 5);
+		String prefix = channel.getChannelMetaData().getCustomer() + "/" + channel.getChannelMetaData().getBucket() + "/" + props.get("coordination.period_seconds", 5);
 		String groupName = "Loki Rope (" + prefix + ")";
 		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddEvent.Count", groupName, "count", new TimerCountPublisher("", addEventTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addEventTimer)));
@@ -31,16 +32,16 @@ public class RopeStats implements Rope
 			{
 				DateTime firstEventTime = null;
 
-				for (TimeBucket timeBucket : rope.getTimeBuckets())
+				for (Batch batch : channel.getTimeBuckets())
 				{
 					if (firstEventTime == null)
 					{
-						firstEventTime = timeBucket.getFirstEventTime();
+						firstEventTime = batch.getFirstEventTime();
 					}
 
-					if (timeBucket.getFirstEventTime().isBefore(firstEventTime))
+					if (batch.getFirstEventTime().isBefore(firstEventTime))
 					{
-						firstEventTime = timeBucket.getFirstEventTime();
+						firstEventTime = batch.getFirstEventTime();
 					}
 
 				}
@@ -57,7 +58,7 @@ public class RopeStats implements Rope
 		{
 			public String getValue()
 			{
-				return Integer.toString(rope.getTimeBuckets().size());
+				return Integer.toString(channel.getTimeBuckets().size());
 			}
 		}));
 		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " TimeBuckets.Size", groupName, "size in kb", new PublishCallback()
@@ -66,16 +67,16 @@ public class RopeStats implements Rope
 			{
 				long ropePayloadSize = 0;
 
-				for (TimeBucket timeBucket : rope.getTimeBuckets())
+				for (Batch batch : channel.getTimeBuckets())
 				{
-					ropePayloadSize += timeBucket.getBytes();
+					ropePayloadSize += batch.getBytes();
 				}
 
 				return Long.toString(ropePayloadSize / KBytes);
 			}
 		}));
 
-		if (rope.getBucketMetaData().getRedundancy() == BucketMetaData.Redundancy.doublewritesync)
+		if (channel.getChannelMetaData().getRedundancy() == ChannelMetaData.Redundancy.doublewritesync)
 		{
 			MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddBackupEvent.Count", groupName, "count", new TimerCountPublisher("", addBackupEventTimer)));
 			MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddBackupEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupEventTimer)));
@@ -83,7 +84,7 @@ public class RopeStats implements Rope
 			{
 				public String getValue()
 				{
-					return Integer.toString(rope.getBackupTimeBuckets().size());
+					return Integer.toString(channel.getBackupTimeBuckets().size());
 				}
 			}));
 			MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " BackupTimeBuckets.Size", groupName, "size in kb", new PublishCallback()
@@ -92,9 +93,9 @@ public class RopeStats implements Rope
 				{
 					long ropePayloadSize = 0;
 
-					for (TimeBucket timeBucket : rope.getBackupTimeBuckets())
+					for (Batch batch : channel.getBackupTimeBuckets())
 					{
-						ropePayloadSize += timeBucket.getBytes();
+						ropePayloadSize += batch.getBytes();
 					}
 
 					return Long.toString(ropePayloadSize / KBytes);
@@ -103,50 +104,50 @@ public class RopeStats implements Rope
 		}
 	}
 
-	public BucketMetaData getBucketMetaData()
+	public ChannelMetaData getChannelMetaData()
 	{
-		return rope.getBucketMetaData();
+		return channel.getChannelMetaData();
 	}
 
 	public void addEvent(Message message)
 	{
-		rope.addEvent(message);
+		channel.addEvent(message);
 		addEventTimer.add(message.getPayload().length);
 	}
 
 	public void addBackupEvent(Message message)
 	{
-		rope.addBackupEvent(message);
+		channel.addBackupEvent(message);
 		addBackupEventTimer.add(message.getPayload().length);
 	}
 
-	public Collection<TimeBucket> getTimeBuckets()
+	public Collection<Batch> getTimeBuckets()
 	{
-		return rope.getTimeBuckets();
+		return channel.getTimeBuckets();
 	}
 
-	public Collection<TimeBucket> getBackupTimeBuckets()
+	public Collection<Batch> getBackupTimeBuckets()
 	{
-		return rope.getBackupTimeBuckets();
+		return channel.getBackupTimeBuckets();
 	}
 
-	public TimeBucket getTimeBucket(DateTime nearestPeriodCeiling)
+	public Batch getTimeBucket(DateTime nearestPeriodCeiling)
 	{
-		return rope.getTimeBucket(nearestPeriodCeiling);
+		return channel.getTimeBucket(nearestPeriodCeiling);
 	}
 
-	public TimeBucket getBackupTimeBucket(DateTime nearestPeriodCeiling)
+	public Batch getBackupTimeBucket(DateTime nearestPeriodCeiling)
 	{
-		return rope.getBackupTimeBucket(nearestPeriodCeiling);
+		return channel.getBackupTimeBucket(nearestPeriodCeiling);
 	}
 
 	public void clear(DateTime nearestPeriodCeiling)
 	{
-		rope.clear(nearestPeriodCeiling);
+		channel.clear(nearestPeriodCeiling);
 	}
 
 	public void clearBackup(DateTime nearestPeriodCeiling)
 	{
-		rope.clearBackup(nearestPeriodCeiling);
+		channel.clearBackup(nearestPeriodCeiling);
 	}
 }

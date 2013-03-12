@@ -1,11 +1,11 @@
 package com.gltech.scale.core.inbound;
 
+import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.*;
-import com.gltech.scale.core.rope.RopeManagersByPeriod;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.rope.RopeManagerRestClient;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.aggregator.AggregatorRestClient;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
 import com.gltech.scale.core.storage.StorageServiceRestClient;
 import org.joda.time.DateTime;
@@ -23,7 +23,7 @@ public class InboundResourceTest
 {
 	InboundService inboundService;
 	StorageServiceRestClient storageServiceRestClient;
-	RopeManagerRestClient ropeManagerRestClient;
+	AggregatorRestClient aggregatorRestClient;
 	BucketMetaDataCache bucketMetaDataCache;
 	ChannelCoordinator channelCoordinator;
 
@@ -37,7 +37,7 @@ public class InboundResourceTest
 				return new TimePeriodUtils().nearestPeriodCeiling(dateTime);
 			}
 
-			public RopeManagersByPeriod getRopeManagerPeriodMatrix(DateTime dateTime)
+			public AggregatorsByPeriod getRopeManagerPeriodMatrix(DateTime dateTime)
 			{
 				return null;
 			}
@@ -52,15 +52,15 @@ public class InboundResourceTest
 				return null;
 			}
 
-			public void addTimeBucket(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+			public void addTimeBucket(ChannelMetaData bucketMetaData, DateTime nearestPeriodCeiling)
 			{
 			}
 
-			public void clearTimeBucketMetaData(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+			public void clearTimeBucketMetaData(ChannelMetaData bucketMetaData, DateTime nearestPeriodCeiling)
 			{
 			}
 
-			public void clearCollectorLock(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+			public void clearCollectorLock(ChannelMetaData bucketMetaData, DateTime nearestPeriodCeiling)
 			{
 			}
 
@@ -70,18 +70,18 @@ public class InboundResourceTest
 		};
 
 		storageServiceRestClient = mock(StorageServiceRestClient.class);
-		ropeManagerRestClient = mock(RopeManagerRestClient.class);
+		aggregatorRestClient = mock(AggregatorRestClient.class);
 		bucketMetaDataCache = mock(BucketMetaDataCache.class);
 		channelCoordinator = mock(ChannelCoordinator.class);
-		inboundService = new InboundServiceImpl(clusterService, channelCoordinator, storageServiceRestClient, ropeManagerRestClient, bucketMetaDataCache, new TimePeriodUtils());
+		inboundService = new InboundServiceImpl(clusterService, channelCoordinator, storageServiceRestClient, aggregatorRestClient, bucketMetaDataCache, new TimePeriodUtils());
 	}
 
 	@Test
 	public void testPeriodSecondBySecond() throws Exception
 	{
-		BucketMetaData bucketMetaData = createBucketMetaData("c1", "b1", 5);
+		ChannelMetaData channelMetaData = createBucketMetaData("c1", "b1", 5);
 		BucketMetaDataCache bucketMetaDataCache = mock(BucketMetaDataCache.class);
-		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(bucketMetaData);
+		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
 		InboundResource inboundResource = new InboundResource(bucketMetaDataCache, inboundService);
 		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, 15);
@@ -93,9 +93,9 @@ public class InboundResourceTest
 	@Test
 	public void testPeriodSecondBySecond2() throws Exception
 	{
-		BucketMetaData bucketMetaData = createBucketMetaData("c1", "b1", 5);
+		ChannelMetaData channelMetaData = createBucketMetaData("c1", "b1", 5);
 		BucketMetaDataCache bucketMetaDataCache = mock(BucketMetaDataCache.class);
-		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(bucketMetaData);
+		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
 		InboundResource inboundResource = new InboundResource(bucketMetaDataCache, inboundService);
 		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, 13);
@@ -107,9 +107,9 @@ public class InboundResourceTest
 	@Test
 	public void testPeriodByMinute() throws Exception
 	{
-		BucketMetaData bucketMetaData = createBucketMetaData("c1", "b1", 5);
+		ChannelMetaData channelMetaData = createBucketMetaData("c1", "b1", 5);
 		BucketMetaDataCache bucketMetaDataCache = mock(BucketMetaDataCache.class);
-		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(bucketMetaData);
+		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
 		InboundResource inboundResource = new InboundResource(bucketMetaDataCache, inboundService);
 		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, -1);
@@ -134,9 +134,9 @@ public class InboundResourceTest
 	@Test
 	public void testPeriodByHour() throws Exception
 	{
-		BucketMetaData bucketMetaData = createBucketMetaData("c1", "b1", 5);
+		ChannelMetaData channelMetaData = createBucketMetaData("c1", "b1", 5);
 		BucketMetaDataCache bucketMetaDataCache = mock(BucketMetaDataCache.class);
-		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(bucketMetaData);
+		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
 		InboundResource inboundResource = new InboundResource(bucketMetaDataCache, inboundService);
 		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, -1, -1);
@@ -158,9 +158,9 @@ public class InboundResourceTest
 		verify(storageServiceRestClient, times(720)).getEventStream(any(ServiceMetaData.class), anyString(), anyString(), anyString());
 	}
 
-	private BucketMetaData createBucketMetaData(String customer, String bucket, int period)
+	private ChannelMetaData createBucketMetaData(String customer, String bucket, int period)
 	{
-		return new BucketMetaData(customer, bucket, BucketMetaData.BucketType.eventset, period, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
+		return new ChannelMetaData(customer, bucket, ChannelMetaData.BucketType.eventset, period, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
 
 }

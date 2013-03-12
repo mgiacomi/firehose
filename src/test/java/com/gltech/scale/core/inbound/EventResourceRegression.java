@@ -3,7 +3,7 @@ package com.gltech.scale.core.inbound;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.StorageServiceRestClient;
 import com.gltech.scale.util.Http404Exception;
 import com.gltech.scale.util.Props;
@@ -30,7 +30,7 @@ public class EventResourceRegression
 	private StorageServiceRestClient storageServiceRestClient;
 	private ServiceMetaData eventService;
 	private ServiceMetaData storageService;
-	private BucketMetaData bmd1;
+	private ChannelMetaData bmd1;
 	private TimePeriodUtils timePeriodUtils;
 
 	@Before
@@ -79,7 +79,7 @@ public class EventResourceRegression
 	public void createdAndGetBucketMetaData() throws Exception
 	{
 		storageServiceRestClient.putBucketMetaData(storageService, bmd1);
-		BucketMetaData bmd2 = inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
+		ChannelMetaData bmd2 = inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
 		assertEquals(bmd1, bmd2);
 	}
 
@@ -102,10 +102,10 @@ public class EventResourceRegression
 	{
 		storageServiceRestClient.putBucketMetaData(storageService, bmd1);
 
-		BucketMetaData bmd2 = inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
+		ChannelMetaData bmd2 = inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
 		assertEquals(bmd1, bmd2);
 
-		BucketMetaData bucketMetaData = inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
+		ChannelMetaData channelMetaData = inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
 
 		List<String> requests = new ArrayList<>();
 		requests.add("{\"singer\":\"Metallica\",\"title\":\"Fade To Black\"}");
@@ -127,7 +127,7 @@ public class EventResourceRegression
 		StringBuilder expectedResults1 = new StringBuilder();
 		for (String json : requests)
 		{
-			inboundRestClient.postEvent(eventService, bucketMetaData.getCustomer(), bucketMetaData.getBucket(), json);
+			inboundRestClient.postEvent(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), json);
 			if (expectedResults1.length() > 0)
 			{
 				expectedResults1.append(",");
@@ -141,7 +141,7 @@ public class EventResourceRegression
 		StringBuilder expectedResults2 = new StringBuilder();
 		for (String json : requests2)
 		{
-			inboundRestClient.postEvent(eventService, bucketMetaData.getCustomer(), bucketMetaData.getBucket(), json);
+			inboundRestClient.postEvent(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), json);
 			if (expectedResults2.length() > 0)
 			{
 				expectedResults2.append(",");
@@ -154,24 +154,24 @@ public class EventResourceRegression
 
 		Thread.sleep(60000);
 
-		String firstEvents = inboundRestClient.getEvents(eventService, bucketMetaData.getCustomer(), bucketMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(first), TimeUnit.SECONDS);
+		String firstEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(first), TimeUnit.SECONDS);
 		assertEquals("[" + expectedResults1 + "]", firstEvents);
 
-		String secondEvents = inboundRestClient.getEvents(eventService, bucketMetaData.getCustomer(), bucketMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(second), TimeUnit.SECONDS);
+		String secondEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(second), TimeUnit.SECONDS);
 		assertEquals("[" + expectedResults2 + "]", secondEvents);
 
-		String allEvents = inboundRestClient.getEvents(eventService, bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nowish, TimeUnit.MINUTES);
+		String allEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.MINUTES);
 		assertEquals("[" + expectedResults1 + "," + expectedResults2 + "]", allEvents);
 
-		allEvents = inboundRestClient.getEvents(eventService, bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nowish, TimeUnit.HOURS);
+		allEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.HOURS);
 		assertEquals("[" + expectedResults1 + "," + expectedResults2 + "]", allEvents);
 
-		allEvents = inboundRestClient.getEvents(eventService, bucketMetaData.getCustomer(), bucketMetaData.getBucket(), nowish, TimeUnit.DAYS);
+		allEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.DAYS);
 		assertEquals("[" + expectedResults1 + "," + expectedResults2 + "]", allEvents);
 	}
 
-	private BucketMetaData createBucketMetaData(String customer, String bucket)
+	private ChannelMetaData createBucketMetaData(String customer, String bucket)
 	{
-		return new BucketMetaData(customer, bucket, BucketMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
+		return new ChannelMetaData(customer, bucket, ChannelMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
 }

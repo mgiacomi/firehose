@@ -1,4 +1,4 @@
-package com.gltech.scale.core.rope;
+package com.gltech.scale.core.aggregator;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RopeManagersByPeriod
+public class AggregatorsByPeriod
 {
 	private final DateTime period;
 	private final List<PrimaryBackupSet> primaryBackupSets;
@@ -17,7 +17,7 @@ public class RopeManagersByPeriod
 //	private final AtomicInteger singleIndex = new AtomicInteger(0);
 
 	@JsonCreator
-	public RopeManagersByPeriod(@JsonProperty("period") DateTime period, @JsonProperty("primaryBackupSets") List<PrimaryBackupSet> primaryBackupSets)
+	public AggregatorsByPeriod(@JsonProperty("period") DateTime period, @JsonProperty("primaryBackupSets") List<PrimaryBackupSet> primaryBackupSets)
 	{
 		this.period = period;
 		this.primaryBackupSets = primaryBackupSets;

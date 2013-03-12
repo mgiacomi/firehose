@@ -1,9 +1,9 @@
 package com.gltech.scale.core.cluster;
 
+import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.rope.PrimaryBackupSet;
-import com.gltech.scale.core.rope.RopeManagersByPeriod;
+import com.gltech.scale.core.aggregator.PrimaryBackupSet;
 import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 import org.joda.time.DateTime;
@@ -108,10 +108,10 @@ public class RopeCoordinatorRegression
 
 		while (true)
 		{
-			RopeManagersByPeriod ropeManagersByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
-			if (ropeManagersByPeriod != null)
+			AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
+			if (aggregatorsByPeriod != null)
 			{
-				for (PrimaryBackupSet primaryBackupSet : ropeManagersByPeriod.getPrimaryBackupSets())
+				for (PrimaryBackupSet primaryBackupSet : aggregatorsByPeriod.getPrimaryBackupSets())
 				{
 					FakeRopeManager primary = idToRopeManager.get(primaryBackupSet.getPrimary().getWorkerId().toString());
 					primary.assign(true, timePeriodUtils.nearestPeriodCeiling(DateTime.now()));

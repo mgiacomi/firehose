@@ -1,5 +1,6 @@
-package com.gltech.scale.core.rope;
+package com.gltech.scale.core.aggregator;
 
+import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Message;
 import com.google.inject.Inject;
 import com.gltech.scale.util.Http404Exception;
@@ -13,14 +14,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 @Path("/ropes")
-public class RopeResource
+public class AggregatorResource
 {
-	private RopeManager ropeManager;
+	private Aggregator aggregator;
 
 	@Inject
-	public RopeResource(RopeManager ropeManager)
+	public AggregatorResource(Aggregator aggregator)
 	{
-		this.ropeManager = ropeManager;
+		this.aggregator = aggregator;
 	}
 
 	@Path("/event")
@@ -29,7 +30,7 @@ public class RopeResource
 	public Response postEvent(byte[] data)
 	{
 		Message event = new Message(new String(data));
-		ropeManager.addEvent(event);
+		aggregator.addEvent(event);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
@@ -39,7 +40,7 @@ public class RopeResource
 	public Response postBackupEvent(byte[] data)
 	{
 		Message event = new Message(new String(data));
-		ropeManager.addBackupEvent(event);
+		aggregator.addBackupEvent(event);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
@@ -49,7 +50,7 @@ public class RopeResource
 									@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
-		ropeManager.clear(customer, bucket, dateTime);
+		aggregator.clear(customer, bucket, dateTime);
 
 		return Response.ok().build();
 	}
@@ -70,7 +71,7 @@ public class RopeResource
 				{
 					try
 					{
-						ropeManager.writeTimeBucketEvents(output, customer, bucket, dateTime);
+						aggregator.writeTimeBucketEvents(output, customer, bucket, dateTime);
 					}
 					catch (Exception e)
 					{
@@ -103,7 +104,7 @@ public class RopeResource
 				{
 					try
 					{
-						ropeManager.writeBackupTimeBucketEvents(output, customer, bucket, dateTime);
+						aggregator.writeBackupTimeBucketEvents(output, customer, bucket, dateTime);
 					}
 					catch (Exception e)
 					{
@@ -130,9 +131,9 @@ public class RopeResource
 
 		try
 		{
-			TimeBucketMetaData timeBucketMetaData = ropeManager.getTimeBucketMetaData(customer, bucket, dateTime);
+			BatchMetaData batchMetaData = aggregator.getTimeBucketMetaData(customer, bucket, dateTime);
 
-			return Response.ok(timeBucketMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
+			return Response.ok(batchMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
 		}
 		catch (Http404Exception e)
 		{
@@ -150,9 +151,9 @@ public class RopeResource
 
 		try
 		{
-			TimeBucketMetaData timeBucketMetaData = ropeManager.getBackupTimeBucketMetaData(customer, bucket, dateTime);
+			BatchMetaData batchMetaData = aggregator.getBackupTimeBucketMetaData(customer, bucket, dateTime);
 
-			return Response.ok(timeBucketMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
+			return Response.ok(batchMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
 		}
 		catch (Http404Exception e)
 		{

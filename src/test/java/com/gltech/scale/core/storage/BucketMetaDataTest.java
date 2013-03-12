@@ -1,5 +1,6 @@
 package com.gltech.scale.core.storage;
 
+import com.gltech.scale.core.model.ChannelMetaData;
 import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,16 +18,16 @@ public class BucketMetaDataTest
 	@Test
 	public void testEventSet()
 	{
-		BucketMetaData bucketMetaData = createEventSetBucket("C", "B");
+		ChannelMetaData channelMetaData = createEventSetBucket("C", "B");
 
 		String json = "{\"customer\":\"C\",\"bucket\":\"B\",\"bucketType\":\"eventset\",\"mediaType\":\"application/json\",\"lifeTime\":\"small\",\"periodSeconds\":60,\"redundancy\":\"singlewrite\"}";
-		assertEquals(json, bucketMetaData.toJson().toString());
-		assertEquals("BucketMetaData{customer='C', bucket='B' " + json + "}", bucketMetaData.toString());
+		assertEquals(json, channelMetaData.toJson().toString());
+		assertEquals("BucketMetaData{customer='C', bucket='B' " + json + "}", channelMetaData.toString());
 	}
 
-	public static BucketMetaData createEventSetBucket(String customer, String bucket)
+	public static ChannelMetaData createEventSetBucket(String customer, String bucket)
 	{
-		return new BucketMetaData(customer, bucket, "{\"bucketType\":\"EvEntSet\", \"redundancy\":\"singlewrite\", \"mediaType\":\"application/json\"}");
+		return new ChannelMetaData(customer, bucket, "{\"bucketType\":\"EvEntSet\", \"redundancy\":\"singlewrite\", \"mediaType\":\"application/json\"}");
 	}
 
 	@Test
@@ -39,7 +40,7 @@ public class BucketMetaDataTest
 	public void testWrong()
 	{
 		exception.expect(BucketMetaDataException.class);
-		new BucketMetaData("C", "B", "{\"bucketType\":\"nothing\"}");
+		new ChannelMetaData("C", "B", "{\"bucketType\":\"nothing\"}");
 	}
 
 	@Test
@@ -49,69 +50,69 @@ public class BucketMetaDataTest
 		DateTime testDate = new DateTime(2012, 9, 21, 22, 31, 41);
 
 		// Periods by minute buckets
-		BucketMetaData oneMinBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 60, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		BucketMetaData threeMinBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 180, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		BucketMetaData fiveMinBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 300, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		BucketMetaData sixMinBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 360, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		BucketMetaData tenMinBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 600, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		BucketMetaData thirtyMinBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 1800, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		assertEquals(new DateTime(2012, 9, 21, 22, 32, 0), oneMinBucket.nearestPeriodCeiling(testDate));
-		assertEquals(new DateTime(2012, 9, 21, 22, 33, 0), threeMinBucket.nearestPeriodCeiling(testDate));
-		assertEquals(new DateTime(2012, 9, 21, 22, 35, 0), fiveMinBucket.nearestPeriodCeiling(testDate));
-		assertEquals(new DateTime(2012, 9, 21, 22, 36, 0), sixMinBucket.nearestPeriodCeiling(testDate));
-		assertEquals(new DateTime(2012, 9, 21, 22, 40, 0), tenMinBucket.nearestPeriodCeiling(testDate));
-		assertEquals(new DateTime(2012, 9, 21, 23, 0, 0), thirtyMinBucket.nearestPeriodCeiling(testDate));
+		ChannelMetaData oneMinChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 60, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		ChannelMetaData threeMinChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 180, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		ChannelMetaData fiveMinChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 300, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		ChannelMetaData sixMinChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 360, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		ChannelMetaData tenMinChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 600, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		ChannelMetaData thirtyMinChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 1800, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		assertEquals(new DateTime(2012, 9, 21, 22, 32, 0), oneMinChannel.nearestPeriodCeiling(testDate));
+		assertEquals(new DateTime(2012, 9, 21, 22, 33, 0), threeMinChannel.nearestPeriodCeiling(testDate));
+		assertEquals(new DateTime(2012, 9, 21, 22, 35, 0), fiveMinChannel.nearestPeriodCeiling(testDate));
+		assertEquals(new DateTime(2012, 9, 21, 22, 36, 0), sixMinChannel.nearestPeriodCeiling(testDate));
+		assertEquals(new DateTime(2012, 9, 21, 22, 40, 0), tenMinChannel.nearestPeriodCeiling(testDate));
+		assertEquals(new DateTime(2012, 9, 21, 23, 0, 0), thirtyMinChannel.nearestPeriodCeiling(testDate));
 
 		// Periods by minute buckets
-		BucketMetaData threeSecBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 3, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		BucketMetaData fiveSecBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		BucketMetaData tenSecBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 10, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		BucketMetaData thirtySecBucket = new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 30, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		assertEquals(new DateTime(2012, 9, 21, 22, 31, 42), threeSecBucket.nearestPeriodCeiling(testDate));
-		assertEquals(new DateTime(2012, 9, 21, 22, 31, 45), fiveSecBucket.nearestPeriodCeiling(testDate));
-		assertEquals(new DateTime(2012, 9, 21, 22, 31, 50), tenSecBucket.nearestPeriodCeiling(testDate));
-		assertEquals(new DateTime(2012, 9, 21, 22, 32, 0), thirtySecBucket.nearestPeriodCeiling(testDate));
+		ChannelMetaData threeSecChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 3, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		ChannelMetaData fiveSecChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		ChannelMetaData tenSecChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 10, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		ChannelMetaData thirtySecChannel = new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 30, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		assertEquals(new DateTime(2012, 9, 21, 22, 31, 42), threeSecChannel.nearestPeriodCeiling(testDate));
+		assertEquals(new DateTime(2012, 9, 21, 22, 31, 45), fiveSecChannel.nearestPeriodCeiling(testDate));
+		assertEquals(new DateTime(2012, 9, 21, 22, 31, 50), tenSecChannel.nearestPeriodCeiling(testDate));
+		assertEquals(new DateTime(2012, 9, 21, 22, 32, 0), thirtySecChannel.nearestPeriodCeiling(testDate));
 	}
 
 	@Test
 	public void testIsPeriodValid()
 	{
 		// All divisible by an hour (in seconds)
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 10, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 20, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 30, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 60, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 120, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 180, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 300, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 360, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 10, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 20, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 30, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 60, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 120, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 180, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 300, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 360, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
 
 	@Test
 	public void testIsPeriodValidFail11Seconds()
 	{
 		exception.expect(IllegalArgumentException.class);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 11, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 11, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
 
 	@Test
 	public void testIsPeriodValidFail35Seconds()
 	{
 		exception.expect(IllegalArgumentException.class);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 35, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 35, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
 
 	@Test
 	public void testIsPeriodValidFail130Seconds()
 	{
 		exception.expect(IllegalArgumentException.class);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 130, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 130, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
 
 	@Test
 	public void testIsPeriodValidFail320Seconds()
 	{
 		exception.expect(IllegalArgumentException.class);
-		new BucketMetaData("c", "b", BucketMetaData.BucketType.eventset, 320, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
+		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 320, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
 }

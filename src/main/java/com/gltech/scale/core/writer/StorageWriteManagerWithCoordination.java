@@ -6,7 +6,7 @@ import com.google.inject.Injector;
 import com.gltech.scale.core.cluster.BatchPeriodMapper;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.monitor.*;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
 import com.gltech.scale.util.Props;
 import org.joda.time.format.DateTimeFormat;
@@ -66,10 +66,10 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 					{
 						try
 						{
-							BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(batchPeriodMapper.getCustomer(), batchPeriodMapper.getBucket(), true);
+							ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(batchPeriodMapper.getCustomer(), batchPeriodMapper.getBucket(), true);
 
 							BatchCollector batchCollector = injector.getInstance(BatchCollector.class);
-							batchCollector.assign(bucketMetaData, batchPeriodMapper.getNearestPeriodCeiling());
+							batchCollector.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());
 
 							// Get a Timer from the timermap based on the bucket being collected.
 							String timerName = batchPeriodMapper.getCustomer() + "/" + batchPeriodMapper.getBucket() + "/" + Integer.toString(periodSeconds);

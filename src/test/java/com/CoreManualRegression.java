@@ -3,6 +3,7 @@ package com;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.inbound.InboundRestClient;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.*;
 import com.gltech.scale.util.ClientCreator;
@@ -21,9 +22,9 @@ import java.util.concurrent.TimeUnit;
 public class CoreManualRegression
 {
 	static private final Client client = ClientCreator.createCached();
-	static private BucketMetaData bmd1 = new BucketMetaData("Matt", "1s", BucketMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-	static private BucketMetaData bmd2 = new BucketMetaData("Matt", "2s", BucketMetaData.BucketType.eventset, 30, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.singlewrite);
-	static private BucketMetaData bmd3 = new BucketMetaData("Matt", "3d", BucketMetaData.BucketType.eventset, 60, MediaType.APPLICATION_JSON_TYPE, BucketMetaData.LifeTime.small, BucketMetaData.Redundancy.doublewritesync);
+	static private ChannelMetaData bmd1 = new ChannelMetaData("Matt", "1s", ChannelMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+	static private ChannelMetaData bmd2 = new ChannelMetaData("Matt", "2s", ChannelMetaData.BucketType.eventset, 30, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+	static private ChannelMetaData bmd3 = new ChannelMetaData("Matt", "3d", ChannelMetaData.BucketType.eventset, 60, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.doublewritesync);
 
 	static public class PrimaryServer
 	{

@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.model.*;
 import com.google.common.base.Throwables;
 import com.gltech.scale.ganglia.Timer;
 import com.gltech.scale.ganglia.TimerThreadPoolExecutor;
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.Storage;
 import com.gltech.scale.util.Props;
 import com.ning.compress.lzf.LZFInputStream;
@@ -50,11 +50,11 @@ public class AwsS3Storage implements Storage
 		semaphore = new Semaphore(activeUploads);
 	}
 
-	public void putBucket(BucketMetaData bucketMetaData)
+	public void putBucket(ChannelMetaData channelMetaData)
 	{
-		String key = bucketMetaData.getCustomer() + "|" + bucketMetaData.getBucket();
+		String key = channelMetaData.getCustomer() + "|" + channelMetaData.getBucket();
 
-		byte[] jsonData = bucketMetaData.toJson().toString().getBytes();
+		byte[] jsonData = channelMetaData.toJson().toString().getBytes();
 		ByteArrayInputStream bais = new ByteArrayInputStream(jsonData);
 
 		ObjectMetadata metadata = new ObjectMetadata();
@@ -63,7 +63,7 @@ public class AwsS3Storage implements Storage
 		s3Client.putObject(s3BucketName, key, bais, metadata);
 	}
 
-	public BucketMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String customer, String bucket)
 	{
 		String key = customer + "|" + bucket;
 		S3Object s3Object = null;
@@ -83,7 +83,7 @@ public class AwsS3Storage implements Storage
 		try
 		{
 			byte[] data = IOUtils.toByteArray(s3Object.getObjectContent());
-			return new BucketMetaData(new String(data));
+			return new ChannelMetaData(new String(data));
 		}
 		catch (IOException e)
 		{

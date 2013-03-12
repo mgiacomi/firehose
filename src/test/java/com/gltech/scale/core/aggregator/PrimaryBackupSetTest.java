@@ -1,4 +1,4 @@
-package com.gltech.scale.core.rope;
+package com.gltech.scale.core.aggregator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
@@ -70,21 +70,21 @@ public class PrimaryBackupSetTest
 		primaryBackupSets.add(primaryBackupSet1);
 		primaryBackupSets.add(primaryBackupSet2);
 
-		RopeManagersByPeriod ropeManagersByPeriod = new RopeManagersByPeriod(new DateTime(), primaryBackupSets);
+		AggregatorsByPeriod aggregatorsByPeriod = new AggregatorsByPeriod(new DateTime(), primaryBackupSets);
 
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new JodaModule());
 
-		String json = mapper.writeValueAsString(ropeManagersByPeriod);
-		RopeManagersByPeriod ropeManagersByPeriod1 = mapper.readValue(json, RopeManagersByPeriod.class);
+		String json = mapper.writeValueAsString(aggregatorsByPeriod);
+		AggregatorsByPeriod aggregatorsByPeriod1 = mapper.readValue(json, AggregatorsByPeriod.class);
 
-		assertEquals(ropeManagersByPeriod.getPeriod().getMillis(), ropeManagersByPeriod1.getPeriod().getMillis());
+		assertEquals(aggregatorsByPeriod.getPeriod().getMillis(), aggregatorsByPeriod1.getPeriod().getMillis());
 
-		PrimaryBackupSet primaryBackupSet = ropeManagersByPeriod.nextPrimaryBackupSet();
+		PrimaryBackupSet primaryBackupSet = aggregatorsByPeriod.nextPrimaryBackupSet();
 		assertEquals(primaryBackupSet.getPrimary(), primaryBackupSet1.getPrimary());
 		assertEquals(primaryBackupSet.getBackup(), primaryBackupSet1.getBackup());
 
-		primaryBackupSet = ropeManagersByPeriod.nextPrimaryBackupSet();
+		primaryBackupSet = aggregatorsByPeriod.nextPrimaryBackupSet();
 		assertEquals(primaryBackupSet.getPrimary(), primaryBackupSet2.getPrimary());
 		assertEquals(primaryBackupSet.getBackup(), primaryBackupSet2.getBackup());
 	}

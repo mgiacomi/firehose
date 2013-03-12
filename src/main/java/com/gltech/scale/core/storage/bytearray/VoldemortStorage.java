@@ -1,6 +1,6 @@
 package com.gltech.scale.core.storage.bytearray;
 
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.DuplicateBucketException;
 import com.gltech.scale.util.VoldemortClient;
 import org.slf4j.Logger;
@@ -32,10 +32,10 @@ public class VoldemortStorage implements InternalStorage
 		this.payloadClient = VoldemortClient.createFactory().getStoreClient(storeName);
 	}
 
-	public void putBucket(final BucketMetaData bucketMetaData)
+	public void putBucket(final ChannelMetaData channelMetaData)
 	{
-		final Map<String, String> keyMap = createBucketKeyMap(bucketMetaData.getCustomer(),
-				bucketMetaData.getBucket());
+		final Map<String, String> keyMap = createBucketKeyMap(channelMetaData.getCustomer(),
+				channelMetaData.getBucket());
 		bucketClient.applyUpdate(new UpdateAction<Map<String, String>, String>()
 		{
 			public void update(StoreClient<Map<String, String>, String> client)
@@ -43,12 +43,12 @@ public class VoldemortStorage implements InternalStorage
 				Versioned<String> versioned = client.get(keyMap);
 				if (versioned == null)
 				{
-					versioned = new Versioned<>(bucketMetaData.toJson().toString());
+					versioned = new Versioned<>(channelMetaData.toJson().toString());
 					client.put(keyMap, versioned);
 					return;
 				}
 				throw new DuplicateBucketException("Bucket already exists "
-						+ bucketMetaData.getCustomer() + " " + bucketMetaData.getBucket());
+						+ channelMetaData.getCustomer() + " " + channelMetaData.getBucket());
 
 			}
 		});
@@ -62,7 +62,7 @@ public class VoldemortStorage implements InternalStorage
 		return keyMap;
 	}
 
-	public BucketMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String customer, String bucket)
 	{
 		Map<String, String> keyMap = createBucketKeyMap(customer, bucket);
 		String json = bucketClient.getValue(keyMap);
@@ -70,7 +70,7 @@ public class VoldemortStorage implements InternalStorage
 		{
 			return null;
 		}
-		return new BucketMetaData(customer, bucket, json);
+		return new ChannelMetaData(customer, bucket, json);
 	}
 
 	private Map<String, String> createPayloadKeyMap(String customer, String bucket, String id)
@@ -80,11 +80,11 @@ public class VoldemortStorage implements InternalStorage
 		return bucketKeyMap;
 	}
 
-	public StoragePayload internalGetPayload(BucketMetaData bucketMetaData, String id)
+	public StoragePayload internalGetPayload(ChannelMetaData channelMetaData, String id)
 	{
 		try
 		{
-			Map<String, String> payloadKeyMap = createPayloadKeyMap(bucketMetaData.getCustomer(), bucketMetaData.getBucket(), id);
+			Map<String, String> payloadKeyMap = createPayloadKeyMap(channelMetaData.getCustomer(), channelMetaData.getBucket(), id);
 			Versioned<byte[]> versioned = payloadClient.get(payloadKeyMap);
 			if (versioned == null)
 			{
@@ -93,13 +93,13 @@ public class VoldemortStorage implements InternalStorage
 			StoragePayload payload = StoragePayload.convert(versioned.getValue());
 			if (payload != null)
 			{
-				payload.setBucketMetaData(bucketMetaData);
+				payload.setChannelMetaData(channelMetaData);
 			}
 			return payload;
 		}
 		catch (IOException e)
 		{
-			logger.warn("unable to parse payload {} {} {}", bucketMetaData, id, e);
+			logger.warn("unable to parse payload {} {} {}", channelMetaData, id, e);
 			return null;
 		}
 	}
@@ -109,11 +109,11 @@ public class VoldemortStorage implements InternalStorage
 		return internalGetPayload(getBucket(customer, bucket), id);
 	}
 
-	public void internalPutPayload(BucketMetaData bucketMetaData, StoragePayload storagePayload)
+	public void internalPutPayload(ChannelMetaData channelMetaData, StoragePayload storagePayload)
 	{
 		try
 		{
-			final Map<String, String> payloadKeyMap = createPayloadKeyMap(bucketMetaData.getCustomer(), bucketMetaData.getBucket(), storagePayload.getId());
+			final Map<String, String> payloadKeyMap = createPayloadKeyMap(channelMetaData.getCustomer(), channelMetaData.getBucket(), storagePayload.getId());
 			final byte[] bytes = storagePayload.convert();
 			logger.debug("putting {} bytes in payload {}", bytes.length, payloadKeyMap);
 			payloadClient.applyUpdate(new UpdateAction<Map<String, String>, byte[]>()

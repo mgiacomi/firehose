@@ -1,6 +1,6 @@
 package com.gltech.scale.core.storage.bytearray;
 
-import com.gltech.scale.core.storage.BucketMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,19 +18,19 @@ public class TermVoldemortStorage implements InternalStorage
 		largeTermPayloadStorage = new VoldemortStorage("LargeTermPayloadStorage");
 	}
 
-	public void putBucket(final BucketMetaData bucketMetaData)
+	public void putBucket(final ChannelMetaData channelMetaData)
 	{
-		shortTermPayloadStorage.putBucket(bucketMetaData);
+		shortTermPayloadStorage.putBucket(channelMetaData);
 	}
 
-	public BucketMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String customer, String bucket)
 	{
 		return shortTermPayloadStorage.getBucket(customer, bucket);
 	}
 
-	public StoragePayload internalGetPayload(BucketMetaData bucketMetaData, String id)
+	public StoragePayload internalGetPayload(ChannelMetaData channelMetaData, String id)
 	{
-		return getVoldemortStorage(bucketMetaData.getLifeTime()).internalGetPayload(bucketMetaData, id);
+		return getVoldemortStorage(channelMetaData.getLifeTime()).internalGetPayload(channelMetaData, id);
 	}
 
 	public StoragePayload getPayload(String customer, String bucket, String id)
@@ -38,9 +38,9 @@ public class TermVoldemortStorage implements InternalStorage
 		return internalGetPayload(getBucket(customer, bucket), id);
 	}
 
-	public void internalPutPayload(BucketMetaData bucketMetaData, StoragePayload storagePayload)
+	public void internalPutPayload(ChannelMetaData channelMetaData, StoragePayload storagePayload)
 	{
-		getVoldemortStorage(bucketMetaData.getLifeTime()).internalPutPayload(bucketMetaData, storagePayload);
+		getVoldemortStorage(channelMetaData.getLifeTime()).internalPutPayload(channelMetaData, storagePayload);
 	}
 
 	public void putPayload(StoragePayload storagePayload)
@@ -48,13 +48,13 @@ public class TermVoldemortStorage implements InternalStorage
 		internalPutPayload(getBucket(storagePayload.getCustomer(), storagePayload.getBucket()), storagePayload);
 	}
 
-	private VoldemortStorage getVoldemortStorage(BucketMetaData.LifeTime lifeTime)
+	private VoldemortStorage getVoldemortStorage(ChannelMetaData.LifeTime lifeTime)
 	{
-		if (lifeTime.equals(BucketMetaData.LifeTime.large))
+		if (lifeTime.equals(ChannelMetaData.LifeTime.large))
 		{
 			return largeTermPayloadStorage;
 		}
-		else if (lifeTime.equals(BucketMetaData.LifeTime.medium))
+		else if (lifeTime.equals(ChannelMetaData.LifeTime.medium))
 		{
 			return mediumTermPayloadStorage;
 		}

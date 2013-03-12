@@ -1,4 +1,4 @@
-package com.gltech.scale.core.rope;
+package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.google.inject.Inject;
@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 public class WeightManager implements Runnable, LifeCycle
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.rope.WeightManager");
-	private final RopeManager ropeManager;
+	private final Aggregator aggregator;
 	private final ChannelCoordinator channelCoordinator;
 	private volatile boolean shutdown = false;
 
 	@Inject
-	public WeightManager(RopeManager ropeManager, ChannelCoordinator channelCoordinator)
+	public WeightManager(Aggregator aggregator, ChannelCoordinator channelCoordinator)
 	{
-		this.ropeManager = ropeManager;
+		this.aggregator = aggregator;
 		this.channelCoordinator = channelCoordinator;
 	}
 
@@ -29,8 +29,8 @@ public class WeightManager implements Runnable, LifeCycle
 				try
 				{
 					boolean active = true;
-					int primaries = ropeManager.getActiveTimeBuckets().size();
-					int backups = ropeManager.getActiveBackupTimeBuckets().size();
+					int primaries = aggregator.getActiveTimeBuckets().size();
+					int backups = aggregator.getActiveBackupTimeBuckets().size();
 					int rested = 999;
 
 					if (primaries == 0 && backups == 0)
