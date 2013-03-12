@@ -2,7 +2,7 @@ package com.gltech.scale.core.rope;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.Message;
-import com.gltech.scale.core.util.ClientCreator;
+import com.gltech.scale.util.ClientCreator;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;

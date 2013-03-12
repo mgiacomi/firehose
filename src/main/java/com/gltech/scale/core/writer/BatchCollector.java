@@ -1,6 +1,6 @@
 package com.gltech.scale.core.writer;
 
-import com.gltech.scale.core.monitor.Timer;
+import com.gltech.scale.ganglia.Timer;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
 

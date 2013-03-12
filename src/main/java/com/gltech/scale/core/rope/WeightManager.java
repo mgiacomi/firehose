@@ -2,7 +2,7 @@ package com.gltech.scale.core.rope;
 
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.google.inject.Inject;
-import com.gltech.scale.core.lifecycle.LifeCycle;
+import com.gltech.scale.lifecycle.LifeCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

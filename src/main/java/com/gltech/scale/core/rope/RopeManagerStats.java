@@ -1,6 +1,7 @@
 package com.gltech.scale.core.rope;
 
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.ganglia.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.gltech.scale.core.monitor.*;

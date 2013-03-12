@@ -10,7 +10,7 @@ import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;
 import com.gltech.scale.core.storage.bytearray.StoragePayload;
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 import org.joda.time.DateTime;
 import org.junit.*;

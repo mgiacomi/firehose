@@ -3,7 +3,8 @@ package com.gltech.scale.core.rope;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.monitor.*;
 import com.gltech.scale.core.storage.BucketMetaData;
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.ganglia.*;
+import com.gltech.scale.util.Props;
 import org.joda.time.DateTime;
 
 import java.util.Collection;

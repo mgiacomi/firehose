@@ -5,7 +5,7 @@ import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.monitor.Timer;
+import com.gltech.scale.ganglia.Timer;
 import com.gltech.scale.core.rope.PrimaryBackupSet;
 import com.gltech.scale.core.rope.RopeManagerRestClient;
 import com.gltech.scale.core.rope.RopeManagersByPeriod;

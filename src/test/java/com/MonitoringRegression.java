@@ -1,7 +1,7 @@
 package com;
 
 import com.gltech.scale.core.server.EmbeddedServer;
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 
 public class MonitoringRegression

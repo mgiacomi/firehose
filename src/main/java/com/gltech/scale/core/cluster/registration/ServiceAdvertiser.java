@@ -1,7 +1,7 @@
 package com.gltech.scale.core.cluster.registration;
 
 import com.google.common.base.Throwables;
-import com.gltech.scale.core.util.ZkClientCreator;
+import com.gltech.scale.util.ZkClientCreator;
 import com.netflix.curator.framework.CuratorFramework;
 import com.netflix.curator.utils.ZKPaths;
 import com.netflix.curator.x.discovery.ServiceCacheBuilder;

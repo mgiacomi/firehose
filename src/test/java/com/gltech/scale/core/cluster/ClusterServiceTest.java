@@ -2,7 +2,7 @@ package com.gltech.scale.core.cluster;
 
 import com.gltech.scale.core.cluster.registration.RegistrationServiceImpl;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 import org.joda.time.DateTime;
 import org.junit.*;

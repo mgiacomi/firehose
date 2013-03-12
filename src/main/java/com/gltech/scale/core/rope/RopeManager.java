@@ -1,7 +1,7 @@
 package com.gltech.scale.core.rope;
 
 import com.gltech.scale.core.model.Message;
-import com.gltech.scale.core.lifecycle.LifeCycle;
+import com.gltech.scale.lifecycle.LifeCycle;
 import org.joda.time.DateTime;
 
 import java.io.OutputStream;

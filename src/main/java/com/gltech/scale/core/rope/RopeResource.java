@@ -2,7 +2,7 @@ package com.gltech.scale.core.rope;
 
 import com.gltech.scale.core.model.Message;
 import com.google.inject.Inject;
-import com.gltech.scale.core.util.Http404Exception;
+import com.gltech.scale.util.Http404Exception;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.*;

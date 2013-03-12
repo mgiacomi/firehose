@@ -2,7 +2,7 @@ package com.gltech.scale.core.server;
 
 import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.inbound.InboundServiceImpl;
-import com.gltech.scale.monitor.MonitorResource;
+import com.gltech.scale.ganglia.MonitorResource;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -21,7 +21,7 @@ import com.gltech.scale.core.rope.*;
 import com.gltech.scale.core.storage.*;
 import com.gltech.scale.core.storage.bytearray.*;
 import com.gltech.scale.core.storage.stream.AwsS3Storage;
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.util.Props;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 

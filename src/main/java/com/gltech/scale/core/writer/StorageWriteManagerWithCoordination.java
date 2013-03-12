@@ -1,5 +1,6 @@
 package com.gltech.scale.core.writer;
 
+import com.gltech.scale.ganglia.*;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.gltech.scale.core.cluster.BatchPeriodMapper;
@@ -7,7 +8,7 @@ import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.monitor.*;
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.util.Props;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

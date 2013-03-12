@@ -1,13 +1,13 @@
 package com.gltech.scale.core.storage;
 
+import com.gltech.scale.util.VoldemortClientTest;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;
 import com.gltech.scale.core.storage.bytearray.TermVoldemortStorage;
 import com.gltech.scale.core.storage.bytearray.ValidatingStorage;
-import com.gltech.scale.core.util.Props;
-import com.gltech.scale.core.voldemort.VoldemortTestUtil;
+import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -28,7 +28,7 @@ public class StorageResourceVoldemortTest extends StorageResourceBaseTest
 
 		testingServer = new TestingServer(21818);
 
-		VoldemortTestUtil.start();
+		VoldemortClientTest.start();
 
 		EmbeddedServer.start(9090, new Module()
 		{
@@ -44,7 +44,7 @@ public class StorageResourceVoldemortTest extends StorageResourceBaseTest
 	public static void afterClass() throws Exception
 	{
 		EmbeddedServer.stop();
-		VoldemortTestUtil.stop();
+		VoldemortClientTest.stop();
 		testingServer.stop();
 	}
 }

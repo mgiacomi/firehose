@@ -2,9 +2,9 @@ package com.gltech.scale.core.storage;
 
 import com.google.common.base.Throwables;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.util.ClientCreator;
-import com.gltech.scale.core.util.Http404Exception;
-import com.gltech.scale.core.util.UrlEncoder;
+import com.gltech.scale.util.ClientCreator;
+import com.gltech.scale.util.Http404Exception;
+import com.gltech.scale.util.UrlEncoder;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;

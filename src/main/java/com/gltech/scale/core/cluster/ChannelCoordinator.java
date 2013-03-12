@@ -1,6 +1,6 @@
 package com.gltech.scale.core.cluster;
 
-import com.gltech.scale.core.lifecycle.LifeCycle;
+import com.gltech.scale.lifecycle.LifeCycle;
 import com.gltech.scale.core.rope.RopeManagersByPeriod;
 import org.joda.time.DateTime;
 

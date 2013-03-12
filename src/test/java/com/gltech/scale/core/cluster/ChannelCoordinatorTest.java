@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.rope.RopeManagersByPeriod;
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 import org.joda.time.DateTime;
 import org.junit.After;

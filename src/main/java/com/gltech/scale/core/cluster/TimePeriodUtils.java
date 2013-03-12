@@ -1,6 +1,6 @@
 package com.gltech.scale.core.cluster;
 
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.util.Props;
 import org.joda.time.DateTime;
 
 public class TimePeriodUtils

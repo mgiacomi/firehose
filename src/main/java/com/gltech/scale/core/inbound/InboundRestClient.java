@@ -2,8 +2,8 @@ package com.gltech.scale.core.inbound;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.storage.BucketMetaData;
-import com.gltech.scale.core.util.ClientCreator;
-import com.gltech.scale.core.util.Http404Exception;
+import com.gltech.scale.util.ClientCreator;
+import com.gltech.scale.util.Http404Exception;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;

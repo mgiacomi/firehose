@@ -2,7 +2,7 @@ package com.gltech.scale.core.cluster.registration;
 
 import com.gltech.scale.core.cluster.ClusterException;
 import com.google.common.base.Throwables;
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.util.Props;
 import com.netflix.curator.framework.CuratorFramework;
 import com.netflix.curator.framework.state.ConnectionState;
 import com.netflix.curator.x.discovery.ServiceInstance;

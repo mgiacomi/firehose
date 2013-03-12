@@ -1,6 +1,6 @@
 package com.gltech.scale.core.inbound;
 
-import com.gltech.scale.core.lifecycle.LifeCycle;
+import com.gltech.scale.lifecycle.LifeCycle;
 import com.gltech.scale.core.storage.BucketMetaData;
 import org.joda.time.DateTime;
 

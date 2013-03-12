@@ -3,7 +3,7 @@ package com.gltech.scale.core.storage;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.util.Http404Exception;
+import com.gltech.scale.util.Http404Exception;
 
 import javax.ws.rs.core.MediaType;
 import java.util.concurrent.ConcurrentHashMap;

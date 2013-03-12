@@ -4,7 +4,7 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.gltech.scale.core.server.EmbeddedServer;
-import com.gltech.scale.core.util.Props;
+import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 import org.junit.BeforeClass;
 import org.junit.Test;

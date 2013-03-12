@@ -2,7 +2,7 @@ package com.gltech.scale.core.storage.bytearray;
 
 import com.gltech.scale.core.storage.BucketMetaData;
 import com.gltech.scale.core.storage.DuplicateBucketException;
-import com.gltech.scale.core.voldemort.VoldemortUtil;
+import com.gltech.scale.util.VoldemortClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import voldemort.client.StoreClient;
@@ -22,14 +22,14 @@ public class VoldemortStorage implements InternalStorage
 
 	public VoldemortStorage()
 	{
-		this.bucketClient = VoldemortUtil.createFactory().getStoreClient("BucketStorage");
-		this.payloadClient = VoldemortUtil.createFactory().getStoreClient("ShortTermPayloadStorage");
+		this.bucketClient = VoldemortClient.createFactory().getStoreClient("BucketStorage");
+		this.payloadClient = VoldemortClient.createFactory().getStoreClient("ShortTermPayloadStorage");
 	}
 
 	public VoldemortStorage(String storeName)
 	{
-		this.bucketClient = VoldemortUtil.createFactory().getStoreClient("BucketStorage");
-		this.payloadClient = VoldemortUtil.createFactory().getStoreClient(storeName);
+		this.bucketClient = VoldemortClient.createFactory().getStoreClient("BucketStorage");
+		this.payloadClient = VoldemortClient.createFactory().getStoreClient(storeName);
 	}
 
 	public void putBucket(final BucketMetaData bucketMetaData)

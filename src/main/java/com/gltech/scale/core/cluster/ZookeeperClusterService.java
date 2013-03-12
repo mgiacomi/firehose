@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.storage.BucketMetaData;
-import com.gltech.scale.core.util.ZkClientCreator;
+import com.gltech.scale.util.ZkClientCreator;
 import com.netflix.curator.framework.CuratorFramework;
 import com.netflix.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
