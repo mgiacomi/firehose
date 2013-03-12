@@ -1,4 +1,4 @@
-package com.gltech.scale.core.collector;
+package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.BucketMetaData;
@@ -15,29 +15,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class TimeBucketStreamsManager
+public class BatchStreamsManager
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.TimeBucketStreamsManager");
-	private List<EventStream> timeBucketStreams = new ArrayList<>();
+	private List<MessageStream> timeBucketStreams = new ArrayList<>();
 	private int totalStreams = 0;
 	private Set<String> processedEvents = new HashSet<>();
 	private String customerBucketPeriod;
 	private long bytesWritten;
 
-	public TimeBucketStreamsManager(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+	public BatchStreamsManager(BucketMetaData bucketMetaData, DateTime nearestPeriodCeiling)
 	{
 		customerBucketPeriod = bucketMetaData.getCustomer() + "|" + bucketMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + "|" + bucketMetaData.getRedundancy();
 	}
 
 	public void registerInputStream(InputStream ropeStream)
 	{
-		timeBucketStreams.add(new EventInputStream(customerBucketPeriod, ropeStream));
+		timeBucketStreams.add(new MessageInputStream(customerBucketPeriod, ropeStream));
 		totalStreams++;
 	}
 
 	public void registerEventList(List<Message> events)
 	{
-		timeBucketStreams.add(new EventListStream(customerBucketPeriod, events));
+		timeBucketStreams.add(new MessageListStream(customerBucketPeriod, events));
 		totalStreams++;
 	}
 
@@ -55,42 +55,42 @@ public class TimeBucketStreamsManager
 
 			while (timeBucketStreams.size() > 0)
 			{
-				EventStream candidateNextRecord = null;
-				for (EventStream eventStream : new ArrayList<>(timeBucketStreams))
+				MessageStream candidateNextRecord = null;
+				for (MessageStream messageStream : new ArrayList<>(timeBucketStreams))
 				{
 					// If the stream is out of records then remove it from the list and continue loop.
-					if (eventStream.getCurrentMessage() == null)
+					if (messageStream.getCurrentMessage() == null)
 					{
-						timeBucketStreams.remove(eventStream);
-						eventStream.close();
+						timeBucketStreams.remove(messageStream);
+						messageStream.close();
 						continue;
 					}
 
 					// If there is no candidate then this is the candidate.
 					if (candidateNextRecord == null)
 					{
-						candidateNextRecord = eventStream;
+						candidateNextRecord = messageStream;
 					}
 					else
 					{
 						// Is this record has already been processed (because of doublewrite), then ignore it and advance the stream.
-						if (processedEvents.contains(eventStream.getCurrentMessage().getUuid()))
+						if (processedEvents.contains(messageStream.getCurrentMessage().getUuid()))
 						{
-							eventStream.nextRecord();
+							messageStream.nextRecord();
 							recordsReceived++;
 						}
 
 						// Is this record the same as the candidateNextRecord (because of doublewrite), then ignore it and advance the stream.
-						else if (eventStream.getCurrentMessage().equals(candidateNextRecord.getCurrentMessage()))
+						else if (messageStream.getCurrentMessage().equals(candidateNextRecord.getCurrentMessage()))
 						{
-							eventStream.nextRecord();
+							messageStream.nextRecord();
 							recordsReceived++;
 						}
 
 						// If this record older then the current candidateNextRecord then it is the candidate
-						else if (eventStream.getCurrentMessage().getReceived_at().isBefore(candidateNextRecord.getCurrentMessage().getReceived_at()))
+						else if (messageStream.getCurrentMessage().getReceived_at().isBefore(candidateNextRecord.getCurrentMessage().getReceived_at()))
 						{
-							candidateNextRecord = eventStream;
+							candidateNextRecord = messageStream;
 						}
 					}
 				}
@@ -134,9 +134,9 @@ public class TimeBucketStreamsManager
 				// Ignore
 			}
 
-			for (EventStream eventStream : timeBucketStreams)
+			for (MessageStream messageStream : timeBucketStreams)
 			{
-				eventStream.close();
+				messageStream.close();
 			}
 		}
 

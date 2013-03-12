@@ -3,7 +3,7 @@ package com.gltech.scale.core.server;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
-import com.gltech.scale.core.collector.CollectorManager;
+import com.gltech.scale.core.writer.StorageWriteManager;
 import com.gltech.scale.core.coordination.CoordinationService;
 import com.gltech.scale.core.coordination.RopeCoordinator;
 import com.gltech.scale.core.inbound.InboundService;
@@ -130,10 +130,10 @@ public class EmbeddedServer
 		if (props.get("enable.collector_manager", true))
 		{
 			// Start the CollectorManager and register it for shutdown
-			CollectorManager collectorManager = injector.getInstance(CollectorManager.class);
-			collectorManager.setInjector(injector);
-			new Thread(collectorManager, "CollectorManager").start();
-			LifeCycleManager.getInstance().add(collectorManager, LifeCycle.Priority.INITIAL);
+			StorageWriteManager storageWriteManager = injector.getInstance(StorageWriteManager.class);
+			storageWriteManager.setInjector(injector);
+			new Thread(storageWriteManager, "CollectorManager").start();
+			LifeCycleManager.getInstance().add(storageWriteManager, LifeCycle.Priority.INITIAL);
 
 			// Start the RopeCoordinator and register it for shutdown
 			RopeCoordinator ropeCoordinator = injector.getInstance(RopeCoordinator.class);

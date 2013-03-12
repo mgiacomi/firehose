@@ -1,4 +1,4 @@
-package com.gltech.scale.core.collector;
+package com.gltech.scale.core.writer;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 
-public class CollectorManagerWithCoordination implements CollectorManager
+public class StorageWriteManagerWithCoordination implements StorageWriteManager
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.CollectorManagerWithCoordination");
 	private volatile boolean shutdown = false;
@@ -28,7 +28,7 @@ public class CollectorManagerWithCoordination implements CollectorManager
 	private int periodSeconds;
 
 	@Inject
-	public CollectorManagerWithCoordination(CoordinationService coordinationService, BucketMetaDataCache bucketMetaDataCache)
+	public StorageWriteManagerWithCoordination(CoordinationService coordinationService, BucketMetaDataCache bucketMetaDataCache)
 	{
 		this.coordinationService = coordinationService;
 		this.bucketMetaDataCache = bucketMetaDataCache;
@@ -67,14 +67,14 @@ public class CollectorManagerWithCoordination implements CollectorManager
 						{
 							BucketMetaData bucketMetaData = bucketMetaDataCache.getBucketMetaData(bucketPeriodMapper.getCustomer(), bucketPeriodMapper.getBucket(), true);
 
-							TimeBucketCollector timeBucketCollector = injector.getInstance(TimeBucketCollector.class);
-							timeBucketCollector.assign(bucketMetaData, bucketPeriodMapper.getNearestPeriodCeiling());
+							BatchCollector batchCollector = injector.getInstance(BatchCollector.class);
+							batchCollector.assign(bucketMetaData, bucketPeriodMapper.getNearestPeriodCeiling());
 
 							// Get a Timer from the timermap based on the bucket being collected.
 							String timerName = bucketPeriodMapper.getCustomer() + "/" + bucketPeriodMapper.getBucket() + "/" + Integer.toString(periodSeconds);
-							timeBucketCollector.setTimer(timerMap.get(timerName));
+							batchCollector.setTimer(timerMap.get(timerName));
 
-							threadPoolExecutor.submit(timeBucketCollector);
+							threadPoolExecutor.submit(batchCollector);
 						}
 						catch (Exception e)
 						{

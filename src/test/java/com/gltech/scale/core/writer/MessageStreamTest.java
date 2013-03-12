@@ -1,4 +1,4 @@
-package com.gltech.scale.core.collector;
+package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.coordination.TimePeriodUtils;
 import com.gltech.scale.core.model.Message;
@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 
-public class EventStreamTest
+public class MessageStreamTest
 {
 	@Test
 	public void nextRecordTest() throws Exception
@@ -32,12 +32,12 @@ public class EventStreamTest
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		timeBucket.eventsToJson(bos);
 
-		EventStream eventStream = new EventInputStream("test", new ByteArrayInputStream(bos.toByteArray()));
+		MessageStream messageStream = new MessageInputStream("test", new ByteArrayInputStream(bos.toByteArray()));
 
-		assertEquals("testdata", new String(eventStream.getCurrentMessage().getPayload()));
-		eventStream.nextRecord();
-		assertEquals("testdata2", new String(eventStream.getCurrentMessage().getPayload()));
-		eventStream.nextRecord();
-		assertNull(eventStream.getCurrentMessage());
+		assertEquals("testdata", new String(messageStream.getCurrentMessage().getPayload()));
+		messageStream.nextRecord();
+		assertEquals("testdata2", new String(messageStream.getCurrentMessage().getPayload()));
+		messageStream.nextRecord();
+		assertNull(messageStream.getCurrentMessage());
 	}
 }

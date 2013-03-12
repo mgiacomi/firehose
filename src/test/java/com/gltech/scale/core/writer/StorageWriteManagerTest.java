@@ -1,4 +1,4 @@
-package com.gltech.scale.core.collector;
+package com.gltech.scale.core.writer;
 
 import com.google.inject.Binder;
 import com.google.inject.Injector;
@@ -12,7 +12,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
-public class CollectorManagerTest
+public class StorageWriteManagerTest
 {
 	static private Props props;
 
@@ -26,7 +26,7 @@ public class CollectorManagerTest
 	@Test
 	public void testCollectorManagerStartAndStop() throws Exception
 	{
-		final CollectorTestManager collectorManager = new CollectorTestManager();
+		final StorageWriteTestManager collectorManager = new StorageWriteTestManager();
 
 		TestingServer testingServer = new TestingServer(21818);
 
@@ -34,7 +34,7 @@ public class CollectorManagerTest
 		{
 			public void configure(Binder binder)
 			{
-				binder.bind(CollectorManager.class).toInstance(collectorManager);
+				binder.bind(StorageWriteManager.class).toInstance(collectorManager);
 			}
 		});
 
@@ -50,7 +50,7 @@ public class CollectorManagerTest
 		testingServer.stop();
 	}
 
-	static class CollectorTestManager implements CollectorManager
+	static class StorageWriteTestManager implements StorageWriteManager
 	{
 		private volatile boolean shutdown = false;
 		private volatile boolean confirmShutdown = false;

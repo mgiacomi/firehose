@@ -1,4 +1,4 @@
-package com.gltech.scale.core.collector;
+package com.gltech.scale.core.writer;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class EventInputStream implements EventStream
+public class MessageInputStream implements MessageStream
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.EventInputStream");
 	private final JsonParser jp;
@@ -21,7 +21,7 @@ public class EventInputStream implements EventStream
 	private int counter = 0;
 	private String customerBucketPeriod;
 
-	public EventInputStream(String customerBucketPeriod, InputStream inputStream)
+	public MessageInputStream(String customerBucketPeriod, InputStream inputStream)
 	{
 		this.customerBucketPeriod = customerBucketPeriod;
 		this.inputStream = inputStream;

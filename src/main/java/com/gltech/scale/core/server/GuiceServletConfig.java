@@ -9,7 +9,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.util.Modules;
-import com.gltech.scale.core.collector.*;
+import com.gltech.scale.core.writer.*;
 import com.gltech.scale.core.coordination.CoordinationService;
 import com.gltech.scale.core.coordination.RopeCoordinator;
 import com.gltech.scale.core.coordination.RopeCoordinatorImpl;
@@ -81,11 +81,11 @@ public class GuiceServletConfig extends GuiceServletContextListener
 
 					if (props.get("enable.collector_manager", true))
 					{
-						bind(CollectorResource.class);
+						bind(StorageWriteResource.class);
 
 						// These should not be singletons we want to get a new one with each injector call.
-						bind(CollectorManager.class).to(CollectorManagerWithCoordination.class);
-						bind(TimeBucketCollector.class).to(TimeBucketCollectorImpl.class);
+						bind(StorageWriteManager.class).to(StorageWriteManagerWithCoordination.class);
+						bind(BatchCollector.class).to(BatchCollectorImpl.class);
 					}
 
 					if (props.get("storage_service.local", false))

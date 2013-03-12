@@ -1,4 +1,4 @@
-package com.gltech.scale.core.collector;
+package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.coordination.TimePeriodUtils;
 import com.gltech.scale.core.model.Message;
@@ -14,7 +14,7 @@ import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 
-public class TimeBucketStreamsManagerTest
+public class BatchStreamsManagerTest
 {
 	@Test
 	public void nextMultiStreamTest() throws Exception
@@ -78,14 +78,14 @@ public class TimeBucketStreamsManagerTest
 		timeBucketb1.eventsToJson(bos3);
 		timeBucketb2.eventsToJson(bos4);
 
-		TimeBucketStreamsManager timeBucketStreamsManager = new TimeBucketStreamsManager(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
-		timeBucketStreamsManager.registerInputStream(new ByteArrayInputStream(bos1.toByteArray()));
-		timeBucketStreamsManager.registerInputStream(new ByteArrayInputStream(bos2.toByteArray()));
-		timeBucketStreamsManager.registerInputStream(new ByteArrayInputStream(bos3.toByteArray()));
-		timeBucketStreamsManager.registerInputStream(new ByteArrayInputStream(bos4.toByteArray()));
+		BatchStreamsManager batchStreamsManager = new BatchStreamsManager(bucketMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
+		batchStreamsManager.registerInputStream(new ByteArrayInputStream(bos1.toByteArray()));
+		batchStreamsManager.registerInputStream(new ByteArrayInputStream(bos2.toByteArray()));
+		batchStreamsManager.registerInputStream(new ByteArrayInputStream(bos3.toByteArray()));
+		batchStreamsManager.registerInputStream(new ByteArrayInputStream(bos4.toByteArray()));
 
 		ByteArrayOutputStream storageStream = new ByteArrayOutputStream();
-		timeBucketStreamsManager.writeEvents(storageStream);
+		batchStreamsManager.writeEvents(storageStream);
 
 		ByteArrayInputStream eventsStream = new ByteArrayInputStream(storageStream.toByteArray());
 		List<Message> events = TimeBucket.jsonToEvents(eventsStream);

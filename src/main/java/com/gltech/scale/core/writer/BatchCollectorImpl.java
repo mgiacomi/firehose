@@ -1,4 +1,4 @@
-package com.gltech.scale.core.collector;
+package com.gltech.scale.core.writer;
 
 import com.gc.iotools.stream.is.InputStreamFromOutputStream;
 import com.google.inject.Inject;
@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TimeBucketCollectorImpl implements TimeBucketCollector
+public class BatchCollectorImpl implements BatchCollector
 {
 	private static final Logger logger = LoggerFactory.getLogger("com.lokiscale.collector.TimeBucketCollectorSingleAndDouble");
 	private DateTime nearestPeriodCeiling;
@@ -33,7 +33,7 @@ public class TimeBucketCollectorImpl implements TimeBucketCollector
 	private Timer timer;
 
 	@Inject
-	public TimeBucketCollectorImpl(RopeManagerRestClient ropeManagerRestClient, StorageServiceClient storageServiceClient, CoordinationService coordinationService, RopeCoordinator ropeCoordinator)
+	public BatchCollectorImpl(RopeManagerRestClient ropeManagerRestClient, StorageServiceClient storageServiceClient, CoordinationService coordinationService, RopeCoordinator ropeCoordinator)
 	{
 		this.ropeManagerRestClient = ropeManagerRestClient;
 		this.storageServiceClient = storageServiceClient;
@@ -96,13 +96,13 @@ public class TimeBucketCollectorImpl implements TimeBucketCollector
 				}
 			}
 
-			final TimeBucketStreamsManager timeBucketStreamsManager = new TimeBucketStreamsManager(bucketMetaData, nearestPeriodCeiling);
+			final BatchStreamsManager batchStreamsManager = new BatchStreamsManager(bucketMetaData, nearestPeriodCeiling);
 
 			// Register rope manager streams with the stream manager.
 			for (ServiceMetaData ropeManager : ropeManagers)
 			{
 				InputStream ropeStream = ropeManagerRestClient.getTimeBucketEventsStream(ropeManager, customer, bucket, nearestPeriodCeiling);
-				timeBucketStreamsManager.registerInputStream(ropeStream);
+				batchStreamsManager.registerInputStream(ropeStream);
 			}
 
 			final InputStreamFromOutputStream<Long> inputStream = new InputStreamFromOutputStream<Long>()
@@ -110,7 +110,7 @@ public class TimeBucketCollectorImpl implements TimeBucketCollector
 				@Override
 				public Long produce(final OutputStream outputStream) throws Exception
 				{
-					return timeBucketStreamsManager.writeEvents(outputStream);
+					return batchStreamsManager.writeEvents(outputStream);
 				}
 			};
 

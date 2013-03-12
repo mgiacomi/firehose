@@ -1,8 +1,8 @@
-package com.gltech.scale.core.collector;
+package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.model.Message;
 
-public interface EventStream
+public interface MessageStream
 {
 	Message getCurrentMessage();
 

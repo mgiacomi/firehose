@@ -1,4 +1,4 @@
-package com.gltech.scale.core.collector;
+package com.gltech.scale.core.writer;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/collector")
-public class CollectorResource
+public class StorageWriteResource
 {
 	@Context
 	UriInfo uriInfo;
