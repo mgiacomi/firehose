@@ -61,11 +61,11 @@ public class AggregatorIntegrationTest
 	}
 
 	@Test
-	public void testEventToRopeAndCollect() throws Exception
+	public void testEventToAggregatorAndCollect() throws Exception
 	{
-		ServiceMetaData ropeManager = new ServiceMetaData();
-		ropeManager.setListenAddress(props.get("rope_manager.rest_host", "localhost"));
-		ropeManager.setListenPort(props.get("rope_manager.rest_port", 9090));
+		ServiceMetaData aggregator = new ServiceMetaData();
+		aggregator.setListenAddress(props.get("aggregator.rest_host", "localhost"));
+		aggregator.setListenPort(props.get("aggregator.rest_port", 9090));
 
 		ServiceMetaData eventService = new ServiceMetaData();
 		eventService.setListenAddress(props.get("event_service.rest_host", "localhost"));
@@ -89,10 +89,10 @@ public class AggregatorIntegrationTest
 		}
 		DateTime first = DateTime.now();
 
-		// Test injecting fake events to the rope manager to make sure they are collected too.
+		// Test injecting fake events to the aggregator to make sure they are collected too.
 		AggregatorRestClient rrc = new AggregatorRestClient();
 		Message backupMessage = new Message("customer1", "bucket1", "event from failed server".getBytes());
-		rrc.postBackupEvent(ropeManager, backupMessage);
+		rrc.postBackupEvent(aggregator, backupMessage);
 
 		Thread.sleep(5000);
 
@@ -102,8 +102,8 @@ public class AggregatorIntegrationTest
 		}
 		DateTime second = DateTime.now();
 
-		AggregatorRestClient ropeClient = new AggregatorRestClient();
-		List<Message> events = ropeClient.getTimeBucketEvents(ropeManager, "customer1", "bucket1", first);
+		AggregatorRestClient aggregatorClient = new AggregatorRestClient();
+		List<Message> events = aggregatorClient.getTimeBucketEvents(aggregator, "customer1", "bucket1", first);
 		assertEquals(3, events.size());
 
 		for (int i = 0; i < events.size(); i++)
@@ -112,7 +112,7 @@ public class AggregatorIntegrationTest
 			assertEquals(requests.get(i), new String(message.getPayload()));
 		}
 
-		events = ropeClient.getTimeBucketEvents(ropeManager, "customer1", "bucket1", second);
+		events = aggregatorClient.getTimeBucketEvents(aggregator, "customer1", "bucket1", second);
 		assertEquals(3, events.size());
 
 		for (int i = 0; i < events.size(); i++)
@@ -121,7 +121,7 @@ public class AggregatorIntegrationTest
 			assertEquals(requests2.get(i), new String(message.getPayload()));
 		}
 
-		List<Message> backupsEvents = ropeClient.getBackupTimeBucketEvents(ropeManager, "customer1", "bucket1", first);
+		List<Message> backupsEvents = aggregatorClient.getBackupTimeBucketEvents(aggregator, "customer1", "bucket1", first);
 		assertEquals(1, backupsEvents.size());
 		assertEquals("event from failed server", new String(backupsEvents.get(0).getPayload()));
 	}

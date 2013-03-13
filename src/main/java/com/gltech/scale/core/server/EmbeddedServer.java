@@ -71,7 +71,7 @@ public class EmbeddedServer
 		StatisticsFilter.add(timerMap);
 		StatisticsFilter.add("/events/", "Events");
 		StatisticsFilter.add("/storage/", "Storage");
-		StatisticsFilter.add("/ropes/", "Ropes");
+		StatisticsFilter.add("/aggregator/", "Aggregator");
 		sch.addFilter(StatisticsFilter.class, "/*", null);
 
 		// Then add GuiceFilter and configure the server to
@@ -115,9 +115,9 @@ public class EmbeddedServer
 			LifeCycleManager.getInstance().add(inboundService, LifeCycle.Priority.INITIAL);
 		}
 
-		if (props.get("enable.rope_manager", true))
+		if (props.get("enable.aggregator", true))
 		{
-			// Registered RopeManager for shutdown
+			// Registered aggregator for shutdown
 			Aggregator aggregator = injector.getInstance(Aggregator.class);
 			LifeCycleManager.getInstance().add(aggregator, LifeCycle.Priority.INITIAL);
 
@@ -135,9 +135,9 @@ public class EmbeddedServer
 			new Thread(storageWriteManager, "CollectorManager").start();
 			LifeCycleManager.getInstance().add(storageWriteManager, LifeCycle.Priority.INITIAL);
 
-			// Start the RopeCoordinator and register it for shutdown
+			// Start the ChannelCoordinator and register it for shutdown
 			ChannelCoordinator channelCoordinator = injector.getInstance(ChannelCoordinator.class);
-			new Thread(channelCoordinator, "RopeCoordinator").start();
+			new Thread(channelCoordinator, "ChannelCoordinator").start();
 			LifeCycleManager.getInstance().add(channelCoordinator, LifeCycle.Priority.INITIAL);
 		}
 

@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentMap;
 public class InboundServiceImpl implements InboundService
 {
 	private static final Logger logger = LoggerFactory.getLogger(InboundServiceImpl.class);
-	private ConcurrentMap<DateTime, AggregatorsByPeriod> ropeManagerPeriodMatrices = new ConcurrentHashMap<>();
+	private ConcurrentMap<DateTime, AggregatorsByPeriod> aggregatorPeriodMatrices = new ConcurrentHashMap<>();
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;
 	private StorageServiceClient storageServiceClient;
@@ -73,12 +73,12 @@ public class InboundServiceImpl implements InboundService
 			logger.debug("Pre-storing event payload data to storage service: customer={} bucket={} uuid={} bytes={}", message.getCustomer(), message.getBucket(), message.getUuid(), payload.length);
 		}
 
-		AggregatorsByPeriod aggregatorsByPeriod = ropeManagerPeriodMatrices.get(nearestPeriodCeiling);
+		AggregatorsByPeriod aggregatorsByPeriod = aggregatorPeriodMatrices.get(nearestPeriodCeiling);
 
 		if (aggregatorsByPeriod == null)
 		{
-			AggregatorsByPeriod newAggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(nearestPeriodCeiling);
-			aggregatorsByPeriod = ropeManagerPeriodMatrices.putIfAbsent(nearestPeriodCeiling, newAggregatorsByPeriod);
+			AggregatorsByPeriod newAggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(nearestPeriodCeiling);
+			aggregatorsByPeriod = aggregatorPeriodMatrices.putIfAbsent(nearestPeriodCeiling, newAggregatorsByPeriod);
 			if (aggregatorsByPeriod == null)
 			{
 				aggregatorsByPeriod = newAggregatorsByPeriod;
@@ -89,14 +89,14 @@ public class InboundServiceImpl implements InboundService
 
 		if (channelMetaData.getRedundancy().equals(ChannelMetaData.Redundancy.singlewrite))
 		{
-			// This gets a rope manager.  Each call with round robin though all (primary and backup) rope managers.
-			ServiceMetaData ropeManager = aggregatorsByPeriod.next();
-			aggregatorRestClient.postEvent(ropeManager, message);
+			// This gets a aggregator.  Each call with round robin though all (primary and backup) rope managers.
+			ServiceMetaData aggregator = aggregatorsByPeriod.next();
+			aggregatorRestClient.postEvent(aggregator, message);
 		}
 
 		if (channelMetaData.getRedundancy().equals(ChannelMetaData.Redundancy.doublewritesync))
 		{
-			// This gets a primary and backup rope manager.  Each call with round robin though available sets.
+			// This gets a primary and backup aggregator.  Each call with round robin though available sets.
 			PrimaryBackupSet primaryBackupSet = aggregatorsByPeriod.nextPrimaryBackupSet();
 			aggregatorRestClient.postEvent(primaryBackupSet.getPrimary(), message);
 
@@ -106,7 +106,7 @@ public class InboundServiceImpl implements InboundService
 			}
 			else
 			{
-				logger.error("BucketMetaData requires double write redundancy, but no backup rope managers are available.");
+				logger.error("BucketMetaData requires double write redundancy, but no backup aggregators are available.");
 			}
 		}
 	}

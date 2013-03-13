@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 public class AggregatorImpl implements Aggregator
 {
 	private static final Logger logger = LoggerFactory.getLogger(Aggregator.class);
-	private ConcurrentMap<ChannelMetaData, Channel> ropes = new ConcurrentHashMap<>();
+	private ConcurrentMap<ChannelMetaData, Channel> channels = new ConcurrentHashMap<>();
 	private BucketMetaDataCache bucketMetaDataCache;
 	private ClusterService clusterService;
 	private TimePeriodUtils timePeriodUtils;
@@ -34,24 +34,24 @@ public class AggregatorImpl implements Aggregator
 		this.clusterService = clusterService;
 		this.timePeriodUtils = timePeriodUtils;
 
-		// Register the rope manager with the coordination service, so that collectors can find us
-		clusterService.getRegistrationService().registerAsRopeManager();
+		// Register the aggregator with the coordination service, so that collectors can find us
+		clusterService.getRegistrationService().registerAsAggregator();
 	}
 
 	@Override
 	public void addEvent(Message message)
 	{
 		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(message.getCustomer(), message.getBucket(), true);
-		Channel channel = ropes.get(channelMetaData);
+		Channel channel = channels.get(channelMetaData);
 
 		if (channel == null)
 		{
 			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils));
-			channel = ropes.putIfAbsent(channelMetaData, newChannel);
+			channel = channels.putIfAbsent(channelMetaData, newChannel);
 			if (channel == null)
 			{
 				channel = newChannel;
-				logger.info("Creating Rope {customer=" + message.getCustomer() + ", bucket=" + message.getBucket() + "}");
+				logger.info("Creating Channel {customer=" + message.getCustomer() + ", bucket=" + message.getBucket() + "}");
 			}
 		}
 
@@ -63,13 +63,13 @@ public class AggregatorImpl implements Aggregator
 	{
 		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(message.getCustomer(), message.getBucket(), true);
 
-		Channel channel = ropes.get(channelMetaData);
+		Channel channel = channels.get(channelMetaData);
 
 		if (channel == null)
 		{
-			logger.info("Creating Rope {customer=" + message.getCustomer() + ", bucket=" + message.getBucket() + "}");
+			logger.info("Creating Channel {customer=" + message.getCustomer() + ", bucket=" + message.getBucket() + "}");
 			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils));
-			channel = ropes.putIfAbsent(channelMetaData, newChannel);
+			channel = channels.putIfAbsent(channelMetaData, newChannel);
 			if (channel == null)
 			{
 				channel = newChannel;
@@ -83,7 +83,7 @@ public class AggregatorImpl implements Aggregator
 	public void clear(String customer, String bucket, DateTime dateTime)
 	{
 		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
-		Channel channel = ropes.get(channelMetaData);
+		Channel channel = channels.get(channelMetaData);
 
 		if (channel != null)
 		{
@@ -100,7 +100,7 @@ public class AggregatorImpl implements Aggregator
 	{
 		List<Batch> activeBatches = new ArrayList<>();
 
-		for (Channel channel : ropes.values())
+		for (Channel channel : channels.values())
 		{
 			for (Batch batch : channel.getTimeBuckets())
 			{
@@ -116,7 +116,7 @@ public class AggregatorImpl implements Aggregator
 	{
 		List<Batch> activeBackupBatches = new ArrayList<>();
 
-		for (Channel channel : ropes.values())
+		for (Channel channel : channels.values())
 		{
 			for (Batch batch : channel.getBackupTimeBuckets())
 			{
@@ -134,11 +134,11 @@ public class AggregatorImpl implements Aggregator
 
 		if (channelMetaData != null)
 		{
-			Channel channel = ropes.get(channelMetaData);
+			Channel channel = channels.get(channelMetaData);
 
 			if (channel != null)
 			{
-				Batch batch = ropes.get(channelMetaData).getTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime));
+				Batch batch = channels.get(channelMetaData).getTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime));
 
 				if (batch != null)
 				{
@@ -157,7 +157,7 @@ public class AggregatorImpl implements Aggregator
 
 		if (channelMetaData != null)
 		{
-			Channel channel = ropes.get(channelMetaData);
+			Channel channel = channels.get(channelMetaData);
 
 			if (channel != null)
 			{
@@ -183,19 +183,19 @@ public class AggregatorImpl implements Aggregator
 	public BatchMetaData getTimeBucketMetaData(String customer, String bucket, DateTime dateTime)
 	{
 		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
-		return ropes.get(channelMetaData).getTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
+		return channels.get(channelMetaData).getTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
 	}
 
 	@Override
 	public BatchMetaData getBackupTimeBucketMetaData(String customer, String bucket, DateTime dateTime)
 	{
 		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
-		return ropes.get(channelMetaData).getBackupTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
+		return channels.get(channelMetaData).getBackupTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
 	}
 
 	@Override
 	public void shutdown()
 	{
-		clusterService.getRegistrationService().unRegisterAsRopeManager();
+		clusterService.getRegistrationService().unRegisterAsAggregator();
 	}
 }

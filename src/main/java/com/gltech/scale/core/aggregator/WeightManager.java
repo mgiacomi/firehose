@@ -40,12 +40,12 @@ public class WeightManager implements Runnable, LifeCycle
 					}
 
 					channelCoordinator.registerWeight(active, primaries, backups, rested);
-					logger.trace("Registering weight with RopeCoordinator. active={}, primaries={}, backups={}, rested={}", active, primaries, backups, rested);
+					logger.trace("Registering weight with ChannelCoordinator. active={}, primaries={}, backups={}, rested={}", active, primaries, backups, rested);
 				}
 				catch (Exception e)
 				{
 					// May fail due to network/zookeeper issues.  If so, just try again next time.
-					logger.error("Failed to update weight for RopeManager.", e);
+					logger.error("Failed to update weight for Aggregator.", e);
 				}
 
 				Thread.sleep(500);

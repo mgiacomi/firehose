@@ -65,9 +65,9 @@ public class BatchCollectorImpl implements BatchCollector
 			String customer = channelMetaData.getCustomer();
 			String bucket = channelMetaData.getBucket();
 
-			List<ServiceMetaData> ropeManagers = new ArrayList<>();
+			List<ServiceMetaData> aggregators = new ArrayList<>();
 
-			AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(nearestPeriodCeiling);
+			AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(nearestPeriodCeiling);
 
 			for (PrimaryBackupSet primaryBackupSet : aggregatorsByPeriod.getPrimaryBackupSets())
 			{
@@ -76,33 +76,33 @@ public class BatchCollectorImpl implements BatchCollector
 					BatchMetaData primaryMetaData = aggregatorRestClient.getTimeBucketMetaData(primaryBackupSet.getPrimary(), customer, bucket, nearestPeriodCeiling);
 					BatchMetaData backupMetaData = aggregatorRestClient.getTimeBucketMetaData(primaryBackupSet.getPrimary(), customer, bucket, nearestPeriodCeiling);
 
-					ropeManagers.add(primaryBackupSet.getPrimary());
+					aggregators.add(primaryBackupSet.getPrimary());
 
 					// If there is any discrepancy between the primary and backup rope for a double write bucket,
 					// then pull both and let TimeBucketStreamsManager figure it out. Otherwise only primary is used.
 					if (primaryMetaData.getEventsAdded() != backupMetaData.getEventsAdded() || primaryMetaData.getBytes() != backupMetaData.getBytes())
 					{
-						ropeManagers.add(primaryBackupSet.getBackup());
+						aggregators.add(primaryBackupSet.getBackup());
 					}
 				}
 				else
 				{
-					ropeManagers.add(primaryBackupSet.getPrimary());
+					aggregators.add(primaryBackupSet.getPrimary());
 
 					if (primaryBackupSet.getBackup() != null)
 					{
-						ropeManagers.add(primaryBackupSet.getBackup());
+						aggregators.add(primaryBackupSet.getBackup());
 					}
 				}
 			}
 
 			final BatchStreamsManager batchStreamsManager = new BatchStreamsManager(channelMetaData, nearestPeriodCeiling);
 
-			// Register rope manager streams with the stream manager.
-			for (ServiceMetaData ropeManager : ropeManagers)
+			// Register aggregator streams with the stream manager.
+			for (ServiceMetaData ropeManager : aggregators)
 			{
-				InputStream ropeStream = aggregatorRestClient.getTimeBucketEventsStream(ropeManager, customer, bucket, nearestPeriodCeiling);
-				batchStreamsManager.registerInputStream(ropeStream);
+				InputStream aggregatorStream = aggregatorRestClient.getTimeBucketEventsStream(ropeManager, customer, bucket, nearestPeriodCeiling);
+				batchStreamsManager.registerInputStream(aggregatorStream);
 			}
 
 			final InputStreamFromOutputStream<Long> inputStream = new InputStreamFromOutputStream<Long>()
@@ -122,11 +122,11 @@ public class BatchCollectorImpl implements BatchCollector
 			// Remove time bucket references from the coordination service.
 			clusterService.clearTimeBucketMetaData(channelMetaData, nearestPeriodCeiling);
 
-			// Data has been written so remove it from all active rope managers.
-			for (ServiceMetaData ropeManager : ropeManagers)
+			// Data has been written so remove it from all active aggregator.
+			for (ServiceMetaData aggregator : aggregators)
 			{
-				// RopeManager can now remove the time bucket
-				aggregatorRestClient.clearTimeBucket(ropeManager, customer, bucket, nearestPeriodCeiling);
+				// Aggregator can now remove the time bucket
+				aggregatorRestClient.clearTimeBucket(aggregator, customer, bucket, nearestPeriodCeiling);
 			}
 
 			long completedIn = System.nanoTime() - start;

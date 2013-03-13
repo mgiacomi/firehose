@@ -22,7 +22,7 @@ public class ChannelStats implements Channel
 		this.channel = channel;
 
 		String prefix = channel.getChannelMetaData().getCustomer() + "/" + channel.getChannelMetaData().getBucket() + "/" + props.get("coordination.period_seconds", 5);
-		String groupName = "Loki Rope (" + prefix + ")";
+		String groupName = "Channel (" + prefix + ")";
 		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddEvent.Count", groupName, "count", new TimerCountPublisher("", addEventTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addEventTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " OldestEvent.Time", groupName, "oldest event seconds", new PublishCallback()
@@ -64,14 +64,14 @@ public class ChannelStats implements Channel
 		{
 			public String getValue()
 			{
-				long ropePayloadSize = 0;
+				long channelPayloadSize = 0;
 
 				for (Batch batch : channel.getTimeBuckets())
 				{
-					ropePayloadSize += batch.getBytes();
+					channelPayloadSize += batch.getBytes();
 				}
 
-				return Long.toString(ropePayloadSize / KBytes);
+				return Long.toString(channelPayloadSize / KBytes);
 			}
 		}));
 
@@ -90,14 +90,14 @@ public class ChannelStats implements Channel
 			{
 				public String getValue()
 				{
-					long ropePayloadSize = 0;
+					long channelPayloadSize = 0;
 
 					for (Batch batch : channel.getBackupTimeBuckets())
 					{
-						ropePayloadSize += batch.getBytes();
+						channelPayloadSize += batch.getBytes();
 					}
 
-					return Long.toString(ropePayloadSize / KBytes);
+					return Long.toString(channelPayloadSize / KBytes);
 				}
 			}));
 		}

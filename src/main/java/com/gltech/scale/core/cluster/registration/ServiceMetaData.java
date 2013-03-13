@@ -85,7 +85,7 @@ public class ServiceMetaData
 
 	public String toString()
 	{
-		return "RopeManagerMetaData{" +
+		return "AggregatorMetaData{" +
 				"workerId=" + workerId +
 				", listenAddress='" + listenAddress + '\'' +
 				", listenPort=" + listenPort +

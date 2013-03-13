@@ -43,7 +43,7 @@ public class AggregatorRegression
 	}
 
 	@Test
-	public void testRopeAssignmentOverTime() throws Exception
+	public void testAggregatorAssignmentOverTime() throws Exception
 	{
 		TimePeriodUtils timePeriodUtils = new TimePeriodUtils();
 
@@ -59,41 +59,41 @@ public class AggregatorRegression
 		ServiceMetaData rm9 = new ServiceMetaData(UUID.randomUUID(), "9.9.9.9", 9);
 
 		RegistrationService registrationService = mock(RegistrationService.class);
-		when(registrationService.getRopeManagerMetaDataById(rm0.getWorkerId().toString())).thenReturn(rm0);
-		when(registrationService.getRopeManagerMetaDataById(rm1.getWorkerId().toString())).thenReturn(rm1);
-		when(registrationService.getRopeManagerMetaDataById(rm2.getWorkerId().toString())).thenReturn(rm2);
-		when(registrationService.getRopeManagerMetaDataById(rm3.getWorkerId().toString())).thenReturn(rm3);
-		when(registrationService.getRopeManagerMetaDataById(rm4.getWorkerId().toString())).thenReturn(rm4);
-		when(registrationService.getRopeManagerMetaDataById(rm5.getWorkerId().toString())).thenReturn(rm5);
-		when(registrationService.getRopeManagerMetaDataById(rm6.getWorkerId().toString())).thenReturn(rm6);
-		when(registrationService.getRopeManagerMetaDataById(rm7.getWorkerId().toString())).thenReturn(rm7);
-		when(registrationService.getRopeManagerMetaDataById(rm8.getWorkerId().toString())).thenReturn(rm8);
-		when(registrationService.getRopeManagerMetaDataById(rm9.getWorkerId().toString())).thenReturn(rm9);
+		when(registrationService.getAggregatorMetaDataById(rm0.getWorkerId().toString())).thenReturn(rm0);
+		when(registrationService.getAggregatorMetaDataById(rm1.getWorkerId().toString())).thenReturn(rm1);
+		when(registrationService.getAggregatorMetaDataById(rm2.getWorkerId().toString())).thenReturn(rm2);
+		when(registrationService.getAggregatorMetaDataById(rm3.getWorkerId().toString())).thenReturn(rm3);
+		when(registrationService.getAggregatorMetaDataById(rm4.getWorkerId().toString())).thenReturn(rm4);
+		when(registrationService.getAggregatorMetaDataById(rm5.getWorkerId().toString())).thenReturn(rm5);
+		when(registrationService.getAggregatorMetaDataById(rm6.getWorkerId().toString())).thenReturn(rm6);
+		when(registrationService.getAggregatorMetaDataById(rm7.getWorkerId().toString())).thenReturn(rm7);
+		when(registrationService.getAggregatorMetaDataById(rm8.getWorkerId().toString())).thenReturn(rm8);
+		when(registrationService.getAggregatorMetaDataById(rm9.getWorkerId().toString())).thenReturn(rm9);
 
 		ChannelCoordinator channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
 
-		FakeRopeManager frm0 = new FakeRopeManager(rm0);
-		FakeRopeManager frm1 = new FakeRopeManager(rm1);
-		FakeRopeManager frm2 = new FakeRopeManager(rm2);
-		FakeRopeManager frm3 = new FakeRopeManager(rm3);
-		FakeRopeManager frm4 = new FakeRopeManager(rm4);
-		FakeRopeManager frm5 = new FakeRopeManager(rm5);
-		FakeRopeManager frm6 = new FakeRopeManager(rm6);
-		FakeRopeManager frm7 = new FakeRopeManager(rm7);
-		FakeRopeManager frm8 = new FakeRopeManager(rm8);
-		FakeRopeManager frm9 = new FakeRopeManager(rm9);
+		FakeAggregator frm0 = new FakeAggregator(rm0);
+		FakeAggregator frm1 = new FakeAggregator(rm1);
+		FakeAggregator frm2 = new FakeAggregator(rm2);
+		FakeAggregator frm3 = new FakeAggregator(rm3);
+		FakeAggregator frm4 = new FakeAggregator(rm4);
+		FakeAggregator frm5 = new FakeAggregator(rm5);
+		FakeAggregator frm6 = new FakeAggregator(rm6);
+		FakeAggregator frm7 = new FakeAggregator(rm7);
+		FakeAggregator frm8 = new FakeAggregator(rm8);
+		FakeAggregator frm9 = new FakeAggregator(rm9);
 
-		Map<String, FakeRopeManager> idToRopeManager = new HashMap<>();
-		idToRopeManager.put(rm0.getWorkerId().toString(), frm0);
-		idToRopeManager.put(rm1.getWorkerId().toString(), frm1);
-		idToRopeManager.put(rm2.getWorkerId().toString(), frm2);
-		idToRopeManager.put(rm3.getWorkerId().toString(), frm3);
-		idToRopeManager.put(rm4.getWorkerId().toString(), frm4);
-		idToRopeManager.put(rm5.getWorkerId().toString(), frm5);
-		idToRopeManager.put(rm6.getWorkerId().toString(), frm6);
-		idToRopeManager.put(rm7.getWorkerId().toString(), frm7);
-		idToRopeManager.put(rm8.getWorkerId().toString(), frm8);
-		idToRopeManager.put(rm9.getWorkerId().toString(), frm9);
+		Map<String, FakeAggregator> idToAggregator = new HashMap<>();
+		idToAggregator.put(rm0.getWorkerId().toString(), frm0);
+		idToAggregator.put(rm1.getWorkerId().toString(), frm1);
+		idToAggregator.put(rm2.getWorkerId().toString(), frm2);
+		idToAggregator.put(rm3.getWorkerId().toString(), frm3);
+		idToAggregator.put(rm4.getWorkerId().toString(), frm4);
+		idToAggregator.put(rm5.getWorkerId().toString(), frm5);
+		idToAggregator.put(rm6.getWorkerId().toString(), frm6);
+		idToAggregator.put(rm7.getWorkerId().toString(), frm7);
+		idToAggregator.put(rm8.getWorkerId().toString(), frm8);
+		idToAggregator.put(rm9.getWorkerId().toString(), frm9);
 
 		new Thread(frm0).start();
 		new Thread(frm1).start();
@@ -108,17 +108,17 @@ public class AggregatorRegression
 
 		while (true)
 		{
-			AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
+			AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now());
 			if (aggregatorsByPeriod != null)
 			{
 				for (PrimaryBackupSet primaryBackupSet : aggregatorsByPeriod.getPrimaryBackupSets())
 				{
-					FakeRopeManager primary = idToRopeManager.get(primaryBackupSet.getPrimary().getWorkerId().toString());
+					FakeAggregator primary = idToAggregator.get(primaryBackupSet.getPrimary().getWorkerId().toString());
 					primary.assign(true, timePeriodUtils.nearestPeriodCeiling(DateTime.now()));
 
 					if (primaryBackupSet.getBackup() != null)
 					{
-						FakeRopeManager backup = idToRopeManager.get(primaryBackupSet.getBackup().getWorkerId().toString());
+						FakeAggregator backup = idToAggregator.get(primaryBackupSet.getBackup().getWorkerId().toString());
 						backup.assign(false, timePeriodUtils.nearestPeriodCeiling(DateTime.now()));
 					}
 				}
@@ -130,17 +130,17 @@ public class AggregatorRegression
 
 	}
 
-	class FakeRopeManager implements Runnable
+	class FakeAggregator implements Runnable
 	{
 		private DateTime nearestPeriodCeiling;
 		private ChannelCoordinator channelCoordinator;
 		private boolean primary;
 
-		FakeRopeManager(ServiceMetaData serviceMetaData)
+		FakeAggregator(ServiceMetaData serviceMetaData)
 		{
 			RegistrationService registrationService = mock(RegistrationService.class);
 			channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
-			when(registrationService.getLocalRopeManagerMetaData()).thenReturn(serviceMetaData);
+			when(registrationService.getLocalAggregatorMetaData()).thenReturn(serviceMetaData);
 		}
 
 		public void assign(boolean primary, DateTime nearestPeriodCeiling)

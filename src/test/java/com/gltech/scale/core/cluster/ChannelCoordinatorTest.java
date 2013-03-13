@@ -50,18 +50,18 @@ public class ChannelCoordinatorTest
 
 		RegistrationService registrationService = mock(RegistrationService.class);
 		ChannelCoordinator channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
-		when(registrationService.getRopeManagerMetaDataById(rm0.getWorkerId().toString())).thenReturn(rm0);
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm0);
+		when(registrationService.getAggregatorMetaDataById(rm0.getWorkerId().toString())).thenReturn(rm0);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm0);
 		channelCoordinator.registerWeight(true, 3, 2, 0);
 
-		channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
-		channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().plusSeconds(5));
+		channelCoordinator.getAggregatorPeriodMatrix(DateTime.now());
+		channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().plusSeconds(5));
 
 		boolean gotException = false;
 
 		try
 		{
-			channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().plusSeconds(10));
+			channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().plusSeconds(10));
 		}
 		catch (ClusterException e)
 		{
@@ -78,31 +78,31 @@ public class ChannelCoordinatorTest
 		ServiceMetaData rm1 = new ServiceMetaData(UUID.randomUUID(), "1.1.1.1", 1);
 
 		RegistrationService registrationService = mock(RegistrationService.class);
-		when(registrationService.getRopeManagerMetaDataById(rm0.getWorkerId().toString())).thenReturn(rm0);
-		when(registrationService.getRopeManagerMetaDataById(rm1.getWorkerId().toString())).thenReturn(rm1);
+		when(registrationService.getAggregatorMetaDataById(rm0.getWorkerId().toString())).thenReturn(rm0);
+		when(registrationService.getAggregatorMetaDataById(rm1.getWorkerId().toString())).thenReturn(rm1);
 
 		ChannelCoordinator channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm0);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm0);
 		channelCoordinator.registerWeight(true, 3, 2, 0);
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm1);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm1);
 		channelCoordinator.registerWeight(true, 2, 2, 0);
 
-		AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(2));
+		AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(2));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 0);
 
 		channelCoordinator.registerWeight(true, 4, 2, 0);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(1));
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(1));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 0);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 1);
 	}
 
 	@Test
-	public void testGetRopeManagerPeriodMatrix() throws Exception
+	public void testGetAggregatorPeriodMatrix() throws Exception
 	{
 		ServiceMetaData rm0 = new ServiceMetaData(UUID.randomUUID(), "0.0.0.0", 0);
 		ServiceMetaData rm1 = new ServiceMetaData(UUID.randomUUID(), "1.1.1.1", 1);
@@ -116,104 +116,104 @@ public class ChannelCoordinatorTest
 		ServiceMetaData rm9 = new ServiceMetaData(UUID.randomUUID(), "9.9.9.9", 9);
 
 		RegistrationService registrationService = mock(RegistrationService.class);
-		when(registrationService.getRopeManagerMetaDataById(rm0.getWorkerId().toString())).thenReturn(rm0);
-		when(registrationService.getRopeManagerMetaDataById(rm1.getWorkerId().toString())).thenReturn(rm1);
-		when(registrationService.getRopeManagerMetaDataById(rm2.getWorkerId().toString())).thenReturn(rm2);
-		when(registrationService.getRopeManagerMetaDataById(rm3.getWorkerId().toString())).thenReturn(rm3);
-		when(registrationService.getRopeManagerMetaDataById(rm4.getWorkerId().toString())).thenReturn(rm4);
-		when(registrationService.getRopeManagerMetaDataById(rm5.getWorkerId().toString())).thenReturn(rm5);
-		when(registrationService.getRopeManagerMetaDataById(rm6.getWorkerId().toString())).thenReturn(rm6);
-		when(registrationService.getRopeManagerMetaDataById(rm7.getWorkerId().toString())).thenReturn(rm7);
-		when(registrationService.getRopeManagerMetaDataById(rm8.getWorkerId().toString())).thenReturn(rm8);
-		when(registrationService.getRopeManagerMetaDataById(rm9.getWorkerId().toString())).thenReturn(rm9);
+		when(registrationService.getAggregatorMetaDataById(rm0.getWorkerId().toString())).thenReturn(rm0);
+		when(registrationService.getAggregatorMetaDataById(rm1.getWorkerId().toString())).thenReturn(rm1);
+		when(registrationService.getAggregatorMetaDataById(rm2.getWorkerId().toString())).thenReturn(rm2);
+		when(registrationService.getAggregatorMetaDataById(rm3.getWorkerId().toString())).thenReturn(rm3);
+		when(registrationService.getAggregatorMetaDataById(rm4.getWorkerId().toString())).thenReturn(rm4);
+		when(registrationService.getAggregatorMetaDataById(rm5.getWorkerId().toString())).thenReturn(rm5);
+		when(registrationService.getAggregatorMetaDataById(rm6.getWorkerId().toString())).thenReturn(rm6);
+		when(registrationService.getAggregatorMetaDataById(rm7.getWorkerId().toString())).thenReturn(rm7);
+		when(registrationService.getAggregatorMetaDataById(rm8.getWorkerId().toString())).thenReturn(rm8);
+		when(registrationService.getAggregatorMetaDataById(rm9.getWorkerId().toString())).thenReturn(rm9);
 
 		ChannelCoordinator channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm1);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm1);
 		channelCoordinator.registerWeight(true, 2, 2, 0);
 
-		AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(1));
+		AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(1));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
 		assertNull(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup());
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm0);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm0);
 		channelCoordinator.registerWeight(true, 3, 2, 0);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(2));
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(2));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 0);
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm5);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm5);
 		channelCoordinator.registerWeight(false, 0, 0, 111);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(3));
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(3));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 1);
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm2);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm2);
 		channelCoordinator.registerWeight(true, 1, 2, 0);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(4));
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(4));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 2);
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm3);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm3);
 		channelCoordinator.registerWeight(true, 0, 1, 0);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(5));
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(5));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 3);
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm7);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm7);
 		channelCoordinator.registerWeight(false, 0, 0, 12);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(6));
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(6));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 7);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 5);
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm4);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm4);
 		channelCoordinator.registerWeight(true, 0, 0, 0);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(7));
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(7));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 7);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 5);
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm9);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm9);
 		channelCoordinator.registerWeight(false, 0, 0, 1);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(8));
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(8));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 7);
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm6);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm6);
 		channelCoordinator.registerWeight(false, 0, 0, 21);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now().minusHours(9));
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(9));
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 2);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 7);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getPrimary().getListenPort(), 6);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getBackup().getListenPort(), 5);
 
-		when(registrationService.getLocalRopeManagerMetaData()).thenReturn(rm8);
+		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm8);
 		channelCoordinator.registerWeight(false, 0, 0, 2);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now());
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 2);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 8);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getPrimary().getListenPort(), 7);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getBackup().getListenPort(), 6);
 
-		aggregatorsByPeriod = channelCoordinator.getRopeManagerPeriodMatrix(DateTime.now());
+		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now());
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().size(), 2);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 8);

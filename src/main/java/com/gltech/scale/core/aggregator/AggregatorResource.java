@@ -13,7 +13,7 @@ import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.OutputStream;
 
-@Path("/ropes")
+@Path("/aggregator")
 public class AggregatorResource
 {
 	private Aggregator aggregator;

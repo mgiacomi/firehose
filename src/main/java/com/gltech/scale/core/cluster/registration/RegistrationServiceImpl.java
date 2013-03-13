@@ -23,15 +23,15 @@ public class RegistrationServiceImpl implements RegistrationService
 	private static final Logger logger = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 	private ServiceAdvertiser eventServiceAdvertiser;
 	private ServiceAdvertiser collectorManagerAdvertiser;
-	private ServiceAdvertiser ropeManagerAdvertiser;
+	private ServiceAdvertiser aggregatorAdvertiser;
 	private ServiceAdvertiser storageServiceAdvertiser;
 	private ServiceMetaData localEventServiceMetaData;
 	private ServiceMetaData localCollectorManagerMetaData;
-	private ServiceMetaData localRopeManagerMetaData;
+	private ServiceMetaData localAggregatorMetaData;
 	private ServiceMetaData localStorageServiceMetaData;
 	private ServiceCache<ServiceMetaData> eventServiceCache;
 	private ServiceCache<ServiceMetaData> collectorManagerCache;
-	private ServiceCache<ServiceMetaData> ropeManagerCache;
+	private ServiceCache<ServiceMetaData> aggregatorCache;
 	private ServiceCache<ServiceMetaData> storageServiceCache;
 	private RandomStrategy<ServiceMetaData> randomStorageStrategy = new RandomStrategy<>();
 	private RoundRobinStrategy<ServiceMetaData> roundRobinStorageStrategy = new RoundRobinStrategy<>();
@@ -48,9 +48,9 @@ public class RegistrationServiceImpl implements RegistrationService
 		collectorManagerCache = collectorManagerAdvertiser.getServiceCache();
 		collectorManagerCache.addListener(new CollectorManagerCacheListener());
 
-		ropeManagerAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.ROPE_SERVICE);
-		ropeManagerCache = ropeManagerAdvertiser.getServiceCache();
-		ropeManagerCache.addListener(new RopeManagerCacheListener());
+		aggregatorAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.AGGREGATOR_SERVICE);
+		aggregatorCache = aggregatorAdvertiser.getServiceCache();
+		aggregatorCache.addListener(new AggregatorCacheListener());
 
 		storageServiceAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.STORAGE_SERVICE);
 		storageServiceCache = storageServiceAdvertiser.getServiceCache();
@@ -60,7 +60,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		{
 			eventServiceCache.start();
 			collectorManagerCache.start();
-			ropeManagerCache.start();
+			aggregatorCache.start();
 			storageServiceCache.start();
 		}
 		catch (Exception e)
@@ -118,36 +118,36 @@ public class RegistrationServiceImpl implements RegistrationService
 		logger.info("Unregistered CollectorManager server host=" + localCollectorManagerMetaData.getListenAddress() + " port=" + localCollectorManagerMetaData.getListenPort());
 	}
 
-	public void registerAsRopeManager()
+	public void registerAsAggregator()
 	{
 		String host = props.get("server_host", "localhost");
 		int port = props.get("server_port", 8080);
 
 		try
 		{
-			localRopeManagerMetaData = ropeManagerAdvertiser.available(host, port);
-			logger.info("Registering RopeManager server host=" + host + " port=" + port);
+			localAggregatorMetaData = aggregatorAdvertiser.available(host, port);
+			logger.info("Registering aggregator server host=" + host + " port=" + port);
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to register RopeManager host=" + host + " port=" + port, e);
+			throw new ClusterException("Failed to register aggregator host=" + host + " port=" + port, e);
 		}
 	}
 
-	public void unRegisterAsRopeManager()
+	public void unRegisterAsAggregator()
 	{
-		ropeManagerAdvertiser.unavailable(localRopeManagerMetaData);
-		logger.info("Unregistered RopeManager server host=" + localRopeManagerMetaData.getListenAddress() + " port=" + localRopeManagerMetaData.getListenPort());
+		aggregatorAdvertiser.unavailable(localAggregatorMetaData);
+		logger.info("Unregistered aggregator server host=" + localAggregatorMetaData.getListenAddress() + " port=" + localAggregatorMetaData.getListenPort());
 	}
 
-	public ServiceMetaData getLocalRopeManagerMetaData()
+	public ServiceMetaData getLocalAggregatorMetaData()
 	{
-		return localRopeManagerMetaData;
+		return localAggregatorMetaData;
 	}
 
-	public ServiceMetaData getRopeManagerMetaDataById(String id)
+	public ServiceMetaData getAggregatorMetaDataById(String id)
 	{
-		for (ServiceInstance<ServiceMetaData> serviceInstance : ropeManagerCache.getInstances())
+		for (ServiceInstance<ServiceMetaData> serviceInstance : aggregatorCache.getInstances())
 		{
 			if (serviceInstance.getId().equals(id))
 			{
@@ -231,11 +231,11 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
-	public List<ServiceMetaData> getRegisteredRopeManagers()
+	public List<ServiceMetaData> getRegisteredAggregators()
 	{
 		List<ServiceMetaData> serviceMetaDataList = new ArrayList<>();
 
-		for (ServiceInstance<ServiceMetaData> serviceMetaData : ropeManagerCache.getInstances())
+		for (ServiceInstance<ServiceMetaData> serviceMetaData : aggregatorCache.getInstances())
 		{
 			serviceMetaDataList.add(serviceMetaData.getPayload());
 		}
@@ -249,7 +249,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		{
 			eventServiceCache.close();
 			collectorManagerCache.close();
-			ropeManagerCache.close();
+			aggregatorCache.close();
 			storageServiceCache.close();
 
 			logger.info("Registration ServiceCache is shutdown.");
@@ -288,12 +288,12 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
-	private class RopeManagerCacheListener implements ServiceCacheListener
+	private class AggregatorCacheListener implements ServiceCacheListener
 	{
 		@Override
 		public void cacheChanged()
 		{
-			logger.info("Registered RopeManager list has been updated. " + ropeManagerCache.getInstances().size() + " RopeManager(s) are active.");
+			logger.info("Registered RopeManager list has been updated. " + aggregatorCache.getInstances().size() + " RopeManager(s) are active.");
 		}
 
 		@Override

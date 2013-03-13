@@ -40,10 +40,10 @@ public class ZookeeperClusterService implements ClusterService
 		{
 			BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(channelMetaData, nearestPeriodCeiling);
 
-			if (client.checkExists().forPath("/rope/timebuckets/" + batchPeriodMapper.getNodeName()) == null)
+			if (client.checkExists().forPath("/aggregator/timebuckets/" + batchPeriodMapper.getNodeName()) == null)
 			{
-				client.create().creatingParentsIfNeeded().forPath("/rope/timebuckets/" + batchPeriodMapper.getNodeName());
-				logger.info("Registering time Bucket on rope: " + batchPeriodMapper.getNodeName());
+				client.create().creatingParentsIfNeeded().forPath("/aggregator/timebuckets/" + batchPeriodMapper.getNodeName());
+				logger.info("Registering time Bucket on channel: " + batchPeriodMapper.getNodeName());
 			}
 		}
 		catch (KeeperException.NodeExistsException nee)
@@ -52,7 +52,7 @@ public class ZookeeperClusterService implements ClusterService
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to register rope manager.", e);
+			throw new ClusterException("Failed to register aggregator.", e);
 		}
 	}
 
@@ -141,9 +141,9 @@ public class ZookeeperClusterService implements ClusterService
 		{
 			List<BatchPeriodMapper> mappers = new ArrayList<>();
 
-			if (client.checkExists().forPath("/rope/timebuckets") != null)
+			if (client.checkExists().forPath("/channel/timebuckets") != null)
 			{
-				for (String nodeName : client.getChildren().forPath("/rope/timebuckets"))
+				for (String nodeName : client.getChildren().forPath("/channel/timebuckets"))
 				{
 					mappers.add(new BatchPeriodMapper(nodeName));
 				}
@@ -171,7 +171,7 @@ public class ZookeeperClusterService implements ClusterService
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to remove rope and collector for time bucket: " + batchPeriodMapper.getNodeName(), e);
+			throw new ClusterException("Failed to remove channel and collector for time bucket: " + batchPeriodMapper.getNodeName(), e);
 		}
 	}
 
@@ -182,12 +182,12 @@ public class ZookeeperClusterService implements ClusterService
 
 		try
 		{
-			client.delete().forPath("/rope/timebuckets/" + batchPeriodMapper.getNodeName());
+			client.delete().forPath("/channel/timebuckets/" + batchPeriodMapper.getNodeName());
 			logger.info("Removed TimeBucket: " + batchPeriodMapper.getNodeName());
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to remove rope and collector for time bucket: " + batchPeriodMapper.getNodeName(), e);
+			throw new ClusterException("Failed to remove channel and collector for time bucket: " + batchPeriodMapper.getNodeName(), e);
 		}
 	}
 

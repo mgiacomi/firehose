@@ -14,13 +14,13 @@ public interface RegistrationService
 
 	void unRegisterAsCollectorManager();
 
-	void registerAsRopeManager();
+	void registerAsAggregator();
 
-	void unRegisterAsRopeManager();
+	void unRegisterAsAggregator();
 
-	ServiceMetaData getLocalRopeManagerMetaData();
+	ServiceMetaData getLocalAggregatorMetaData();
 
-	ServiceMetaData getRopeManagerMetaDataById(String id);
+	ServiceMetaData getAggregatorMetaDataById(String id);
 
 	void registerAsStorageService();
 
@@ -32,7 +32,7 @@ public interface RegistrationService
 
 	ServiceMetaData getStorageServiceSticky();
 
-	List<ServiceMetaData> getRegisteredRopeManagers();
+	List<ServiceMetaData> getRegisteredAggregators();
 
 	void shutdown();
 }

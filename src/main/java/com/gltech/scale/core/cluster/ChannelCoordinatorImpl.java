@@ -57,12 +57,12 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 
 				try
 				{
-					getRopeManagerPeriodMatrix(now);
+					getAggregatorPeriodMatrix(now);
 				}
 				catch (Exception e)
 				{
 					// May fail due to network/zookeeper issues.  If so, just try again next time.
-					logger.error("Failed to get RopeManagerPeriodMatrix for period: " + now, e);
+					logger.error("Failed to get AggregatorPeriodMatrix for period: " + now, e);
 				}
 
 				Thread.sleep(1000);
@@ -70,10 +70,10 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		}
 		catch (InterruptedException e)
 		{
-			logger.error("RopeCoordinatorImpl was inturrupted.", e);
+			logger.error("ChannelCoordinatorImpl was inturrupted.", e);
 		}
 
-		logger.info("RopeCoordinatorImpl has been shutdown.");
+		logger.info("ChannelCoordinatorImpl has been shutdown.");
 	}
 
 	public void shutdown()
@@ -84,23 +84,23 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	public void registerWeight(boolean active, int primaries, int backups, int restedfor)
 	{
 		long weight = WeightBreakdown.toWeight(active, primaries, backups, restedfor);
-		ServiceMetaData ropeManager = registrationService.getLocalRopeManagerMetaData();
+		ServiceMetaData aggregator = registrationService.getLocalAggregatorMetaData();
 
-		if (ropeManager != null)
+		if (aggregator != null)
 		{
 			try
 			{
-				ZKPaths.mkdirs(client.getZookeeperClient().getZooKeeper(), "/rope_manager/weights");
+				ZKPaths.mkdirs(client.getZookeeperClient().getZooKeeper(), "/aggregator/weights");
 
-				String newNode = "/rope_manager/weights/" + weight + "|" + ropeManager.getWorkerId().toString();
+				String newNode = "/rope_manager/weights/" + weight + "|" + aggregator.getWorkerId().toString();
 				String oldNode = null;
 
-				for (String weightToId : client.getChildren().forPath("/rope_manager/weights"))
+				for (String weightToId : client.getChildren().forPath("/aggregator/weights"))
 				{
 					String[] nodeParts = weightToId.split("\\|");
-					if (ropeManager.getWorkerId().toString().equals(nodeParts[1]))
+					if (aggregator.getWorkerId().toString().equals(nodeParts[1]))
 					{
-						oldNode = "/rope_manager/weights/" + nodeParts[0] + "|" + nodeParts[1];
+						oldNode = "/aggregator/weights/" + nodeParts[0] + "|" + nodeParts[1];
 					}
 				}
 
@@ -116,36 +116,36 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 					client.create().withMode(CreateMode.EPHEMERAL).forPath(newNode);
 				}
 
-				logger.trace("Registering weight={} for rope manager={}:", weight, ropeManager.getWorkerId());
+				logger.trace("Registering weight={} for aggregator={}:", weight, aggregator.getWorkerId());
 			}
 			catch (Exception e)
 			{
-				throw new ClusterException("Failed to get a list of RopeManager weights.", e);
+				throw new ClusterException("Failed to get a list of aggregator weights.", e);
 			}
 		}
 	}
 
-	public AggregatorsByPeriod getRopeManagerPeriodMatrix(DateTime nearestPeriodCeiling)
+	public AggregatorsByPeriod getAggregatorPeriodMatrix(DateTime nearestPeriodCeiling)
 	{
 		nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(nearestPeriodCeiling);
 
-		AggregatorsByPeriod aggregatorsByPeriod = readRopeManagersByPeriod(nearestPeriodCeiling);
+		AggregatorsByPeriod aggregatorsByPeriod = readAggregatorsByPeriod(nearestPeriodCeiling);
 
 		if (aggregatorsByPeriod == null)
 		{
-			aggregatorsByPeriod = writeRopeManagerByPeriod(nearestPeriodCeiling);
+			aggregatorsByPeriod = writeAggregatorByPeriod(nearestPeriodCeiling);
 		}
 
 		return aggregatorsByPeriod;
 	}
 
-	AggregatorsByPeriod readRopeManagersByPeriod(DateTime nearestPeriodCeiling)
+	AggregatorsByPeriod readAggregatorsByPeriod(DateTime nearestPeriodCeiling)
 	{
 		String period = nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
 
 		try
 		{
-			byte[] data = client.getData().forPath("/rope_manager/periods/" + period);
+			byte[] data = client.getData().forPath("/aggregator/periods/" + period);
 			return mapper.readValue(new String(data), AggregatorsByPeriod.class);
 		}
 		catch (KeeperException.NoNodeException e)
@@ -154,27 +154,27 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to get RopeManager period data for " + period, e);
+			throw new ClusterException("Failed to get aggregator period data for " + period, e);
 		}
 	}
 
-	AggregatorsByPeriod writeRopeManagerByPeriod(DateTime nearestPeriodCeiling)
+	AggregatorsByPeriod writeAggregatorByPeriod(DateTime nearestPeriodCeiling)
 	{
 		// You can't schedule anything more then one time period into the future.
 		int periodSeconds = props.get("coordination.period_seconds", 5);
 
 		if (nearestPeriodCeiling.isAfter(timePeriodUtils.nearestPeriodCeiling(DateTime.now()).plusSeconds(5)))
 		{
-			throw new ClusterException(" You can not schedule RopeManager more then " + periodSeconds + " seconds into the future.");
+			throw new ClusterException(" You can not schedule aggregator more then " + periodSeconds + " seconds into the future.");
 		}
 
 		try
 		{
-			if (client.checkExists().forPath("/rope_manager/weights") != null)
+			if (client.checkExists().forPath("/aggregator/weights") != null)
 			{
 				SortedMap<Long, String> weightsToIds = new TreeMap<>();
 
-				for (String weightToId : client.getChildren().forPath("/rope_manager/weights"))
+				for (String weightToId : client.getChildren().forPath("/aggregator/weights"))
 				{
 					String[] nodeParts = weightToId.split("\\|");
 					long weight = Long.valueOf(nodeParts[0]);
@@ -194,44 +194,44 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 					weightsToIds.put(weight, nodeParts[1]);
 				}
 
-				int totalRopeManagers = 0;
-				int restingRopeManagers = 0;
+				int totalAggregators = 0;
+				int restingAggregators = 0;
 
 				for (long weight : weightsToIds.keySet())
 				{
 					if (!new WeightBreakdown(weight).isActive())
 					{
-						restingRopeManagers++;
+						restingAggregators++;
 					}
-					totalRopeManagers++;
+					totalAggregators++;
 				}
 
 				List<PrimaryBackupSet> primaryBackupSets = new ArrayList<>();
 
-				// We don't have any rope managers.  Eat shit and die.
-				if (totalRopeManagers == 0)
+				// We don't have any aggregators.  Eat shit and die.
+				if (totalAggregators == 0)
 				{
 					return null;
 				}
 
 				// We only have one total, so just use it.
-				else if (totalRopeManagers == 1)
+				else if (totalAggregators == 1)
 				{
 					String id = weightsToIds.get(weightsToIds.firstKey());
-					ServiceMetaData primaryRopeManager = registrationService.getRopeManagerMetaDataById(id);
-					PrimaryBackupSet primaryBackupSet = new PrimaryBackupSet(primaryRopeManager, null);
+					ServiceMetaData primaryAggregator = registrationService.getAggregatorMetaDataById(id);
+					PrimaryBackupSet primaryBackupSet = new PrimaryBackupSet(primaryAggregator, null);
 					primaryBackupSets.add(primaryBackupSet);
 				}
 
-				else if (totalRopeManagers > 1)
+				else if (totalAggregators > 1)
 				{
 					List<String> sortedIds = new ArrayList<>(weightsToIds.values());
 
 					int assignSets = 1;
 
-					if (restingRopeManagers > 3)
+					if (restingAggregators > 3)
 					{
-						assignSets = restingRopeManagers / 2;
+						assignSets = restingAggregators / 2;
 
 						// Check on past assignments and don't go any higher +1 over recent history
 						for (Integer pastSets : registeredSetsHist)
@@ -249,9 +249,9 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 					{
 						String primaryId = sortedIds.get(index++);
 						String secondaryId = sortedIds.get(index++);
-						ServiceMetaData primaryRopeManager = registrationService.getRopeManagerMetaDataById(primaryId);
-						ServiceMetaData secondaryRopeManager = registrationService.getRopeManagerMetaDataById(secondaryId);
-						PrimaryBackupSet primaryBackupSet = new PrimaryBackupSet(primaryRopeManager, secondaryRopeManager);
+						ServiceMetaData primaryAggregator = registrationService.getAggregatorMetaDataById(primaryId);
+						ServiceMetaData secondaryAggregator = registrationService.getAggregatorMetaDataById(secondaryId);
+						PrimaryBackupSet primaryBackupSet = new PrimaryBackupSet(primaryAggregator, secondaryAggregator);
 						primaryBackupSets.add(primaryBackupSet);
 
 						assignSets--;
@@ -263,8 +263,8 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 					String period = nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
 					AggregatorsByPeriod aggregatorsByPeriod = new AggregatorsByPeriod(nearestPeriodCeiling, primaryBackupSets);
 
-					client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/rope_manager/periods/" + period, mapper.writeValueAsString(aggregatorsByPeriod).getBytes());
-					logger.info("Registering " + primaryBackupSets.size() + " RopeManager set(s) for period: " + period);
+					client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/aggregator/periods/" + period, mapper.writeValueAsString(aggregatorsByPeriod).getBytes());
+					logger.info("Registering " + primaryBackupSets.size() + " Aggregator set(s) for period: " + period);
 
 					// Add assign set count to the history, but only keep history of the last three
 					registeredSetsHist.add(primaryBackupSets.size());
@@ -279,16 +279,16 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 				{
 					// It is fine if it already exists. It just means that someone beat us to it.
 					// So let's just return their work.
-					return readRopeManagersByPeriod(nearestPeriodCeiling);
+					return readAggregatorsByPeriod(nearestPeriodCeiling);
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to write RopeManager by period.", e);
+			throw new ClusterException("Failed to write aggregator by period.", e);
 		}
 
-		throw new ClusterException("Failed to write RopeManager by period.");
+		throw new ClusterException("Failed to write aggregator by period.");
 	}
 }
 

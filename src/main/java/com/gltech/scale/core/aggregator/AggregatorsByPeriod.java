@@ -12,7 +12,7 @@ public class AggregatorsByPeriod
 {
 	private final DateTime period;
 	private final List<PrimaryBackupSet> primaryBackupSets;
-	private final List<ServiceMetaData> ropeManagers = new ArrayList<>();
+	private final List<ServiceMetaData> aggregators = new ArrayList<>();
 	private final AtomicInteger setIndex = new AtomicInteger(0);
 //	private final AtomicInteger singleIndex = new AtomicInteger(0);
 
@@ -24,10 +24,10 @@ public class AggregatorsByPeriod
 
 		for (PrimaryBackupSet primaryBackupSet : primaryBackupSets)
 		{
-			ropeManagers.add(primaryBackupSet.getPrimary());
+			aggregators.add(primaryBackupSet.getPrimary());
 			if (primaryBackupSet.getBackup() != null)
 			{
-				ropeManagers.add(primaryBackupSet.getBackup());
+				aggregators.add(primaryBackupSet.getBackup());
 			}
 		}
 	}
@@ -44,13 +44,13 @@ public class AggregatorsByPeriod
 
 	public ServiceMetaData next()
 	{
-		if (ropeManagers.size() == 0)
+		if (aggregators.size() == 0)
 		{
 			return null;
 		}
 
 		int singleIndex = Math.abs(setIndex.getAndIncrement());
-		return ropeManagers.get(singleIndex % ropeManagers.size());
+		return aggregators.get(singleIndex % aggregators.size());
 	}
 
 	public PrimaryBackupSet nextPrimaryBackupSet()

@@ -8,5 +8,5 @@ public interface ChannelCoordinator extends Runnable, LifeCycle
 {
 	void registerWeight(boolean active, int primaries, int backups, int restedfor);
 
-	AggregatorsByPeriod getRopeManagerPeriodMatrix(DateTime nearestPeriodCeiling);
+	AggregatorsByPeriod getAggregatorPeriodMatrix(DateTime nearestPeriodCeiling);
 }

@@ -37,11 +37,6 @@ public class InboundResourceTest
 				return new TimePeriodUtils().nearestPeriodCeiling(dateTime);
 			}
 
-			public AggregatorsByPeriod getRopeManagerPeriodMatrix(DateTime dateTime)
-			{
-				return null;
-			}
-
 			public RegistrationService getRegistrationService()
 			{
 				return mock(RegistrationService.class);

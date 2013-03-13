@@ -53,32 +53,32 @@ public class ClusterServiceTest
 	@Test
 	public void fullPathToNameOnly()
 	{
-		assertEquals("C|B|20121011150500", BatchPeriodMapper.nodeNameStripPath("/rope/timebuckets/C|B|20121011150500"));
+		assertEquals("C|B|20121011150500", BatchPeriodMapper.nodeNameStripPath("/channel/timebuckets/C|B|20121011150500"));
 	}
 
 	@Test
-	public void testRegisterAndQueryRopeManagers() throws Exception
+	public void testRegisterAndQueryAggregators() throws Exception
 	{
 		ClusterService clusterService = new ZookeeperClusterService(new RegistrationServiceImpl());
 
-		props.set("rope_manager.rest_host", "ropemgr1");
-		props.set("rope_manager.rest_port", 8080);
-		clusterService.getRegistrationService().registerAsRopeManager();
+		props.set("aggregator.rest_host", "aggregator1");
+		props.set("aggregator.rest_port", 8080);
+		clusterService.getRegistrationService().registerAsAggregator();
 
-		props.set("rope_manager.rest_host", "ropemgr2");
-		props.set("rope_manager.rest_port", 9090);
-		clusterService.getRegistrationService().registerAsRopeManager();
+		props.set("aggregator.rest_host", "aggregator2");
+		props.set("aggregator.rest_port", 9090);
+		clusterService.getRegistrationService().registerAsAggregator();
 
 		Thread.sleep(1000);
-		List<ServiceMetaData> servers = clusterService.getRegistrationService().getRegisteredRopeManagers();
+		List<ServiceMetaData> servers = clusterService.getRegistrationService().getRegisteredAggregators();
 
-		List<String> ropeNames = new ArrayList<>();
-		ropeNames.add(servers.get(0).getListenAddress());
-		ropeNames.add(servers.get(1).getListenAddress());
+		List<String> channelNames = new ArrayList<>();
+		channelNames.add(servers.get(0).getListenAddress());
+		channelNames.add(servers.get(1).getListenAddress());
 
-		Collections.sort(ropeNames);
+		Collections.sort(channelNames);
 
-		assertEquals("ropemgr1", ropeNames.get(0));
-		assertEquals("ropemgr2", ropeNames.get(1));
+		assertEquals("aggregator1", channelNames.get(0));
+		assertEquals("aggregator2", channelNames.get(1));
 	}
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 public class AggregatorStats implements Aggregator
 {
-	public static final String BASE = "RopeManagerStats";
+	public static final String BASE = "AggregatorStats";
 
 	private final Aggregator aggregator;
 	private Timer addEventTimer = new Timer();
@@ -27,7 +27,7 @@ public class AggregatorStats implements Aggregator
 	{
 		this.aggregator = aggregator;
 
-		String groupName = "Loki Rope Manager";
+		String groupName = "Aggregator";
 		MonitoringPublisher.getInstance().register(new PublishMetric("AddEvent.Count", groupName, "count", new TimerCountPublisher("", addEventTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("AddEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addEventTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("AddBackupEvent.Count", groupName, "count", new TimerCountPublisher("", addBackupEventTimer)));

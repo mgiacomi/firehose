@@ -29,9 +29,9 @@ public class BatchStreamsManager
 		customerBucketPeriod = channelMetaData.getCustomer() + "|" + channelMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + "|" + channelMetaData.getRedundancy();
 	}
 
-	public void registerInputStream(InputStream ropeStream)
+	public void registerInputStream(InputStream aggregatorStream)
 	{
-		timeBucketStreams.add(new MessageInputStream(customerBucketPeriod, ropeStream));
+		timeBucketStreams.add(new MessageInputStream(customerBucketPeriod, aggregatorStream));
 		totalStreams++;
 	}
 
@@ -43,7 +43,7 @@ public class BatchStreamsManager
 
 	public long writeEvents(OutputStream outputStream)
 	{
-		logger.debug("Starting rope -> storage stream merge. " + customerBucketPeriod);
+		logger.debug("Starting aggregator -> storage stream merge. " + customerBucketPeriod);
 
 		long recordsReceived = 0;
 

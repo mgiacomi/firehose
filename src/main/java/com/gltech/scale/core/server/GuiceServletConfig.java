@@ -69,7 +69,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 						bind(InboundService.class).to(InboundServiceImpl.class).in(Singleton.class);
 					}
 
-					if (props.get("enable.rope_manager", true))
+					if (props.get("enable.aggregator", true))
 					{
 						bind(AggregatorResource.class);
 
