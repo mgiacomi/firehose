@@ -31,7 +31,7 @@ public class UninterruptedBlockingQueue<E> implements BlockingQueue<E>
 
 	public UninterruptedBlockingQueue(int capacity)
 	{
-		delegate = new LinkedBlockingQueue<E>(capacity);
+		delegate = new LinkedBlockingQueue<>(capacity);
 	}
 
 	public void put(E e)

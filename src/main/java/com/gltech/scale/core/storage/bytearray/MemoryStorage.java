@@ -10,11 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MemoryStorage implements InternalStorage
 {
 	private static final Logger logger = LoggerFactory.getLogger(MemoryStorage.class);
-
 	private ConcurrentHashMap<String, ChannelMetaData> bucketMap = new ConcurrentHashMap<>();
-
-	private ConcurrentHashMap<ChannelMetaData, ConcurrentHashMap<String, StoragePayload>> payloadsMap =
-			new ConcurrentHashMap<ChannelMetaData, ConcurrentHashMap<String, StoragePayload>>();
+	private ConcurrentHashMap<ChannelMetaData, ConcurrentHashMap<String, StoragePayload>> payloadsMap = new ConcurrentHashMap<>();
 
 	/**
 	 * @param channel

@@ -18,7 +18,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
-public class RopeCoordinatorRegression
+public class AggregatorRegression
 {
 	private TestingServer testingServer;
 	static private Props props;
