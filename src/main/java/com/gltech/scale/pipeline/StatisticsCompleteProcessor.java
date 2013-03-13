@@ -1,6 +1,5 @@
 package com.gltech.scale.pipeline;
 
-import com.gltech.scale.core.monitor.*;
 import com.gltech.scale.ganglia.*;
 
 /**

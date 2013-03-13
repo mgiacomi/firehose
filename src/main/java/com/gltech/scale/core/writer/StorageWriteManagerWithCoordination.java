@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.gltech.scale.core.cluster.BatchPeriodMapper;
 import com.gltech.scale.core.cluster.ClusterService;
-import com.gltech.scale.core.monitor.*;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataCache;
 import com.gltech.scale.util.Props;

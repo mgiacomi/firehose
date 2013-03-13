@@ -6,7 +6,6 @@ import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.ganglia.*;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import com.gltech.scale.core.monitor.*;
 import org.joda.time.DateTime;
 
 import java.io.OutputStream;
