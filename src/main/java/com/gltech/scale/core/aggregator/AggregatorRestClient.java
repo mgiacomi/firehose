@@ -2,8 +2,8 @@ package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.BatchMetaData;
-import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.Batch;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.util.ClientCreator;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.List;
 
@@ -20,11 +21,11 @@ public class AggregatorRestClient
 	private static final Logger logger = LoggerFactory.getLogger(AggregatorRestClient.class);
 	private final Client client = ClientCreator.createCached();
 
-	public void postEvent(ServiceMetaData aggregator, Message event)
+	public void postEvent(ServiceMetaData aggregator, Message message)
 	{
 		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/event";
 		WebResource webResource = client.resource(url);
-		ClientResponse response = webResource.type("application/json").post(ClientResponse.class, event.toJson().toString());
+		ClientResponse response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, message);
 
 		if (response.getStatus() != 202)
 		{
@@ -32,11 +33,11 @@ public class AggregatorRestClient
 		}
 	}
 
-	public void postBackupEvent(ServiceMetaData aggregator, Message event)
+	public void postBackupEvent(ServiceMetaData aggregator, Message message)
 	{
 		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/backup/event";
 		WebResource webResource = client.resource(url);
-		ClientResponse response = webResource.type("application/json").post(ClientResponse.class, event.toJson().toString());
+		ClientResponse response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, message);
 
 		if (response.getStatus() != 202)
 		{
@@ -48,7 +49,7 @@ public class AggregatorRestClient
 	{
 		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + customer + "/" + bucket + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/timebucket/events";
 		WebResource webResource = client.resource(url);
-		ClientResponse response = webResource.accept("application/json").get(ClientResponse.class);
+		ClientResponse response = webResource.accept(MediaType.APPLICATION_OCTET_STREAM_TYPE).get(ClientResponse.class);
 
 		if (response.getStatus() != 200)
 		{
@@ -58,13 +59,13 @@ public class AggregatorRestClient
 		return Batch.jsonToEvents(response.getEntityInputStream());
 	}
 
-	public InputStream getTimeBucketEventsStream(ServiceMetaData aggregator, String customer, String bucket, DateTime dateTime)
+	public InputStream getTimeBucketEventsStream(ServiceMetaData aggregator, String channelName, DateTime dateTime)
 	{
 		try
 		{
-			String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + customer + "/" + bucket + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/timebucket/events";
+			String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/timebucket/events";
 			WebResource webResource = client.resource(url);
-			ClientResponse response = webResource.accept("application/json").get(ClientResponse.class);
+			ClientResponse response = webResource.accept(MediaType.APPLICATION_OCTET_STREAM_TYPE).get(ClientResponse.class);
 
 			if (response.getStatus() != 200)
 			{
@@ -75,7 +76,7 @@ public class AggregatorRestClient
 		}
 		catch (RuntimeException e)
 		{
-			throw new RuntimeException("Failed to connect to Aggregator: " + aggregator + ", customer=" + customer + ", bucket=" + bucket + ", dateTime=" + dateTime, e);
+			throw new RuntimeException("Failed to connect to Aggregator: " + aggregator + ", channelName=" + channelName + ", dateTime=" + dateTime, e);
 		}
 	}
 
@@ -107,9 +108,9 @@ public class AggregatorRestClient
 		return response.getEntityInputStream();
 	}
 
-	public void clearTimeBucket(ServiceMetaData aggregator, String customer, String bucket, DateTime dateTime)
+	public void clearTimeBucket(ServiceMetaData aggregator, String channelName, DateTime dateTime)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + customer + "/" + bucket + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/clear";
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/clear";
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.accept("application/json").delete(ClientResponse.class);
 
@@ -119,9 +120,9 @@ public class AggregatorRestClient
 		}
 	}
 
-	public BatchMetaData getTimeBucketMetaData(ServiceMetaData aggregator, String customer, String bucket, DateTime dateTime)
+	public BatchMetaData getTimeBucketMetaData(ServiceMetaData aggregator, String channelName, DateTime dateTime)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + customer + "/" + bucket + "/timebucket/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/metadata";
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/timebucket/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/metadata";
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.accept("application/json").get(ClientResponse.class);
 

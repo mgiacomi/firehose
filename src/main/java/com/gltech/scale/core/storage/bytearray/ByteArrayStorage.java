@@ -6,11 +6,11 @@ public interface ByteArrayStorage
 {
 	void putBucket(ChannelMetaData channelMetaData);
 
-	ChannelMetaData getBucket(String customer, String bucket);
+	ChannelMetaData getBucket(String channelName);
 
 	void putPayload(StoragePayload storagePayload);
 
-	StoragePayload getPayload(String customer, String bucket, String id);
+	StoragePayload getPayload(String channelName, String id);
 
 	//todo - gfm - 9/24/12 - implement delete
 }

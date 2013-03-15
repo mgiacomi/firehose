@@ -24,41 +24,43 @@ public class AggregatorResource
 		this.aggregator = aggregator;
 	}
 
-	@Path("/event")
+	@Path("/message/{channelName}")
 	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postEvent(byte[] data)
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
+	public Response postEvent(@PathParam("channelName") String channelName, byte[] data)
 	{
-		Message event = new Message(new String(data));
-		aggregator.addEvent(event);
+//		Message event = new Message(new String(data));
+Message message = null;
+		aggregator.addEvent(channelName, message);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
-	@Path("/backup/event")
+	@Path("/message/backup/{channelName}")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response postBackupEvent(byte[] data)
+	public Response postBackupEvent(@PathParam("channelName") String channelName, byte[] data)
 	{
-		Message event = new Message(new String(data));
-		aggregator.addBackupEvent(event);
+//		Message event = new Message(new String(data));
+Message message = null;
+		aggregator.addBackupEvent(channelName, message);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
-	@Path("/{customer}/{bucket}/{year}/{month}/{day}/{hour}/{min}/{sec}/clear")
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/clear")
 	@DELETE
-	public Response clearTimeBucket(@PathParam("customer") String customer, @PathParam("bucket") String bucket, @PathParam("year") int year, @PathParam("month") int month,
+	public Response clearTimeBucket(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 									@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
-		aggregator.clear(customer, bucket, dateTime);
+		aggregator.clear(channelName, dateTime);
 
 		return Response.ok().build();
 	}
 
-	@Path("/{customer}/{bucket}/{year}/{month}/{day}/{hour}/{min}/{sec}/timebucket/events")
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/timebucket/events")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response timeBucketEvents(@PathParam("customer") final String customer, @PathParam("bucket") final String bucket, @PathParam("year") int year, @PathParam("month") int month,
+	public Response timeBucketEvents(@PathParam("channelName") final String channelName, @PathParam("year") int year, @PathParam("month") int month,
 									 @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		final DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
@@ -71,7 +73,7 @@ public class AggregatorResource
 				{
 					try
 					{
-						aggregator.writeTimeBucketEvents(output, customer, bucket, dateTime);
+						aggregator.writeTimeBucketEvents(output, channelName, dateTime);
 					}
 					catch (Exception e)
 					{
@@ -88,10 +90,10 @@ public class AggregatorResource
 		}
 	}
 
-	@Path("/{customer}/{bucket}/{year}/{month}/{day}/{hour}/{min}/{sec}/backup/timebucket/events")
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/backup/timebucket/events")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response backupTimeBucketEvents(@PathParam("customer") final String customer, @PathParam("bucket") final String bucket, @PathParam("year") int year, @PathParam("month") int month,
+	public Response backupTimeBucketEvents(@PathParam("channelName") final String channelName, @PathParam("year") int year, @PathParam("month") int month,
 										   @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		final DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
@@ -104,7 +106,7 @@ public class AggregatorResource
 				{
 					try
 					{
-						aggregator.writeBackupTimeBucketEvents(output, customer, bucket, dateTime);
+						aggregator.writeBackupTimeBucketEvents(output, channelName, dateTime);
 					}
 					catch (Exception e)
 					{
@@ -121,17 +123,17 @@ public class AggregatorResource
 		}
 	}
 
-	@Path("/{customer}/{bucket}/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
+	@Path("/{channelName}/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response timeBucketMetaData(@PathParam("customer") String customer, @PathParam("bucket") String bucket, @PathParam("year") int year, @PathParam("month") int month,
+	public Response timeBucketMetaData(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 									   @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
 
 		try
 		{
-			BatchMetaData batchMetaData = aggregator.getTimeBucketMetaData(customer, bucket, dateTime);
+			BatchMetaData batchMetaData = aggregator.getTimeBucketMetaData(channelName, dateTime);
 
 			return Response.ok(batchMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
 		}
@@ -141,17 +143,17 @@ public class AggregatorResource
 		}
 	}
 
-	@Path("/{customer}/{bucket}/backup/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
+	@Path("/{channelName}/backup/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response backupTimeBucketMetaData(@PathParam("customer") String customer, @PathParam("bucket") String bucket, @PathParam("year") int year, @PathParam("month") int month,
+	public Response backupTimeBucketMetaData(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 											 @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
 
 		try
 		{
-			BatchMetaData batchMetaData = aggregator.getBackupTimeBucketMetaData(customer, bucket, dateTime);
+			BatchMetaData batchMetaData = aggregator.getBackupTimeBucketMetaData(channelName, dateTime);
 
 			return Response.ok(batchMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
 		}

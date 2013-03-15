@@ -56,7 +56,7 @@ public class MessageInputStream implements MessageStream
 		{
 			try
 			{
-				currentMessage = Message.jsonToEvent(jp);
+//				currentMessage = Message.jsonToEvent(jp);
 
 				if (jp.nextToken() == JsonToken.END_ARRAY)
 				{

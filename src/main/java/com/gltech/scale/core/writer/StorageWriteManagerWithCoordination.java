@@ -6,7 +6,7 @@ import com.google.inject.Injector;
 import com.gltech.scale.core.cluster.BatchPeriodMapper;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.storage.BucketMetaDataCache;
+import com.gltech.scale.core.storage.ChannelCache;
 import com.gltech.scale.util.Props;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -22,16 +22,16 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 	private Props props = Props.getProps();
 	private Injector injector;
 	private ClusterService clusterService;
-	private BucketMetaDataCache bucketMetaDataCache;
+	private ChannelCache channelCache;
 	private Timer collectTimeBucketTimer = new Timer();
 	private TimerMap timerMap = new TimerMap();
 	private int periodSeconds;
 
 	@Inject
-	public StorageWriteManagerWithCoordination(ClusterService clusterService, BucketMetaDataCache bucketMetaDataCache)
+	public StorageWriteManagerWithCoordination(ClusterService clusterService, ChannelCache channelCache)
 	{
 		this.clusterService = clusterService;
-		this.bucketMetaDataCache = bucketMetaDataCache;
+		this.channelCache = channelCache;
 		this.periodSeconds = props.get("coordination.period_seconds", 5);
 
 		String groupName = "Loki Collector";
@@ -65,24 +65,24 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 					{
 						try
 						{
-							ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(batchPeriodMapper.getCustomer(), batchPeriodMapper.getBucket(), true);
+							ChannelMetaData channelMetaData = channelCache.getChannelMetaData(batchPeriodMapper.getChannelName(), true);
 
 							BatchCollector batchCollector = injector.getInstance(BatchCollector.class);
 							batchCollector.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());
 
 							// Get a Timer from the timermap based on the bucket being collected.
-							String timerName = batchPeriodMapper.getCustomer() + "/" + batchPeriodMapper.getBucket() + "/" + Integer.toString(periodSeconds);
+							String timerName = batchPeriodMapper.getChannelName() + "/" + Integer.toString(periodSeconds);
 							batchCollector.setTimer(timerMap.get(timerName));
 
 							threadPoolExecutor.submit(batchCollector);
 						}
 						catch (Exception e)
 						{
-							logger.error("Collection error: {}|{}|{}", batchPeriodMapper.getCustomer(), batchPeriodMapper.getBucket(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), e);
+							logger.error("Collection error: {}|{}", batchPeriodMapper.getChannelName(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), e);
 							continue;
 						}
 
-						logger.debug("TimeBucketMataData submitted for collection: {}|{}|{}", batchPeriodMapper.getCustomer(), batchPeriodMapper.getBucket(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+						logger.debug("TimeBucketMataData submitted for collection: {}|{}", batchPeriodMapper.getChannelName(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 
 						continue;
 					}

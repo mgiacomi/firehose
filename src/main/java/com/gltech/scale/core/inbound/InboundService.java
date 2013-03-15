@@ -8,7 +8,7 @@ import java.io.OutputStream;
 
 public interface InboundService extends LifeCycle
 {
-	void addEvent(String customer, String bucket, byte[] payload);
+	void addEvent(String channelName, byte[] payload);
 
 	int writeEventsToOutputStream(ChannelMetaData channelMetaData, DateTime dateTime, OutputStream outputStream, int recordsWritten);
 }

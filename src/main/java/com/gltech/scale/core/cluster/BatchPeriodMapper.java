@@ -8,23 +8,20 @@ import java.io.File;
 
 public class BatchPeriodMapper implements Comparable<BatchPeriodMapper>
 {
-	private final String customer;
-	private final String bucket;
+	private final String channelName;
 	private final DateTime nearestPeriodCeiling;
 
 	public BatchPeriodMapper(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
-		this.customer = channelMetaData.getCustomer();
-		this.bucket = channelMetaData.getBucket();
+		this.channelName = channelMetaData.getName();
 		this.nearestPeriodCeiling = nearestPeriodCeiling;
 	}
 
 	public BatchPeriodMapper(String nodeName)
 	{
 		String[] nodeNameParts = nodeName.split("\\|");
-		customer = nodeNameParts[0];
-		bucket = nodeNameParts[1];
-		nearestPeriodCeiling = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(nodeNameParts[2]);
+		channelName = nodeNameParts[0];
+		nearestPeriodCeiling = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(nodeNameParts[1]);
 	}
 
 	static public String nodeNameStripPath(String nodeName)
@@ -35,13 +32,38 @@ public class BatchPeriodMapper implements Comparable<BatchPeriodMapper>
 	public String getNodeName()
 	{
 		StringBuilder cbp = new StringBuilder();
-		cbp.append(customer);
-		cbp.append("|");
-		cbp.append(bucket);
+		cbp.append(channelName);
 		cbp.append("|");
 		cbp.append(nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 
 		return cbp.toString();
+	}
+
+	public String getChannelName()
+	{
+		return channelName;
+	}
+
+	public DateTime getNearestPeriodCeiling()
+	{
+		return nearestPeriodCeiling;
+	}
+
+	public boolean equals(Object o)
+	{
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		BatchPeriodMapper that = (BatchPeriodMapper) o;
+
+		if (channelName != null ? !channelName.equals(that.channelName) : that.channelName != null) return false;
+
+		return true;
+	}
+
+	public int hashCode()
+	{
+		return channelName != null ? channelName.hashCode() : 0;
 	}
 
 	public int compareTo(BatchPeriodMapper that)
@@ -52,43 +74,5 @@ public class BatchPeriodMapper implements Comparable<BatchPeriodMapper>
 		}
 
 		return this.nearestPeriodCeiling.compareTo(that.nearestPeriodCeiling);
-	}
-
-	public boolean equals(Object o)
-	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		BatchPeriodMapper that = (BatchPeriodMapper) o;
-
-		if (bucket != null ? !bucket.equals(that.bucket) : that.bucket != null) return false;
-		if (customer != null ? !customer.equals(that.customer) : that.customer != null) return false;
-		if (nearestPeriodCeiling != null ? !nearestPeriodCeiling.equals(that.nearestPeriodCeiling) : that.nearestPeriodCeiling != null)
-			return false;
-
-		return true;
-	}
-
-	public int hashCode()
-	{
-		int result = customer != null ? customer.hashCode() : 0;
-		result = 31 * result + (bucket != null ? bucket.hashCode() : 0);
-		result = 31 * result + (nearestPeriodCeiling != null ? nearestPeriodCeiling.hashCode() : 0);
-		return result;
-	}
-
-	public String getCustomer()
-	{
-		return customer;
-	}
-
-	public String getBucket()
-	{
-		return bucket;
-	}
-
-	public DateTime getNearestPeriodCeiling()
-	{
-		return nearestPeriodCeiling;
 	}
 }

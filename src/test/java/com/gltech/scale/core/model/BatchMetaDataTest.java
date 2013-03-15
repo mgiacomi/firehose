@@ -9,6 +9,7 @@ import static junit.framework.Assert.assertEquals;
 
 public class BatchMetaDataTest
 {
+/*
 	@Test
 	public void testToJsonAndBack() throws Exception
 	{
@@ -20,4 +21,5 @@ public class BatchMetaDataTest
 
 		assertEquals(tbmd1, tbmd2);
 	}
+*/
 }

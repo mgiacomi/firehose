@@ -21,13 +21,13 @@ public class StorageResource
 	private HttpHeaders httpHeaders = null;
 
 	private Storage storage;
-	private BucketMetaDataCache bucketMetaDataCache;
+	private ChannelCache channelCache;
 
 	@Inject
-	public StorageResource(Storage storage, BucketMetaDataCache bucketMetaDataCache)
+	public StorageResource(Storage storage, ChannelCache channelCache)
 	{
 		this.storage = storage;
-		this.bucketMetaDataCache = bucketMetaDataCache;
+		this.channelCache = channelCache;
 	}
 
 	@Path("/{customer}/{bucket}")
@@ -42,7 +42,8 @@ public class StorageResource
 			{
 				return Response.status(Response.Status.BAD_REQUEST).entity("Customer and Bucket can not contain '|' aka pipes").build();
 			}
-			ChannelMetaData channelMetaData = new ChannelMetaData(customer, bucket, json);
+//			ChannelMetaData channelMetaData = new ChannelMetaData(customer, bucket, json);
+ChannelMetaData channelMetaData = null;
 			storage.putBucket(channelMetaData);
 			return Response.created(uriInfo.getRequestUri()).build();
 		}
@@ -56,30 +57,27 @@ public class StorageResource
 		}
 	}
 
-	@Path("/{customer}/{bucket}")
+	@Path("/{channelName}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getBucket(@PathParam("customer") String customer,
-							  @PathParam("bucket") String bucket)
+	public Response getBucket(@PathParam("channelName") String channelName)
 	{
-		ChannelMetaData channelMetaData = storage.getBucket(customer, bucket);
+		ChannelMetaData channelMetaData = storage.getBucket(channelName);
 		if (channelMetaData == null)
 		{
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		return Response.ok(channelMetaData.toJson().toString()).build();
+//		return Response.ok(channelMetaData.toJson().toString()).build();
+return null;
 	}
 
-	@Path("/{customer}/{bucket}/{id}")
+	@Path("/{channelName}/{id}")
 	@PUT
-	public Response put(@PathParam("customer") String customer,
-						@PathParam("bucket") String bucket,
-						@PathParam("id") String id,
-						InputStream inputStream)
+	public Response put(@PathParam("channelName") String channelName, @PathParam("id") String id, InputStream inputStream)
 	{
 		try
 		{
-			storage.putPayload(customer, bucket, id, inputStream, httpHeaders.getRequestHeaders());
+			storage.putPayload(channelName, id, inputStream, httpHeaders.getRequestHeaders());
 			IOUtils.closeQuietly(inputStream);
 			return Response.created(uriInfo.getRequestUri()).build();
 		}
@@ -89,27 +87,25 @@ public class StorageResource
 		}
 	}
 
-	@Path("/{customer}/{bucket}/{id}")
+	@Path("/{channelName}/{id}")
 	@GET
-	public Response get(@PathParam("customer") final String customer,
-						@PathParam("bucket") final String bucket,
-						@PathParam("id") final String id)
+	public Response get(@PathParam("channelName") final String channelName, @PathParam("id") final String id)
 	{
 		StreamingOutput out = new StreamingOutput()
 		{
 			public void write(OutputStream outputStream) throws IOException, WebApplicationException
 			{
-				storage.getPayload(customer, bucket, id, outputStream);
+//				storage.getPayload(customer, bucket, id, outputStream);
 			}
 		};
 
-		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
 
 		Response.ResponseBuilder builder = Response.ok(out);
 
 		if (null != channelMetaData)
 		{
-			builder.type(channelMetaData.getMediaType());
+//			builder.type(channelMetaData.getMediaType());
 		}
 
 		return builder.build();

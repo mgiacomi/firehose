@@ -52,9 +52,10 @@ public class AwsS3Storage implements Storage
 
 	public void putBucket(ChannelMetaData channelMetaData)
 	{
-		String key = channelMetaData.getCustomer() + "|" + channelMetaData.getBucket();
+		String key = channelMetaData.getName();
 
-		byte[] jsonData = channelMetaData.toJson().toString().getBytes();
+//byte[] jsonData = channelMetaData.toJson().toString().getBytes();
+byte[] jsonData = null;
 		ByteArrayInputStream bais = new ByteArrayInputStream(jsonData);
 
 		ObjectMetadata metadata = new ObjectMetadata();
@@ -63,9 +64,9 @@ public class AwsS3Storage implements Storage
 		s3Client.putObject(s3BucketName, key, bais, metadata);
 	}
 
-	public ChannelMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String channelName)
 	{
-		String key = customer + "|" + bucket;
+		String key = channelName;
 		S3Object s3Object = null;
 
 		try
@@ -83,7 +84,8 @@ public class AwsS3Storage implements Storage
 		try
 		{
 			byte[] data = IOUtils.toByteArray(s3Object.getObjectContent());
-			return new ChannelMetaData(new String(data));
+//			return new ChannelMetaData(new String(data));
+return null;
 		}
 		catch (IOException e)
 		{
@@ -91,9 +93,9 @@ public class AwsS3Storage implements Storage
 		}
 	}
 
-	public void getPayload(String customer, String bucket, String id, OutputStream outputStream)
+	public void getPayload(String channelName, String id, OutputStream outputStream)
 	{
-		String key = keyNameWithUniquePrefix(customer, bucket, id);
+		String key = keyNameWithUniquePrefix(channelName, id);
 		S3Object s3Object = null;
 
 		try
@@ -131,9 +133,9 @@ public class AwsS3Storage implements Storage
 		}
 	}
 
-	public void putPayload(String customer, String bucket, String id, InputStream inputStream, Map<String, List<String>> headers)
+	public void putPayload(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
 	{
-		String key = keyNameWithUniquePrefix(customer, bucket, id);
+		String key = keyNameWithUniquePrefix(channelName, id);
 
 		// Set part size to 5 MB.
 		int partSize = 5 * MegaBytes;
@@ -195,15 +197,15 @@ public class AwsS3Storage implements Storage
 		}
 	}
 
-	private String keyNameWithUniquePrefix(String customer, String bucket, String id)
+	private String keyNameWithUniquePrefix(String channelName, String id)
 	{
 		try
 		{
 			MessageDigest md = MessageDigest.getInstance("MD5");
-			String key = customer + "|" + bucket + "|" + id;
+			String key = channelName + "|" + id;
 			md.update(key.getBytes(), 0, key.length());
 			String md5 = new BigInteger(1, md.digest()).toString(16);
-			return md5.substring(0, 2) + "|" + customer + "|" + bucket + "|" + id;
+			return md5.substring(0, 2) + "|" + channelName + "|" + id;
 		}
 		catch (NoSuchAlgorithmException e)
 		{

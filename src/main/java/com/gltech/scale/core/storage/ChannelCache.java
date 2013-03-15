@@ -10,22 +10,22 @@ import javax.ws.rs.core.MediaType;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class BucketMetaDataCache
+public class ChannelCache
 {
 	static private ConcurrentMap<String, ChannelMetaData> bucketMetaDataCache = new ConcurrentHashMap<>();
 	private StorageServiceClient storageServiceClient;
 	private ClusterService clusterService;
 
 	@Inject
-	public BucketMetaDataCache(ClusterService clusterService, StorageServiceClient storageServiceClient)
+	public ChannelCache(ClusterService clusterService, StorageServiceClient storageServiceClient)
 	{
 		this.storageServiceClient = storageServiceClient;
 		this.clusterService = clusterService;
 	}
 
-	public ChannelMetaData getBucketMetaData(String customer, String bucket, boolean createIfNotExist)
+	public ChannelMetaData getChannelMetaData(String name, boolean createIfNotExist)
 	{
-		String key = "/" + customer + "/" + bucket;
+		String key = "/channel/" + name;
 
 		ChannelMetaData channelMetaData = bucketMetaDataCache.get(key);
 
@@ -36,7 +36,7 @@ public class BucketMetaDataCache
 
 			try
 			{
-				newChannelMetaData = storageServiceClient.getBucketMetaData(storageService, customer, bucket);
+				newChannelMetaData = storageServiceClient.getChannelMetaData(storageService, name);
 			}
 			catch (Http404Exception e)
 			{
@@ -50,7 +50,7 @@ public class BucketMetaDataCache
 					return null;
 				}
 
-				ChannelMetaData bmd = new ChannelMetaData(customer, bucket, ChannelMetaData.BucketType.eventset, 60, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.singlewrite);
+				ChannelMetaData bmd = new ChannelMetaData(name, 60, false);
 
 				try
 				{
@@ -61,7 +61,7 @@ public class BucketMetaDataCache
 					// It is fine if the bucket already exists.  Some thread beat us to it.
 				}
 
-				newChannelMetaData = storageServiceClient.getBucketMetaData(storageService, customer, bucket);
+				newChannelMetaData = storageServiceClient.getChannelMetaData(storageService, name);
 			}
 
 			channelMetaData = bucketMetaDataCache.putIfAbsent(key, newChannelMetaData);

@@ -21,6 +21,7 @@ import static junit.framework.Assert.assertEquals;
 
 public class EventResourceRegression
 {
+/*
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
@@ -174,4 +175,5 @@ public class EventResourceRegression
 	{
 		return new ChannelMetaData(customer, bucket, ChannelMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
+*/
 }

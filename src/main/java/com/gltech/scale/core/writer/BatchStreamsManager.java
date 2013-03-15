@@ -26,7 +26,7 @@ public class BatchStreamsManager
 
 	public BatchStreamsManager(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
-		customerBucketPeriod = channelMetaData.getCustomer() + "|" + channelMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + "|" + channelMetaData.getRedundancy();
+		customerBucketPeriod = channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + "|" + channelMetaData.isRedundant();
 	}
 
 	public void registerInputStream(InputStream aggregatorStream)
@@ -106,7 +106,8 @@ public class BatchStreamsManager
 
 					}
 
-					byte[] data = candidateNextRecord.getCurrentMessage().toJson().toString().getBytes();
+//					byte[] data = candidateNextRecord.getCurrentMessage().toJson().toString().getBytes();
+byte[] data = null;
 					outputStream.write(data);
 					bytesWritten = bytesWritten + data.length;
 					processedEvents.add(candidateNextRecord.getCurrentMessage().getUuid());

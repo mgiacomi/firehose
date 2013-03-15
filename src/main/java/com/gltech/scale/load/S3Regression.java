@@ -17,10 +17,12 @@ public class S3Regression
 
 		String json = "{\"customer\":\"matt\", \"bucket\":\"testb\", \"bucketType\":\"EvEntSet\", \"redundancy\":\"singlewrite\", \"mediaType\":\"application/json\"}";
 
-		ChannelMetaData channelMetaData = new ChannelMetaData(json);
+//		ChannelMetaData channelMetaData = new ChannelMetaData(json);
+ChannelMetaData channelMetaData = null;
+
 
 		s3Storage.putBucket(channelMetaData);
-		ChannelMetaData channelMetaData1 = s3Storage.getBucket("matt", "testb");
+		ChannelMetaData channelMetaData1 = s3Storage.getBucket("matt");
 
 		if (channelMetaData.equals(channelMetaData1))
 		{

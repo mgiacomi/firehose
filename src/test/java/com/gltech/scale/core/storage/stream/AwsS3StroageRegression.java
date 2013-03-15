@@ -4,6 +4,7 @@ import java.io.*;
 
 public class AwsS3StroageRegression
 {
+/*
 	public static void main(String[] args) throws IOException
 	{
 		AwsS3Storage awsS3Storage = new AwsS3Storage();
@@ -17,4 +18,5 @@ public class AwsS3StroageRegression
 		String data = new String(baos.toByteArray());
 		System.out.println("GOT DATA: " + data.substring(0, 10 ) +"... to "+ data.substring(data.length() - 20));
 	}
+*/
 }

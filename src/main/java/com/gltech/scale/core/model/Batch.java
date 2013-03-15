@@ -34,65 +34,13 @@ public class Batch
 		this.nearestPeriodCeiling = nearestPeriodCeiling;
 	}
 
-	public Batch(InputStream in)
-	{
-		try
-		{
-			JsonFactory f = new MappingJsonFactory();
-			JsonParser jp = f.createJsonParser(in);
-
-			jp.nextToken();
-
-			while (jp.nextToken() != JsonToken.END_OBJECT)
-			{
-				String fieldName = jp.getCurrentName();
-				jp.nextToken();
-				if ("data".equalsIgnoreCase(fieldName))
-				{
-					this.data = new LinkedBlockingQueue<>(jsonToEvents(jp));
-				}
-				else if ("lastEventTime".equals(fieldName))
-				{
-					this.lastEventTime = new DateTime(jp.getText());
-				}
-				else if ("firstEventTime".equals(fieldName))
-				{
-					this.firstEventTime = new DateTime(jp.getText());
-				}
-				else if ("nearestPeriodCeiling".equals(fieldName))
-				{
-					this.nearestPeriodCeiling = new DateTime(jp.getText());
-				}
-				else if ("bucketMetaData".equals(fieldName))
-				{
-					jp.nextToken();
-					channelMetaData = new ChannelMetaData(jp.readValueAsTree().toString());
-				}
-				else if ("bytes".equals(fieldName))
-				{
-					this.bytes = new AtomicLong(jp.getLongValue());
-				}
-				else
-				{
-					throw new IllegalStateException("Unrecognized field '" + fieldName + "'!");
-				}
-			}
-			jp.close();
-		}
-		catch (IOException e)
-		{
-			logger.warn("unable to parse json", e);
-			throw new RuntimeException("unable to parse json", e);
-		}
-	}
-
 	static private List<Message> jsonToEvents(JsonParser jp) throws IOException
 	{
 		List<Message> events = new ArrayList<>();
 
 		while (jp.nextToken() != JsonToken.END_ARRAY)
 		{
-			events.add(Message.jsonToEvent(jp));
+//			events.add(Message.jsonToEvent(jp));
 		}
 
 		return events;
@@ -132,7 +80,6 @@ public class Batch
 
 			g.writeStartObject();
 			g.writeFieldName("bucketMetaData");
-			g.writeNumber(channelMetaData.toJson().toString());
 			g.writeFieldName("bytes");
 			g.writeNumber(bytes.get());
 			g.writeFieldName("eventsAdded");
@@ -190,8 +137,8 @@ public class Batch
 		for (Message event : events)
 		{
 			g.writeStartObject();
-			g.writeStringField("customer", event.getCustomer());
-			g.writeStringField("bucket", event.getBucket());
+//			g.writeStringField("customer", event.getCustomer());
+//			g.writeStringField("bucket", event.getBucket());
 			g.writeStringField("received_at", event.getReceived_at().toString());
 			g.writeStringField("uuid", event.getUuid());
 			g.writeBinaryField("payload", event.getPayload());

@@ -18,6 +18,7 @@ import static junit.framework.Assert.assertEquals;
 
 public class BatchTest
 {
+/*
 	private Batch batch;
 	private ChannelMetaData channelMetaData;
 
@@ -76,4 +77,5 @@ public class BatchTest
 		bigBatch.toJson(new FileOutputStream(new File("stream.json")));
 		System.out.println(bigBatch.getEvents().size() + " items to Json string in " + (System.currentTimeMillis() - timer) + "ms");
 	}
+*/
 }

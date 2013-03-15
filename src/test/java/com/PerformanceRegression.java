@@ -5,28 +5,19 @@ import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.ExplicitIdStrategy;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
-import com.gltech.scale.core.cluster.TimePeriodUtils;
-import com.gltech.scale.core.model.Batch;
-import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Message;
-import com.gltech.scale.core.model.MessageBuf;
-import com.ning.compress.lzf.LZFCompressingInputStream;
 import com.ning.compress.lzf.LZFEncoder;
 import com.ning.compress.lzf.LZFInputStream;
 import com.ning.compress.lzf.LZFOutputStream;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
-
-import static junit.framework.Assert.*;
 
 public class PerformanceRegression
 {
+/*
 	private static final long MegaBytes = 1024L * 1024L;
 
 	@Test
@@ -81,8 +72,8 @@ public class PerformanceRegression
 	public void writeProtoStuffToFile() throws Exception
 	{
 		ExplicitIdStrategy.Registry registry = new ExplicitIdStrategy.Registry();
-		registry.registerPojo(MessageBuf.class, 1);
-		Schema<MessageBuf> schema = RuntimeSchema.getSchema(MessageBuf.class);
+		registry.registerPojo(Message.class, 1);
+		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 
 		int items = 100000;
 		OutputStream fos = new LZFOutputStream(new FileOutputStream(new File("stream.protostuff")));
@@ -92,7 +83,7 @@ public class PerformanceRegression
 		for (int i = 0; i < items; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			ProtostuffIOUtil.writeDelimitedTo(fos, new MessageBuf(UUID.randomUUID().toString(), DateTime.now().getMillis(), testString.getBytes()), schema, linkedBuffer);
+			ProtostuffIOUtil.writeDelimitedTo(fos, new Message(UUID.randomUUID().toString(), DateTime.now().getMillis(), testString.getBytes()), schema, linkedBuffer);
 			linkedBuffer.clear();
 		}
 
@@ -105,8 +96,8 @@ public class PerformanceRegression
 	public void writeProtoStuffToFile2() throws Exception
 	{
 		ExplicitIdStrategy.Registry registry = new ExplicitIdStrategy.Registry();
-		registry.registerPojo(MessageBuf.class, 1);
-		Schema<MessageBuf> schema = RuntimeSchema.getSchema(MessageBuf.class);
+		registry.registerPojo(Message.class, 1);
+		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 
 		int items = 100000;
 		ByteArrayOutputStream fos = new ByteArrayOutputStream();
@@ -116,7 +107,7 @@ public class PerformanceRegression
 		for (int i = 0; i < items; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			byte[] data = ProtostuffIOUtil.toByteArray(new MessageBuf(UUID.randomUUID().toString(), DateTime.now().getMillis(), testString.getBytes()), schema, linkedBuffer);
+			byte[] data = ProtostuffIOUtil.toByteArray(new Message(UUID.randomUUID().toString(), DateTime.now().getMillis(), testString.getBytes()), schema, linkedBuffer);
 			fos.write(LZFEncoder.encode(data));
 			linkedBuffer.clear();
 		}
@@ -130,8 +121,8 @@ public class PerformanceRegression
 	public void writeProtoStuffToFile3() throws Exception
 	{
 		ExplicitIdStrategy.Registry registry = new ExplicitIdStrategy.Registry();
-		registry.registerPojo(MessageBuf.class, 1);
-		Schema<MessageBuf> schema = RuntimeSchema.getSchema(MessageBuf.class);
+		registry.registerPojo(Message.class, 1);
+		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 
 		int items = 100000;
 		ByteArrayOutputStream fos = new ByteArrayOutputStream();
@@ -141,7 +132,7 @@ public class PerformanceRegression
 		for (int i = 0; i < items; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			byte[] data = ProtostuffIOUtil.toByteArray(new MessageBuf(UUID.randomUUID().toString(), DateTime.now().getMillis(), testString.getBytes()), schema, linkedBuffer);
+			byte[] data = ProtostuffIOUtil.toByteArray(new Message(UUID.randomUUID().toString(), DateTime.now().getMillis(), testString.getBytes()), schema, linkedBuffer);
 			fos.write(data);
 			linkedBuffer.clear();
 		}
@@ -202,27 +193,26 @@ public class PerformanceRegression
 			loopCount++;
 		}
 	}
-	*/
 
 	@Test
 	public void readProtoStuffToFile() throws Exception
 	{
 		ExplicitIdStrategy.Registry registry = new ExplicitIdStrategy.Registry();
-		registry.registerPojo(MessageBuf.class, 1);
-		Schema<MessageBuf> schema = RuntimeSchema.getSchema(MessageBuf.class);
+		registry.registerPojo(Message.class, 1);
+		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 
 		InputStream fis = new LZFInputStream(new FileInputStream(new File("stream.protostuff")));
 
 		int counter = 0;
-		MessageBuf message = new MessageBuf();
-		MessageBuf lastMessage = null;
+		Message message = new Message();
+		Message lastMessage = null;
 		try
 		{
 			while (true)
 			{
 				ProtostuffIOUtil.mergeDelimitedFrom(fis, message, schema);
 				lastMessage = message;
-				message = new MessageBuf();
+				message = new Message();
 				//System.out.println(new String(message.getPayload()));
 				counter++;
 			}
@@ -237,4 +227,5 @@ public class PerformanceRegression
 
 		fis.close();
 	}
+*/
 }

@@ -23,6 +23,7 @@ import static junit.framework.Assert.assertEquals;
 
 public class AggregatorIntegrationTest
 {
+/*
 	static private Props props;
 	private TestingServer testingServer;
 
@@ -151,4 +152,5 @@ public class AggregatorIntegrationTest
 			throw new RuntimeException("I would love to get that for you, but I don't know how...");
 		}
 	}
+*/
 }

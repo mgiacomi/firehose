@@ -11,21 +11,21 @@ import java.util.List;
 
 public interface Aggregator extends LifeCycle
 {
-	void addEvent(Message message);
+	void addEvent(String channelName, Message message);
 
-	void addBackupEvent(Message message);
+	void addBackupEvent(String channelName, Message message);
 
-	void clear(String customer, String bucket, DateTime dateTime);
+	void clear(String channelName, DateTime dateTime);
 
 	List<Batch> getActiveTimeBuckets();
 
 	List<Batch> getActiveBackupTimeBuckets();
 
-	long writeTimeBucketEvents(OutputStream outputStream, String customer, String bucket, DateTime dateTime);
+	long writeTimeBucketEvents(OutputStream outputStream, String channel, DateTime dateTime);
 
-	long writeBackupTimeBucketEvents(OutputStream outputStream, String customer, String bucket, DateTime dateTime);
+	long writeBackupTimeBucketEvents(OutputStream outputStream, String channel, DateTime dateTime);
 
-	BatchMetaData getTimeBucketMetaData(String customer, String bucket, DateTime dateTime);
+	BatchMetaData getTimeBucketMetaData(String channelName, DateTime dateTime);
 
-	BatchMetaData getBackupTimeBucketMetaData(String customer, String bucket, DateTime dateTime);
+	BatchMetaData getBackupTimeBucketMetaData(String channelName, DateTime dateTime);
 }

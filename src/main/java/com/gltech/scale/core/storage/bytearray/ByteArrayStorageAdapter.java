@@ -28,29 +28,30 @@ public class ByteArrayStorageAdapter implements Storage
 		byteArrayStorage.putBucket(channelMetaData);
 	}
 
-	public ChannelMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String channelName)
 	{
-		return byteArrayStorage.getBucket(customer, bucket);
+		return byteArrayStorage.getBucket(channelName);
 	}
 
-	public void putPayload(String customer, String bucket, String id, InputStream inputStream, Map<String, List<String>> headers)
+	public void putPayload(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
 	{
-		try
-		{
+//		try
+//		{
 			//todo - gfm - 10/2/12 - handle if-none-match - http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
-			StoragePayload storagePayload = new StoragePayload(id, customer, bucket, IOUtils.toByteArray(inputStream));
+//			StoragePayload storagePayload = new StoragePayload(id, channelName, IOUtils.toByteArray(inputStream));
+StoragePayload storagePayload = null;
 			storagePayload.setPreviousVersions(headers.get(HttpHeaders.IF_MATCH));
 			byteArrayStorage.putPayload(storagePayload);
-		}
-		catch (IOException e)
-		{
-			throw Throwables.propagate(e);
-		}
+//		}
+//		catch (IOException e)
+//		{
+//			throw Throwables.propagate(e);
+//		}
 	}
 
-	public void getPayload(String customer, String bucket, String id, OutputStream outputStream)
+	public void getPayload(String channelName, String id, OutputStream outputStream)
 	{
-		StoragePayload payload = byteArrayStorage.getPayload(customer, bucket, id);
+		StoragePayload payload = byteArrayStorage.getPayload(channelName, id);
 
 		if (payload != null)
 		{

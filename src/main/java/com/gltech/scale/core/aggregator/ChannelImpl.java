@@ -47,13 +47,14 @@ public class ChannelImpl implements Channel
 			if (batch == null)
 			{
 				batch = newBatch;
-				logger.info("Creating TimeBucket {customer=" + channelMetaData.getCustomer() + "|" + channelMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+				logger.info("Creating TimeBucket {channelName=" + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 			}
 		}
 
 		// Using the good old .isDebugEnabled() so we don't create extra String objects (on json payloads) if debug is not enabled.
 		if (logger.isDebugEnabled())
 		{
+/*
 			if (channelMetaData.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE))
 			{
 				if (message.isStored())
@@ -69,6 +70,7 @@ public class ChannelImpl implements Channel
 			{
 				logger.trace("Add event customer={} bucket={} key={} payload_size={}", channelMetaData.getCustomer(), channelMetaData.getBucket(), nearestPeriodCeiling, message.getPayload().length);
 			}
+*/
 		}
 
 		batch.addEvent(message);
@@ -81,7 +83,7 @@ public class ChannelImpl implements Channel
 
 		if (batch == null)
 		{
-			logger.info("Creating Backup TimeBucket " + channelMetaData.getCustomer() + "|" + channelMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+			logger.info("Creating Backup TimeBucket " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 
 			// A coordinationId will be assigned to passed in timeBucketMetaData.
 			clusterService.addTimeBucket(channelMetaData, nearestPeriodCeiling);
@@ -97,6 +99,7 @@ public class ChannelImpl implements Channel
 		// Using the good old .isDebugEnabled() so we don't create extra String objects (on json payloads) if debug is not enabled.
 		if (logger.isDebugEnabled())
 		{
+/*
 			if (channelMetaData.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE))
 			{
 				logger.trace("Add backup event customer={} bucket={} key={} payload={}", channelMetaData.getCustomer(), channelMetaData.getBucket(), nearestPeriodCeiling, new String(message.getPayload()));
@@ -105,6 +108,7 @@ public class ChannelImpl implements Channel
 			{
 				logger.trace("Add backup event customer={} bucket={} key={} payload_size={}", channelMetaData.getCustomer(), channelMetaData.getBucket(), nearestPeriodCeiling, message.getPayload().length);
 			}
+*/
 		}
 
 		batch.addEvent(message);
@@ -138,13 +142,13 @@ public class ChannelImpl implements Channel
 	public void clear(DateTime nearestPeriodCeiling)
 	{
 		timeBuckets.remove(nearestPeriodCeiling);
-		logger.info("Cleared TimeBucket " + channelMetaData.getCustomer() + "|" + channelMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+		logger.info("Cleared TimeBucket " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 	}
 
 	public void clearBackup(DateTime nearestPeriodCeiling)
 	{
 		backupTimeBuckets.remove(nearestPeriodCeiling);
-		logger.info("Cleared backup TimeBuckets " + channelMetaData.getCustomer() + "|" + channelMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+		logger.info("Cleared backup TimeBuckets " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 
 	}
 }

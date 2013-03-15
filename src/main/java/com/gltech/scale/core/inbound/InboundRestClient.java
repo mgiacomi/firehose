@@ -15,9 +15,9 @@ public class InboundRestClient
 {
 	private final Client client = ClientCreator.createCached();
 
-	public ChannelMetaData getBucketMetaData(ServiceMetaData eventService, String customer, String bucket)
+	public ChannelMetaData getBucketMetaData(ServiceMetaData eventService, String channelName)
 	{
-		String url = "http://" + eventService.getListenAddress() + ":" + eventService.getListenPort() + "/events/" + customer + "/" + bucket;
+		String url = "http://" + eventService.getListenAddress() + ":" + eventService.getListenPort() + "/events/" + channelName;
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.accept("application/json").get(ClientResponse.class);
 
@@ -31,7 +31,8 @@ public class InboundRestClient
 			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus());
 		}
 
-		return new ChannelMetaData(customer, bucket, response.getEntity(String.class));
+//		return new ChannelMetaData(channelName, response.getEntity(String.class));
+return null;
 	}
 
 	public void postEvent(ServiceMetaData eventService, String customer, String bucket, String json)

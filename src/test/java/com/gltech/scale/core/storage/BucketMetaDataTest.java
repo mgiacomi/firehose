@@ -15,6 +15,7 @@ public class BucketMetaDataTest
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
+/*
 	@Test
 	public void testEventSet()
 	{
@@ -115,4 +116,5 @@ public class BucketMetaDataTest
 		exception.expect(IllegalArgumentException.class);
 		new ChannelMetaData("c", "b", ChannelMetaData.BucketType.eventset, 320, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
+*/
 }

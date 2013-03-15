@@ -68,12 +68,7 @@ public class LoadClient
 		try
 		{
 			new StorageServiceRestClient().putBucketMetaData(storageService,
-					new ChannelMetaData("LoadClient", bucketName,
-							ChannelMetaData.BucketType.eventset,
-							10,
-							MediaType.APPLICATION_JSON_TYPE,
-							ChannelMetaData.LifeTime.small,
-							ChannelMetaData.Redundancy.singlewrite));
+					new ChannelMetaData("LoadClient", 10, false));
 		}
 		catch (Exception e)
 		{

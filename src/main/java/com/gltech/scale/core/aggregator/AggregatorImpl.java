@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.storage.BucketMetaDataCache;
+import com.gltech.scale.core.storage.ChannelCache;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +23,14 @@ public class AggregatorImpl implements Aggregator
 {
 	private static final Logger logger = LoggerFactory.getLogger(Aggregator.class);
 	private ConcurrentMap<ChannelMetaData, Channel> channels = new ConcurrentHashMap<>();
-	private BucketMetaDataCache bucketMetaDataCache;
+	private ChannelCache channelCache;
 	private ClusterService clusterService;
 	private TimePeriodUtils timePeriodUtils;
 
 	@Inject
-	public AggregatorImpl(BucketMetaDataCache bucketMetaDataCache, ClusterService clusterService, TimePeriodUtils timePeriodUtils)
+	public AggregatorImpl(ChannelCache channelCache, ClusterService clusterService, TimePeriodUtils timePeriodUtils)
 	{
-		this.bucketMetaDataCache = bucketMetaDataCache;
+		this.channelCache = channelCache;
 		this.clusterService = clusterService;
 		this.timePeriodUtils = timePeriodUtils;
 
@@ -39,9 +39,9 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public void addEvent(Message message)
+	public void addEvent(String channelName, Message message)
 	{
-		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(message.getCustomer(), message.getBucket(), true);
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 		Channel channel = channels.get(channelMetaData);
 
 		if (channel == null)
@@ -51,7 +51,7 @@ public class AggregatorImpl implements Aggregator
 			if (channel == null)
 			{
 				channel = newChannel;
-				logger.info("Creating Channel {customer=" + message.getCustomer() + ", bucket=" + message.getBucket() + "}");
+				logger.info("Creating Channel: " + channelName);
 			}
 		}
 
@@ -59,15 +59,15 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public void addBackupEvent(Message message)
+	public void addBackupEvent(String channelName, Message message)
 	{
-		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(message.getCustomer(), message.getBucket(), true);
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 
 		Channel channel = channels.get(channelMetaData);
 
 		if (channel == null)
 		{
-			logger.info("Creating Channel {customer=" + message.getCustomer() + ", bucket=" + message.getBucket() + "}");
+			logger.info("Creating Channel: "+ channelName);
 			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils));
 			channel = channels.putIfAbsent(channelMetaData, newChannel);
 			if (channel == null)
@@ -80,15 +80,15 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public void clear(String customer, String bucket, DateTime dateTime)
+	public void clear(String channelName, DateTime dateTime)
 	{
-		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
 		Channel channel = channels.get(channelMetaData);
 
 		if (channel != null)
 		{
 			channel.clear(timePeriodUtils.nearestPeriodCeiling(dateTime));
-			if (channelMetaData.isDoubleWrite())
+			if (channelMetaData.isRedundant())
 			{
 				channel.clearBackup(timePeriodUtils.nearestPeriodCeiling(dateTime));
 			}
@@ -128,9 +128,9 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public long writeTimeBucketEvents(OutputStream outputStream, String customer, String bucket, DateTime dateTime)
+	public long writeTimeBucketEvents(OutputStream outputStream, String ChannelName, DateTime dateTime)
 	{
-		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(ChannelName, false);
 
 		if (channelMetaData != null)
 		{
@@ -151,9 +151,9 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public long writeBackupTimeBucketEvents(OutputStream outputStream, String customer, String bucket, DateTime dateTime)
+	public long writeBackupTimeBucketEvents(OutputStream outputStream, String ChannelName, DateTime dateTime)
 	{
-		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(ChannelName, false);
 
 		if (channelMetaData != null)
 		{
@@ -180,16 +180,16 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public BatchMetaData getTimeBucketMetaData(String customer, String bucket, DateTime dateTime)
+	public BatchMetaData getTimeBucketMetaData(String channelName, DateTime dateTime)
 	{
-		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
 		return channels.get(channelMetaData).getTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
 	}
 
 	@Override
-	public BatchMetaData getBackupTimeBucketMetaData(String customer, String bucket, DateTime dateTime)
+	public BatchMetaData getBackupTimeBucketMetaData(String channelName, DateTime dateTime)
 	{
-		ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
 		return channels.get(channelMetaData).getBackupTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
 	}
 

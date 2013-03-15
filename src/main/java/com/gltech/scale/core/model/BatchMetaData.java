@@ -35,7 +35,7 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 			this.nearestPeriodCeiling = new DateTime(rootNode.path("nearestPeriodCeiling").asText());
 			this.bytes = rootNode.path("bytes").asLong();
 			this.eventsAdded = rootNode.path("eventsAdded").asLong();
-			this.channelMetaData = new ChannelMetaData(rootNode.path("bucketMetaData").asText());
+//			this.channelMetaData = new ChannelMetaData(rootNode.path("bucketMetaData").asText());
 		}
 		catch (IOException e)
 		{
@@ -50,7 +50,7 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 		objectNode.put("nearestPeriodCeiling", nearestPeriodCeiling.toString());
 		objectNode.put("bytes", bytes);
 		objectNode.put("eventsAdded", eventsAdded);
-		objectNode.put("bucketMetaData", channelMetaData.toJson().toString());
+//		objectNode.put("bucketMetaData", channelMetaData.toJson().toString());
 
 		return objectNode;
 	}

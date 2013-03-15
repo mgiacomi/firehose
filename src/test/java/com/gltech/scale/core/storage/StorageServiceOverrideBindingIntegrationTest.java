@@ -24,6 +24,7 @@ import static junit.framework.Assert.assertEquals;
 
 public class StorageServiceOverrideBindingIntegrationTest
 {
+/*
 	static private Props props;
 	static private TestingServer testingServer;
 	private Client client;
@@ -91,4 +92,5 @@ public class StorageServiceOverrideBindingIntegrationTest
 			throw new RuntimeException("I would love to get that for you, but I don't know how...");
 		}
 	}
+*/
 }

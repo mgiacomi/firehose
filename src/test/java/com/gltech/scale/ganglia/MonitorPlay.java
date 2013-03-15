@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 
 public class MonitorPlay
 {
+/*
 	static private Props props;
 	static private TestingServer testingServer;
 
@@ -49,4 +50,5 @@ public class MonitorPlay
 			System.out.print(i);
 		}
 	}
+*/
 }

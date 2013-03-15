@@ -23,31 +23,33 @@ public class TermVoldemortStorage implements InternalStorage
 		shortTermPayloadStorage.putBucket(channelMetaData);
 	}
 
-	public ChannelMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String channelName)
 	{
-		return shortTermPayloadStorage.getBucket(customer, bucket);
+//		return shortTermPayloadStorage.getBucket(channelName);
+		return null;
 	}
 
 	public StoragePayload internalGetPayload(ChannelMetaData channelMetaData, String id)
 	{
-		return getVoldemortStorage(channelMetaData.getLifeTime()).internalGetPayload(channelMetaData, id);
+//		return getVoldemortStorage(channelMetaData.getLifeTime()).internalGetPayload(channelMetaData, id);
+		return null;
 	}
 
-	public StoragePayload getPayload(String customer, String bucket, String id)
+	public StoragePayload getPayload(String channelName, String id)
 	{
-		return internalGetPayload(getBucket(customer, bucket), id);
+		return internalGetPayload(getBucket(channelName), id);
 	}
 
 	public void internalPutPayload(ChannelMetaData channelMetaData, StoragePayload storagePayload)
 	{
-		getVoldemortStorage(channelMetaData.getLifeTime()).internalPutPayload(channelMetaData, storagePayload);
+		//getVoldemortStorage(channelMetaData.getLifeTime()).internalPutPayload(channelMetaData, storagePayload);
 	}
 
 	public void putPayload(StoragePayload storagePayload)
 	{
-		internalPutPayload(getBucket(storagePayload.getCustomer(), storagePayload.getBucket()), storagePayload);
+		internalPutPayload(getBucket(storagePayload.getChannelMetaData().getName()), storagePayload);
 	}
-
+/*
 	private VoldemortStorage getVoldemortStorage(ChannelMetaData.LifeTime lifeTime)
 	{
 		if (lifeTime.equals(ChannelMetaData.LifeTime.large))
@@ -63,4 +65,5 @@ public class TermVoldemortStorage implements InternalStorage
 			return shortTermPayloadStorage;
 		}
 	}
+*/
 }

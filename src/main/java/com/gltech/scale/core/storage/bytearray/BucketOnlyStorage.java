@@ -15,9 +15,9 @@ public class BucketOnlyStorage implements InternalStorage
 		memoryStorage.putBucket(channelMetaData);
 	}
 
-	public ChannelMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String channelName)
 	{
-		return memoryStorage.getBucket(customer, bucket);
+		return memoryStorage.getBucket(channelName);
 	}
 
 	public void putPayload(StoragePayload storagePayload)
@@ -32,7 +32,7 @@ public class BucketOnlyStorage implements InternalStorage
 		}
 	}
 
-	public StoragePayload getPayload(String customer, String bucket, String id)
+	public StoragePayload getPayload(String channelName, String id)
 	{
 		return null;
 	}

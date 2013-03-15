@@ -2,7 +2,7 @@ package com.gltech.scale.core.inbound;
 
 import com.google.inject.Inject;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.storage.BucketMetaDataCache;
+import com.gltech.scale.core.storage.ChannelCache;
 import com.gltech.scale.util.Http404Exception;
 import com.gltech.scale.util.Props;
 import org.joda.time.DateTime;
@@ -18,7 +18,7 @@ import java.io.OutputStream;
 public class InboundResource
 {
 	private static final Logger logger = LoggerFactory.getLogger(InboundResource.class);
-	private BucketMetaDataCache bucketMetaDataCache;
+	private ChannelCache channelCache;
 	private InboundService inboundService;
 	private static Props props = Props.getProps();
 	private int periodSeconds;
@@ -27,31 +27,32 @@ public class InboundResource
 	UriInfo uriInfo;
 
 	@Inject
-	public InboundResource(BucketMetaDataCache bucketMetaDataCache, InboundService inboundService)
+	public InboundResource(ChannelCache channelCache, InboundService inboundService)
 	{
-		this.bucketMetaDataCache = bucketMetaDataCache;
+		this.channelCache = channelCache;
 		this.inboundService = inboundService;
 		this.periodSeconds = props.get("coordination.period_seconds", 5);
 	}
 
-	@Path("/{customer}/{bucket}")
+	@Path("/{channelName}")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response post(@PathParam("customer") String customer, @PathParam("bucket") String bucket, byte[] payload)
+	public Response post(@PathParam("channelName") String channelName, byte[] payload)
 	{
-		inboundService.addEvent(customer, bucket, payload);
+		inboundService.addEvent(channelName, payload);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
-	@Path("/{customer}/{bucket}")
+	@Path("/{channelName}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response post(@PathParam("customer") String customer, @PathParam("bucket") String bucket)
+	public Response post(@PathParam("channelName") String channelName)
 	{
 		try
 		{
-			ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
-			return Response.ok(channelMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
+			ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
+//			return Response.ok(channelMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
+return null;
 		}
 		catch (Http404Exception e)
 		{
@@ -60,49 +61,49 @@ public class InboundResource
 		}
 	}
 
-	@Path("/{customer}/{bucket}/{year}/{month}/{day}/{hour}/{min}/{sec}")
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get(@PathParam("customer") String customer, @PathParam("bucket") String bucket, @PathParam("year") int year, @PathParam("month") int month,
+	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 						@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
-		return getEventsOrRedirect(customer, bucket, year, month, day, hour, min, sec);
+		return getEventsOrRedirect(channelName, year, month, day, hour, min, sec);
 	}
 
-	@Path("/{customer}/{bucket}/{year}/{month}/{day}/{hour}/{min}")
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get(@PathParam("customer") String customer, @PathParam("bucket") String bucket, @PathParam("year") int year, @PathParam("month") int month,
+	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 						@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min)
 	{
-		return getEventsOrRedirect(customer, bucket, year, month, day, hour, min, -1);
+		return getEventsOrRedirect(channelName, year, month, day, hour, min, -1);
 	}
 
-	@Path("/{customer}/{bucket}/{year}/{month}/{day}/{hour}")
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get(@PathParam("customer") String customer, @PathParam("bucket") String bucket, @PathParam("year") int year,
+	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year,
 						@PathParam("month") int month, @PathParam("day") int day, @PathParam("hour") int hour)
 	{
-		return getEventsOrRedirect(customer, bucket, year, month, day, hour, -1, -1);
+		return getEventsOrRedirect(channelName, year, month, day, hour, -1, -1);
 	}
 
-	@Path("/{customer}/{bucket}/{year}/{month}/{day}")
+	@Path("/{channelName}/{year}/{month}/{day}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get(@PathParam("customer") String customer, @PathParam("bucket") String bucket, @PathParam("year") int year,
+	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year,
 						@PathParam("month") int month, @PathParam("day") int day)
 	{
-		return getEventsOrRedirect(customer, bucket, year, month, day, -1, -1, -1);
+		return getEventsOrRedirect(channelName, year, month, day, -1, -1, -1);
 	}
 
 	// Right now we only support getting events by second, minute, or hour.
-	Response getEventsOrRedirect(final String customer, final String bucket, final int year, final int month, final int day, final int hour, final int min, final int sec)
+	Response getEventsOrRedirect(final String channelName, final int year, final int month, final int day, final int hour, final int min, final int sec)
 	{
 		try
 		{
 			// Get bucket for customer to determine event group interval.
-			final ChannelMetaData channelMetaData = bucketMetaDataCache.getBucketMetaData(customer, bucket, false);
+			final ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
 
 			StreamingOutput out = new StreamingOutput()
 			{
@@ -170,7 +171,7 @@ public class InboundResource
 							}
 						}
 
-						logger.debug("Wrote out {} records for customer={} bucket={} year={} month={} day={} hour={} min={} sec={}", recordsWritten, customer, bucket, year, month, day, hour, min, sec);
+						logger.debug("Wrote out {} records for channelName={} year={} month={} day={} hour={} min={} sec={}", recordsWritten, channelName, year, month, day, hour, min, sec);
 					}
 					catch (Exception e)
 					{
@@ -181,11 +182,12 @@ public class InboundResource
 				}
 			};
 
-
+/*
 			if (channelMetaData.getMediaType().equals(MediaType.APPLICATION_JSON_TYPE))
 			{
 				return Response.ok(out, MediaType.APPLICATION_JSON).build();
 			}
+*/
 		}
 		catch (Http404Exception e)
 		{

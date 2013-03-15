@@ -21,14 +21,14 @@ public class ValidatingStorage implements ByteArrayStorage
 		delegate.putBucket(channelMetaData);
 	}
 
-	public ChannelMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String channelName)
 	{
-		return delegate.getBucket(customer, bucket);
+		return delegate.getBucket(channelName);
 	}
 
 	public void putPayload(StoragePayload storagePayload)
 	{
-		ChannelMetaData channelMetaData = getBucket(storagePayload.getCustomer(), storagePayload.getBucket());
+		ChannelMetaData channelMetaData = getBucket(storagePayload.getChannelMetaData().getName());
 
 		List<String> previousVersions = storagePayload.getPreviousVersions();
 
@@ -54,9 +54,9 @@ public class ValidatingStorage implements ByteArrayStorage
 		throw new InvalidVersionException("unable to match existing version of payload");
 	}
 
-	public StoragePayload getPayload(String customer, String bucket, String id)
+	public StoragePayload getPayload(String channelName, String id)
 	{
-		return delegate.getPayload(customer, bucket, id);
+		return delegate.getPayload(channelName, id);
 	}
 
 

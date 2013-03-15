@@ -1,12 +1,11 @@
 package com.gltech.scale.core.inbound;
 
-import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.storage.BucketMetaDataCache;
+import com.gltech.scale.core.storage.ChannelCache;
 import com.gltech.scale.core.storage.StorageServiceRestClient;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -21,10 +20,11 @@ import static org.mockito.Mockito.*;
 
 public class InboundResourceTest
 {
+/*
 	InboundService inboundService;
 	StorageServiceRestClient storageServiceRestClient;
 	AggregatorRestClient aggregatorRestClient;
-	BucketMetaDataCache bucketMetaDataCache;
+	ChannelCache channelCache;
 	ChannelCoordinator channelCoordinator;
 
 	@Before
@@ -66,19 +66,19 @@ public class InboundResourceTest
 
 		storageServiceRestClient = mock(StorageServiceRestClient.class);
 		aggregatorRestClient = mock(AggregatorRestClient.class);
-		bucketMetaDataCache = mock(BucketMetaDataCache.class);
+		channelCache = mock(ChannelCache.class);
 		channelCoordinator = mock(ChannelCoordinator.class);
-		inboundService = new InboundServiceImpl(clusterService, channelCoordinator, storageServiceRestClient, aggregatorRestClient, bucketMetaDataCache, new TimePeriodUtils());
+		inboundService = new InboundServiceImpl(clusterService, channelCoordinator, storageServiceRestClient, aggregatorRestClient, channelCache, new TimePeriodUtils());
 	}
 
 	@Test
 	public void testPeriodSecondBySecond() throws Exception
 	{
 		ChannelMetaData channelMetaData = createBucketMetaData("c1", "b1", 5);
-		BucketMetaDataCache bucketMetaDataCache = mock(BucketMetaDataCache.class);
-		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
+		ChannelCache channelCache = mock(ChannelCache.class);
+		when(channelCache.getChannelMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(bucketMetaDataCache, inboundService);
+		InboundResource inboundResource = new InboundResource(channelCache, inboundService);
 		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, 15);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
@@ -89,10 +89,10 @@ public class InboundResourceTest
 	public void testPeriodSecondBySecond2() throws Exception
 	{
 		ChannelMetaData channelMetaData = createBucketMetaData("c1", "b1", 5);
-		BucketMetaDataCache bucketMetaDataCache = mock(BucketMetaDataCache.class);
-		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
+		ChannelCache channelCache = mock(ChannelCache.class);
+		when(channelCache.getChannelMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(bucketMetaDataCache, inboundService);
+		InboundResource inboundResource = new InboundResource(channelCache, inboundService);
 		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, 13);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
@@ -103,10 +103,10 @@ public class InboundResourceTest
 	public void testPeriodByMinute() throws Exception
 	{
 		ChannelMetaData channelMetaData = createBucketMetaData("c1", "b1", 5);
-		BucketMetaDataCache bucketMetaDataCache = mock(BucketMetaDataCache.class);
-		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
+		ChannelCache channelCache = mock(ChannelCache.class);
+		when(channelCache.getChannelMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(bucketMetaDataCache, inboundService);
+		InboundResource inboundResource = new InboundResource(channelCache, inboundService);
 		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, -1);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
@@ -130,10 +130,10 @@ public class InboundResourceTest
 	public void testPeriodByHour() throws Exception
 	{
 		ChannelMetaData channelMetaData = createBucketMetaData("c1", "b1", 5);
-		BucketMetaDataCache bucketMetaDataCache = mock(BucketMetaDataCache.class);
-		when(bucketMetaDataCache.getBucketMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
+		ChannelCache channelCache = mock(ChannelCache.class);
+		when(channelCache.getChannelMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(bucketMetaDataCache, inboundService);
+		InboundResource inboundResource = new InboundResource(channelCache, inboundService);
 		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, -1, -1);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
@@ -157,5 +157,5 @@ public class InboundResourceTest
 	{
 		return new ChannelMetaData(customer, bucket, ChannelMetaData.BucketType.eventset, period, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
 	}
-
+*/
 }

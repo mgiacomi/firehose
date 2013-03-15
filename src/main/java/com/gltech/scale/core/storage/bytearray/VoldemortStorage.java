@@ -34,6 +34,7 @@ public class VoldemortStorage implements InternalStorage
 
 	public void putBucket(final ChannelMetaData channelMetaData)
 	{
+/*
 		final Map<String, String> keyMap = createBucketKeyMap(channelMetaData.getCustomer(),
 				channelMetaData.getBucket());
 		bucketClient.applyUpdate(new UpdateAction<Map<String, String>, String>()
@@ -52,30 +53,32 @@ public class VoldemortStorage implements InternalStorage
 
 			}
 		});
+*/
 	}
 
-	private Map<String, String> createBucketKeyMap(String customer, String bucket)
+	private Map<String, String> createBucketKeyMap(String channelName)
 	{
 		final Map<String, String> keyMap = new HashMap<>();
-		keyMap.put("customer", customer);
-		keyMap.put("bucket", bucket);
+		keyMap.put("channelName", channelName);
 		return keyMap;
 	}
 
-	public ChannelMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String channelName)
 	{
-		Map<String, String> keyMap = createBucketKeyMap(customer, bucket);
+		Map<String, String> keyMap = createBucketKeyMap(channelName);
 		String json = bucketClient.getValue(keyMap);
 		if (json == null)
 		{
 			return null;
 		}
-		return new ChannelMetaData(customer, bucket, json);
+//		return new ChannelMetaData(customer, bucket, json);
+		return null;
 	}
 
-	private Map<String, String> createPayloadKeyMap(String customer, String bucket, String id)
+	private Map<String, String> createPayloadKeyMap(String channelName, String id)
 	{
-		Map<String, String> bucketKeyMap = createBucketKeyMap(customer, bucket);
+//		Map<String, String> bucketKeyMap = createBucketKeyMap(channelName);
+		Map<String, String> bucketKeyMap = null;
 		bucketKeyMap.put("id", id);
 		return bucketKeyMap;
 	}
@@ -84,7 +87,7 @@ public class VoldemortStorage implements InternalStorage
 	{
 		try
 		{
-			Map<String, String> payloadKeyMap = createPayloadKeyMap(channelMetaData.getCustomer(), channelMetaData.getBucket(), id);
+			Map<String, String> payloadKeyMap = createPayloadKeyMap(channelMetaData.getName(), id);
 			Versioned<byte[]> versioned = payloadClient.get(payloadKeyMap);
 			if (versioned == null)
 			{
@@ -104,13 +107,15 @@ public class VoldemortStorage implements InternalStorage
 		}
 	}
 
-	public StoragePayload getPayload(String customer, String bucket, String id)
+	public StoragePayload getPayload(String channelName, String id)
 	{
-		return internalGetPayload(getBucket(customer, bucket), id);
+//		return internalGetPayload(getBucket(customer, bucket), id);
+return null;
 	}
 
 	public void internalPutPayload(ChannelMetaData channelMetaData, StoragePayload storagePayload)
 	{
+/*
 		try
 		{
 			final Map<String, String> payloadKeyMap = createPayloadKeyMap(channelMetaData.getCustomer(), channelMetaData.getBucket(), storagePayload.getId());
@@ -137,10 +142,11 @@ public class VoldemortStorage implements InternalStorage
 		{
 			logger.warn("unable to put payload {}", storagePayload, e);
 		}
+*/
 	}
 
 	public void putPayload(StoragePayload storagePayload)
 	{
-		internalPutPayload(getBucket(storagePayload.getCustomer(), storagePayload.getBucket()), storagePayload);
+//		internalPutPayload(getBucket(storagePayload.getCustomer(), storagePayload.getBucket()), storagePayload);
 	}
 }

@@ -19,25 +19,25 @@ public class BatchStreamsManagerTest
 	@Test
 	public void nextMultiStreamTest() throws Exception
 	{
-		ChannelMetaData channelMetaData = new ChannelMetaData("1", "2", ChannelMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.doublewritesync);
-
-		Message e1 = new Message("C1", "B", "testdata0".getBytes());
+//		ChannelMetaData channelMetaData = new ChannelMetaData("1", "2", ChannelMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.doublewritesync);
+ChannelMetaData channelMetaData = null;
+		Message e1 = new Message(1, "testdata0".getBytes());
 		Thread.sleep(10);
-		Message e2 = new Message("C2", "B", "testdata1".getBytes());
+		Message e2 = new Message(1, "testdata1".getBytes());
 		Thread.sleep(10);
-		Message e3 = new Message("C3", "B", "testdata2".getBytes());
+		Message e3 = new Message(1, "testdata2".getBytes());
 		Thread.sleep(10);
-		Message e4 = new Message("C4", "B", "testdata3".getBytes());
+		Message e4 = new Message(1, "testdata3".getBytes());
 		Thread.sleep(10);
-		Message e5 = new Message("C5", "B", "testdata4".getBytes());
+		Message e5 = new Message(1, "testdata4".getBytes());
 		Thread.sleep(10);
-		Message e6 = new Message("C6", "B", "testdata5".getBytes());
+		Message e6 = new Message(1, "testdata5".getBytes());
 		Thread.sleep(10);
-		Message e7 = new Message("C7", "B", "testdata6".getBytes());
+		Message e7 = new Message(1, "testdata6".getBytes());
 		Thread.sleep(10);
-		Message e8 = new Message("C8", "B", "testdata7".getBytes());
+		Message e8 = new Message(1, "testdata7".getBytes());
 		Thread.sleep(10);
-		Message e9 = new Message("C9", "B", "testdata8".getBytes());
+		Message e9 = new Message(1, "testdata8".getBytes());
 
 		DateTime period = DateTime.now();
 

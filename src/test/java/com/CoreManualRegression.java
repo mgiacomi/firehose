@@ -22,9 +22,12 @@ import java.util.concurrent.TimeUnit;
 public class CoreManualRegression
 {
 	static private final Client client = ClientCreator.createCached();
-	static private ChannelMetaData bmd1 = new ChannelMetaData("Matt", "1s", ChannelMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
-	static private ChannelMetaData bmd2 = new ChannelMetaData("Matt", "2s", ChannelMetaData.BucketType.eventset, 30, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
-	static private ChannelMetaData bmd3 = new ChannelMetaData("Matt", "3d", ChannelMetaData.BucketType.eventset, 60, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.doublewritesync);
+//	static private ChannelMetaData bmd1 = new ChannelMetaData("Matt", "1s", ChannelMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+static private ChannelMetaData bmd1 = null;
+//	static private ChannelMetaData bmd2 = new ChannelMetaData("Matt", "2s", ChannelMetaData.BucketType.eventset, 30, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+static private ChannelMetaData bmd2 = null;
+//	static private ChannelMetaData bmd3 = new ChannelMetaData("Matt", "3d", ChannelMetaData.BucketType.eventset, 60, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.doublewritesync);
+static private ChannelMetaData bmd3 = null;
 
 	static public class PrimaryServer
 	{

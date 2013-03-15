@@ -21,11 +21,11 @@ public class ChannelStats implements Channel
 	{
 		this.channel = channel;
 
-		String prefix = channel.getChannelMetaData().getCustomer() + "/" + channel.getChannelMetaData().getBucket() + "/" + props.get("coordination.period_seconds", 5);
-		String groupName = "Channel (" + prefix + ")";
-		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddEvent.Count", groupName, "count", new TimerCountPublisher("", addEventTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addEventTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " OldestEvent.Time", groupName, "oldest event seconds", new PublishCallback()
+		String channelName = channel.getChannelMetaData().getName() + "/" + props.get("coordination.period_seconds", 5);
+		String groupName = "Channel (" + channelName + ")";
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddEvent.Count", groupName, "count", new TimerCountPublisher("", addEventTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addEventTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " OldestEvent.Time", groupName, "oldest event seconds", new PublishCallback()
 		{
 			public String getValue()
 			{
@@ -53,14 +53,14 @@ public class ChannelStats implements Channel
 				return Long.toString(System.currentTimeMillis() - firstEventTime.getMillis() / 1000);
 			}
 		}));
-		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " TimeBuckets.Count", groupName, "count", new PublishCallback()
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " TimeBuckets.Count", groupName, "count", new PublishCallback()
 		{
 			public String getValue()
 			{
 				return Integer.toString(channel.getTimeBuckets().size());
 			}
 		}));
-		MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " TimeBuckets.Size", groupName, "size in kb", new PublishCallback()
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " TimeBuckets.Size", groupName, "size in kb", new PublishCallback()
 		{
 			public String getValue()
 			{
@@ -75,18 +75,18 @@ public class ChannelStats implements Channel
 			}
 		}));
 
-		if (channel.getChannelMetaData().getRedundancy() == ChannelMetaData.Redundancy.doublewritesync)
+		if (channel.getChannelMetaData().isRedundant())
 		{
-			MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddBackupEvent.Count", groupName, "count", new TimerCountPublisher("", addBackupEventTimer)));
-			MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " AddBackupEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupEventTimer)));
-			MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " BackupTimeBuckets.Count", groupName, "count", new PublishCallback()
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupEvent.Count", groupName, "count", new TimerCountPublisher("", addBackupEventTimer)));
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupEventTimer)));
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupTimeBuckets.Count", groupName, "count", new PublishCallback()
 			{
 				public String getValue()
 				{
 					return Integer.toString(channel.getBackupTimeBuckets().size());
 				}
 			}));
-			MonitoringPublisher.getInstance().register(new PublishMetric(prefix + " BackupTimeBuckets.Size", groupName, "size in kb", new PublishCallback()
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupTimeBuckets.Size", groupName, "size in kb", new PublishCallback()
 			{
 				public String getValue()
 				{

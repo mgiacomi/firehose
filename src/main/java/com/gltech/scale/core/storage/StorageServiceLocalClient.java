@@ -22,9 +22,9 @@ public class StorageServiceLocalClient implements StorageServiceClient
 		this.storage = storage;
 	}
 
-	public ChannelMetaData getBucketMetaData(ServiceMetaData storageService, String customer, String bucket)
+	public ChannelMetaData getChannelMetaData(ServiceMetaData storageService, String channelName)
 	{
-		return storage.getBucket(customer, bucket);
+		return storage.getBucket(channelName);
 	}
 
 	public void putBucketMetaData(ServiceMetaData storageService, ChannelMetaData channelMetaData)
@@ -32,34 +32,34 @@ public class StorageServiceLocalClient implements StorageServiceClient
 		storage.putBucket(channelMetaData);
 	}
 
-	public InputStream getEventStream(ServiceMetaData storageService, final String customer, final String bucket, final String id)
+	public InputStream getEventStream(ServiceMetaData storageService, final String channelName, final String id)
 	{
 		return new InputStreamFromOutputStream<Long>()
 		{
 			@Override
 			public Long produce(final OutputStream outputStream) throws Exception
 			{
-				storage.getPayload(customer, bucket, id, outputStream);
+				storage.getPayload(channelName, id, outputStream);
 				return 0L;
 			}
 		};
 	}
 
-	public byte[] get(ServiceMetaData storageService, String customer, String bucket, String id)
+	public byte[] get(ServiceMetaData storageService, String channelName, String id)
 	{
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		storage.getPayload(customer, bucket, id, byteArrayOutputStream);
+		storage.getPayload(channelName, id, byteArrayOutputStream);
 		return byteArrayOutputStream.toByteArray();
 	}
 
-	public void put(ServiceMetaData storageService, String customer, String bucket, String id, InputStream inputStream)
+	public void put(ServiceMetaData storageService, String channelName, String id, InputStream inputStream)
 	{
-		storage.putPayload(customer, bucket, id, inputStream, new HashMap<String, List<String>>());
+		storage.putPayload(channelName, id, inputStream, new HashMap<String, List<String>>());
 	}
 
-	public void put(ServiceMetaData storageService, String customer, String bucket, String id, byte[] payload)
+	public void put(ServiceMetaData storageService, String channelName, String id, byte[] payload)
 	{
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(payload);
-		put(storageService, customer, bucket, id, byteArrayInputStream);
+		put(storageService, channelName, id, byteArrayInputStream);
 	}
 }

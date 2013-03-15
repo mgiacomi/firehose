@@ -21,44 +21,34 @@ public class MemoryStorage implements InternalStorage
 	@Override
 	public void putBucket(ChannelMetaData channel)
 	{
-		String key = createBucketKey(channel);
+		String key = channel.getName();
 		logger.debug("creating {}", channel);
 		if (bucketMap.containsKey(key))
 		{
-			throw new DuplicateBucketException("Bucket already exists " + channel.getCustomer() + " " + channel.getBucket());
+			throw new DuplicateBucketException("Channel already exists " + channel.getName());
 		}
 		bucketMap.put(key, channel);
 		payloadsMap.putIfAbsent(channel, new ConcurrentHashMap<String, StoragePayload>());
 	}
 
-	private String createBucketKey(ChannelMetaData channel)
-	{
-		return createBucketKey(channel.getCustomer(), channel.getBucket());
-	}
-
-	private String createBucketKey(String customer, String bucket)
-	{
-		return customer + "|" + bucket;
-	}
-
 	@Override
-	public ChannelMetaData getBucket(String customer, String bucket)
+	public ChannelMetaData getBucket(String channelName)
 	{
-		return bucketMap.get(createBucketKey(customer, bucket));
+		return bucketMap.get(channelName);
 	}
 
 	@Override
 	public void putPayload(StoragePayload storagePayload)
 	{
 		logger.debug("putting payload {}", storagePayload);
-		ChannelMetaData channelMetaData = getBucket(storagePayload.getCustomer(), storagePayload.getBucket());
-		internalPutPayload(channelMetaData, storagePayload);
+//		ChannelMetaData channelMetaData = getBucket(storagePayload.getCustomer(), storagePayload.getBucket());
+//		internalPutPayload(channelMetaData, storagePayload);
 	}
 
 	@Override
-	public StoragePayload getPayload(String customer, String bucket, String id)
+	public StoragePayload getPayload(String channelName, String id)
 	{
-		ChannelMetaData channelMetaData = getBucket(customer, bucket);
+		ChannelMetaData channelMetaData = getBucket(channelName);
 		StoragePayload payload = internalGetPayload(channelMetaData, id);
 		if (payload != null)
 		{

@@ -19,12 +19,13 @@ public class MessageStreamTest
 	@Test
 	public void nextRecordTest() throws Exception
 	{
-		ChannelMetaData channelMetaData = new ChannelMetaData("1", "2", ChannelMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.doublewritesync);
+//		ChannelMetaData channelMetaData = new ChannelMetaData("1", "2", , 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.doublewritesync);
+		ChannelMetaData channelMetaData = new ChannelMetaData("1", 0, true);
 
 		Batch batch = new Batch(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
-		batch.addEvent(new Message("1", "2", "testdata".getBytes()));
+		batch.addEvent(new Message(0, "testdata".getBytes()));
 		Thread.sleep(5);
-		batch.addEvent(new Message("3", "4", "testdata2".getBytes()));
+		batch.addEvent(new Message(0, "testdata2".getBytes()));
 
 		assertEquals("testdata", new String(batch.getEvents().get(0).getPayload()));
 		assertEquals("testdata2", new String(batch.getEvents().get(1).getPayload()));

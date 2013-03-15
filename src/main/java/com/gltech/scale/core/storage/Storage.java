@@ -11,11 +11,11 @@ public interface Storage
 {
 	void putBucket(ChannelMetaData channelMetaData);
 
-	ChannelMetaData getBucket(String customer, String bucket);
+	ChannelMetaData getBucket(String channelName);
 
-	void putPayload(String customer, String bucket, String id, InputStream inputStream, Map<String, List<String>> headers);
+	void putPayload(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers);
 
-	void getPayload(String customer, String bucket, String id, OutputStream outputStream);
+	void getPayload(String cchannelName, String id, OutputStream outputStream);
 
 	//todo - gfm - 9/24/12 - implement delete
 }

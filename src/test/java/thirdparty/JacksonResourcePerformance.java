@@ -24,12 +24,13 @@ public class JacksonResourcePerformance
 
 	private Batch getTimeBucket(int numEvents)
 	{
-		ChannelMetaData channelMetaData = new ChannelMetaData("1", "2", ChannelMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.doublewritesync);
+//		ChannelMetaData channelMetaData = new ChannelMetaData("1", "2", ChannelMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.doublewritesync);
+ChannelMetaData channelMetaData = null;
 		Batch bigBatch = new Batch(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
 		for (int i = 0; i < numEvents; i++)
 		{
 			String payload = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			bigBatch.addEvent(new Message("1", "2", payload.getBytes()));
+			bigBatch.addEvent(new Message(1, payload.getBytes()));
 		}
 
 		return bigBatch;
@@ -51,7 +52,7 @@ public class JacksonResourcePerformance
 		printJVMMemStats();
 
 		ObjectNode objectNode = textMapper.createObjectNode();
-		objectNode.put("bucketMetaData", batch.getChannelMetaData().toJson());
+//		objectNode.put("bucketMetaData", batch.getChannelMetaData().toJson());
 		objectNode.put("bytes", batch.getBytes());
 		objectNode.put("lastEventTime", batch.getLastEventTime().toString());
 
@@ -59,7 +60,7 @@ public class JacksonResourcePerformance
 
 		for (Message message : batch.getEvents())
 		{
-			dataNode.add(message.toJson());
+//			dataNode.add(message.toJson());
 		}
 		System.out.println(batch.getEvents().size() + " items to JsonNode in " + (System.currentTimeMillis() - timer) + "ms");
 		timer = System.currentTimeMillis();
@@ -79,7 +80,7 @@ public class JacksonResourcePerformance
 		printJVMMemStats();
 
 		ObjectNode objectNode = textMapper.createObjectNode();
-		objectNode.put("bucketMetaData", batch.getChannelMetaData().toJson());
+//		objectNode.put("bucketMetaData", batch.getChannelMetaData().toJson());
 		objectNode.put("bytes", batch.getBytes());
 		objectNode.put("lastEventTime", batch.getLastEventTime().toString());
 
@@ -87,7 +88,7 @@ public class JacksonResourcePerformance
 
 		for (Message message : batch.getEvents())
 		{
-			dataNode.add(message.toJson());
+//			dataNode.add(message.toJson());
 		}
 		System.out.println(batch.getEvents().size() + " items to JsonNode in " + (System.currentTimeMillis() - timer) + "ms");
 		timer = System.currentTimeMillis();
@@ -116,7 +117,7 @@ public class JacksonResourcePerformance
 		g.writeFieldName("bucketMetaData");
 		// You have to use write number to pipe in raw json see:
 		// http://markmail.org/thread/xv26gqctvtee4uoo#query:+page:1+mid:m7ggc4syaj3vuwmq+state:results
-		g.writeNumber(batch.getChannelMetaData().toJson().toString());
+//		g.writeNumber(batch.getChannelMetaData().toJson().toString());
 		g.writeFieldName("bytes");
 		g.writeNumber(batch.getBytes());
 		g.writeStringField("lastEventTime", batch.getLastEventTime().toString());
@@ -126,8 +127,8 @@ public class JacksonResourcePerformance
 		for (Message event : batch.getEvents())
 		{
 			g.writeStartObject();
-			g.writeStringField("customer", event.getCustomer());
-			g.writeStringField("bucket", event.getBucket());
+//			g.writeStringField("customer", event.getCustomer());
+//			g.writeStringField("bucket", event.getBucket());
 			g.writeStringField("received_at", event.getReceived_at().toString());
 			g.writeStringField("uuid", event.getUuid());
 			g.writeBinaryField("payload", event.getPayload());
@@ -157,7 +158,7 @@ public class JacksonResourcePerformance
 		g.writeFieldName("bucketMetaData");
 		// You have to use write number to pipe in raw json see:
 		// http://markmail.org/thread/xv26gqctvtee4uoo#query:+page:1+mid:m7ggc4syaj3vuwmq+state:results
-		g.writeNumber(batch.getChannelMetaData().toJson().toString());
+//		g.writeNumber(batch.getChannelMetaData().toJson().toString());
 		g.writeFieldName("bytes");
 		g.writeNumber(batch.getBytes());
 		g.writeStringField("lastEventTime", batch.getLastEventTime().toString());
@@ -168,11 +169,11 @@ public class JacksonResourcePerformance
 		for (int i = 0; i < 100000000; i++)
 		{
 			String payload = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			Message event = new Message("1", "2", payload.getBytes());
+			Message event = new Message(1, payload.getBytes());
 
 			g.writeStartObject();
-			g.writeStringField("customer", event.getCustomer());
-			g.writeStringField("bucket", event.getBucket());
+//			g.writeStringField("customer", event.getCustomer());
+//			g.writeStringField("bucket", event.getBucket());
 			g.writeStringField("received_at", event.getReceived_at().toString());
 			g.writeStringField("uuid", event.getUuid());
 			g.writeBinaryField("payload", event.getPayload());
@@ -214,8 +215,8 @@ public class JacksonResourcePerformance
 			for (Message event : batch.getEvents())
 			{
 				g.writeStartObject();
-				g.writeStringField("customer", event.getCustomer());
-				g.writeStringField("bucket", event.getBucket());
+//				g.writeStringField("customer", event.getCustomer());
+//				g.writeStringField("bucket", event.getBucket());
 				g.writeStringField("received_at", event.getReceived_at().toString());
 				g.writeStringField("uuid", event.getUuid());
 				g.writeBinaryField("payload", event.getPayload());

@@ -7,6 +7,7 @@ import static junit.framework.Assert.*;
 
 public class MessageTest
 {
+/*
 	@Test
 	public void testToJsonAndBack() throws Exception
 	{
@@ -38,4 +39,5 @@ public class MessageTest
 		assertEquals("", new String(ep.getPayload()));
 		assertTrue(ep.isStored());
 	}
+*/
 }

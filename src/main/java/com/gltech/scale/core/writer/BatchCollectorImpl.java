@@ -62,8 +62,7 @@ public class BatchCollectorImpl implements BatchCollector
 		{
 			long start = System.nanoTime();
 
-			String customer = channelMetaData.getCustomer();
-			String bucket = channelMetaData.getBucket();
+			String channelName = channelMetaData.getName();
 
 			List<ServiceMetaData> aggregators = new ArrayList<>();
 
@@ -71,10 +70,10 @@ public class BatchCollectorImpl implements BatchCollector
 
 			for (PrimaryBackupSet primaryBackupSet : aggregatorsByPeriod.getPrimaryBackupSets())
 			{
-				if (channelMetaData.isDoubleWrite())
+				if (channelMetaData.isRedundant())
 				{
-					BatchMetaData primaryMetaData = aggregatorRestClient.getTimeBucketMetaData(primaryBackupSet.getPrimary(), customer, bucket, nearestPeriodCeiling);
-					BatchMetaData backupMetaData = aggregatorRestClient.getTimeBucketMetaData(primaryBackupSet.getPrimary(), customer, bucket, nearestPeriodCeiling);
+					BatchMetaData primaryMetaData = aggregatorRestClient.getTimeBucketMetaData(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
+					BatchMetaData backupMetaData = aggregatorRestClient.getTimeBucketMetaData(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
 
 					aggregators.add(primaryBackupSet.getPrimary());
 
@@ -101,7 +100,7 @@ public class BatchCollectorImpl implements BatchCollector
 			// Register aggregator streams with the stream manager.
 			for (ServiceMetaData ropeManager : aggregators)
 			{
-				InputStream aggregatorStream = aggregatorRestClient.getTimeBucketEventsStream(ropeManager, customer, bucket, nearestPeriodCeiling);
+				InputStream aggregatorStream = aggregatorRestClient.getTimeBucketEventsStream(ropeManager, channelName, nearestPeriodCeiling);
 				batchStreamsManager.registerInputStream(aggregatorStream);
 			}
 
@@ -116,7 +115,7 @@ public class BatchCollectorImpl implements BatchCollector
 
 			// Write the stream to the storage service.
 			ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
-			storageServiceClient.put(storageService, customer, bucket, nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), inputStream);
+			storageServiceClient.put(storageService, channelName, nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), inputStream);
 			inputStream.close();
 
 			// Remove time bucket references from the coordination service.
@@ -126,12 +125,12 @@ public class BatchCollectorImpl implements BatchCollector
 			for (ServiceMetaData aggregator : aggregators)
 			{
 				// Aggregator can now remove the time bucket
-				aggregatorRestClient.clearTimeBucket(aggregator, customer, bucket, nearestPeriodCeiling);
+				aggregatorRestClient.clearTimeBucket(aggregator, channelName, nearestPeriodCeiling);
 			}
 
 			long completedIn = System.nanoTime() - start;
 
-			logger.info("Completed collecting TimeBucket for " + channelMetaData.getCustomer() + "|" + channelMetaData.getBucket() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + " in " + completedIn / 1000000 + "ms");
+			logger.info("Completed collecting TimeBucket for " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + " in " + completedIn / 1000000 + "ms");
 
 			if (timer != null)
 			{
