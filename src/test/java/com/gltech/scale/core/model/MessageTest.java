@@ -4,7 +4,6 @@ import com.dyuproject.protostuff.JsonIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.ExplicitIdStrategy;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
-import com.gltech.scale.core.model.Message;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;

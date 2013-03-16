@@ -1,5 +1,6 @@
 package com.gltech.scale.core.aggregator;
 
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
@@ -21,7 +22,7 @@ public class ChannelStats implements Channel
 	{
 		this.channel = channel;
 
-		String channelName = channel.getChannelMetaData().getName() + "/" + props.get("coordination.period_seconds", 5);
+		String channelName = channel.getChannelMetaData().getName() + "/" + props.get("period_seconds", Defaults.PERIOD_SECONDS);
 		String groupName = "Channel (" + channelName + ")";
 		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddEvent.Count", groupName, "count", new TimerCountPublisher("", addEventTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addEventTimer)));

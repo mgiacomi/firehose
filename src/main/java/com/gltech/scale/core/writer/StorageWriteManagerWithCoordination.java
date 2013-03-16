@@ -1,5 +1,6 @@
 package com.gltech.scale.core.writer;
 
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.ganglia.*;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -32,7 +33,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 	{
 		this.clusterService = clusterService;
 		this.channelCache = channelCache;
-		this.periodSeconds = props.get("coordination.period_seconds", 5);
+		this.periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
 
 		String groupName = "Loki Collector";
 		MonitoringPublisher.getInstance().register(new PublishMetric("CollectTimeBucket.Count", groupName, "count", new TimerCountPublisher("", collectTimeBucketTimer)));

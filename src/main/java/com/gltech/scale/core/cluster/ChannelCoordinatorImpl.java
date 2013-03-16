@@ -3,6 +3,7 @@ package com.gltech.scale.core.cluster;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
+import com.gltech.scale.core.model.Defaults;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
@@ -161,7 +162,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	AggregatorsByPeriod writeAggregatorByPeriod(DateTime nearestPeriodCeiling)
 	{
 		// You can't schedule anything more then one time period into the future.
-		int periodSeconds = props.get("coordination.period_seconds", 5);
+		int periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
 
 		if (nearestPeriodCeiling.isAfter(timePeriodUtils.nearestPeriodCeiling(DateTime.now()).plusSeconds(5)))
 		{

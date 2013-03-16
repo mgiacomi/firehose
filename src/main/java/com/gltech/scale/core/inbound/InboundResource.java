@@ -1,5 +1,6 @@
 package com.gltech.scale.core.inbound;
 
+import com.gltech.scale.core.model.Defaults;
 import com.google.inject.Inject;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.ChannelCache;
@@ -34,7 +35,7 @@ public class InboundResource
 	{
 		this.channelCache = channelCache;
 		this.inboundService = inboundService;
-		this.periodSeconds = props.get("coordination.period_seconds", 5);
+		this.periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
 	}
 
 	@Path("/{channelName}")

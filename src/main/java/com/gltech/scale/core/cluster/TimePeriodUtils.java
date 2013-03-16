@@ -1,5 +1,6 @@
 package com.gltech.scale.core.cluster;
 
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.util.Props;
 import org.joda.time.DateTime;
 
@@ -25,7 +26,7 @@ public class TimePeriodUtils
 
 	public DateTime nearestPeriodCeiling(DateTime dateTime)
 	{
-		int periodSeconds = props.get("coordination.period_seconds", 5);
+		int periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
 		return nearestPeriodCeiling(dateTime, periodSeconds);
 	}
 
