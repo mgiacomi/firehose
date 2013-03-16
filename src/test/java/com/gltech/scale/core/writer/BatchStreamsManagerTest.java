@@ -19,25 +19,25 @@ public class BatchStreamsManagerTest
 	@Test
 	public void nextMultiStreamTest() throws Exception
 	{
-//		ChannelMetaData channelMetaData = new ChannelMetaData("1", "2", ChannelMetaData.BucketType.eventset, 15, MediaType.APPLICATION_OCTET_STREAM_TYPE, ChannelMetaData.LifeTime.medium, ChannelMetaData.Redundancy.doublewritesync);
-ChannelMetaData channelMetaData = null;
-		Message e1 = new Message(1, "testdata0".getBytes());
+		ChannelMetaData channelMetaData = new ChannelMetaData("test", 3, false);
+
+		Message e1 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata0".getBytes());
 		Thread.sleep(10);
-		Message e2 = new Message(1, "testdata1".getBytes());
+		Message e2 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata1".getBytes());
 		Thread.sleep(10);
-		Message e3 = new Message(1, "testdata2".getBytes());
+		Message e3 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata2".getBytes());
 		Thread.sleep(10);
-		Message e4 = new Message(1, "testdata3".getBytes());
+		Message e4 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata3".getBytes());
 		Thread.sleep(10);
-		Message e5 = new Message(1, "testdata4".getBytes());
+		Message e5 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata4".getBytes());
 		Thread.sleep(10);
-		Message e6 = new Message(1, "testdata5".getBytes());
+		Message e6 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata5".getBytes());
 		Thread.sleep(10);
-		Message e7 = new Message(1, "testdata6".getBytes());
+		Message e7 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata6".getBytes());
 		Thread.sleep(10);
-		Message e8 = new Message(1, "testdata7".getBytes());
+		Message e8 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata7".getBytes());
 		Thread.sleep(10);
-		Message e9 = new Message(1, "testdata8".getBytes());
+		Message e9 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata8".getBytes());
 
 		DateTime period = DateTime.now();
 

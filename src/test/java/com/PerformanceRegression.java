@@ -12,61 +12,13 @@ import com.ning.compress.lzf.LZFOutputStream;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import javax.ws.rs.core.MediaType;
 import java.io.*;
 import java.util.UUID;
 
 public class PerformanceRegression
 {
-/*
-	private static final long MegaBytes = 1024L * 1024L;
-
-	@Test
-	public void testJsonToFile() throws Exception
-	{
-		int items = 100000;
-		OutputStream fos = new LZFOutputStream(new FileOutputStream(new File("stream.json")));
-		long timer = System.currentTimeMillis();
-
-		for (int i = 0; i < items; i++)
-		{
-			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			fos.write(new Message("1", "2", testString.getBytes()).toJson().toString().getBytes());
-		}
-
-		System.out.println(items + " items to Json string in " + (System.currentTimeMillis() - timer) + "ms");
-	}
-
-	@Test
-	public void testJsonToFile2() throws Exception
-	{
-		int items = 100000;
-		ByteArrayOutputStream fos = new ByteArrayOutputStream();
-		long timer = System.currentTimeMillis();
-
-		for (int i = 0; i < items; i++)
-		{
-			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			fos.write(LZFEncoder.encode(new Message("1", "2", testString.getBytes()).toJson().toString().getBytes()));
-		}
-
-		System.out.println(fos.size() / MegaBytes + " mb, " + items + " items to Json2 string in " + (System.currentTimeMillis() - timer) + "ms");
-	}
-
-	@Test
-	public void testJsonToFile3() throws Exception
-	{
-		int items = 100000;
-		ByteArrayOutputStream fos = new ByteArrayOutputStream();
-		long timer = System.currentTimeMillis();
-
-		for (int i = 0; i < items; i++)
-		{
-			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			fos.write(new Message("1", "2", testString.getBytes()).toJson().toString().getBytes());
-		}
-
-		System.out.println(fos.size() / MegaBytes + " mb, " + items + " items to Json3 string in " + (System.currentTimeMillis() - timer) + "ms");
-	}
+private static final long MegaBytes = 1024L * 1024L;
 
 	@Test
 	public void writeProtoStuffToFile() throws Exception
@@ -83,7 +35,7 @@ public class PerformanceRegression
 		for (int i = 0; i < items; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			ProtostuffIOUtil.writeDelimitedTo(fos, new Message(UUID.randomUUID().toString(), DateTime.now().getMillis(), testString.getBytes()), schema, linkedBuffer);
+			ProtostuffIOUtil.writeDelimitedTo(fos, new Message(MediaType.APPLICATION_JSON_TYPE, testString.getBytes()), schema, linkedBuffer);
 			linkedBuffer.clear();
 		}
 
@@ -107,7 +59,7 @@ public class PerformanceRegression
 		for (int i = 0; i < items; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			byte[] data = ProtostuffIOUtil.toByteArray(new Message(UUID.randomUUID().toString(), DateTime.now().getMillis(), testString.getBytes()), schema, linkedBuffer);
+			byte[] data = ProtostuffIOUtil.toByteArray(new Message(MediaType.APPLICATION_JSON_TYPE, testString.getBytes()), schema, linkedBuffer);
 			fos.write(LZFEncoder.encode(data));
 			linkedBuffer.clear();
 		}
@@ -132,7 +84,7 @@ public class PerformanceRegression
 		for (int i = 0; i < items; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			byte[] data = ProtostuffIOUtil.toByteArray(new Message(UUID.randomUUID().toString(), DateTime.now().getMillis(), testString.getBytes()), schema, linkedBuffer);
+			byte[] data = ProtostuffIOUtil.toByteArray(new Message(MediaType.APPLICATION_JSON_TYPE, testString.getBytes()), schema, linkedBuffer);
 			fos.write(data);
 			linkedBuffer.clear();
 		}
@@ -193,6 +145,7 @@ public class PerformanceRegression
 			loopCount++;
 		}
 	}
+	*/
 
 	@Test
 	public void readProtoStuffToFile() throws Exception
@@ -227,5 +180,4 @@ public class PerformanceRegression
 
 		fis.close();
 	}
-*/
 }

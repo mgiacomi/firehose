@@ -23,6 +23,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,18 +57,18 @@ public class InboundServiceImpl implements InboundService
 	}
 
 	@Override
-	public void addEvent(String channelName, byte[] payload)
+	public void addEvent(String channelName, MediaType mediaTypes, byte[] payload)
 	{
 		int maxPayLoadSize = props.get("event_service.max_payload_size_kb", 50) * 1024;
 
-		Message message = new Message(0, payload);
+		Message message = new Message(mediaTypes, payload);
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
 
 		// If the payload is too large then write it to the storage engine now
 		// and create and event object with no payload, which will flag it as stored.
 		if (payload.length > maxPayLoadSize)
 		{
-			message = new Message(0);
+			message = new Message(MediaType.APPLICATION_JSON_TYPE);
 			ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
 			storageServiceClient.put(storageService, channelName, message.getUuid(), payload);
 			logger.debug("Pre-storing event payload data to storage service: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
@@ -111,12 +112,10 @@ public class InboundServiceImpl implements InboundService
 	}
 
 	@Override
-	public int writeEventsToOutputStream(ChannelMetaData channelMetaData, DateTime dateTime, OutputStream outputStream, int recordsWritten)
+	public int writeEventsToOutputStream(String channelName, DateTime dateTime, OutputStream outputStream, int recordsWritten)
 	{
 		String id = timePeriodUtils.nearestPeriodCeiling(dateTime).toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
 		ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
-
-		String channelName = channelMetaData.getName();
 
 		try
 		{

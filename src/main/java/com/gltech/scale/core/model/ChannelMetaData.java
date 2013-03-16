@@ -1,9 +1,14 @@
 package com.gltech.scale.core.model;
 
+import com.dyuproject.protostuff.Tag;
+
 public class ChannelMetaData
 {
+	@Tag(1)
 	private final String name;
+	@Tag(2)
 	private final int daysToLive;
+	@Tag(3)
 	private final boolean redundant;
 
 	public ChannelMetaData(String name, int daysToLive, boolean redundant)
@@ -43,5 +48,14 @@ public class ChannelMetaData
 	public int hashCode()
 	{
 		return name != null ? name.hashCode() : 0;
+	}
+
+	public String toString()
+	{
+		return "ChannelMetaData{" +
+				"name='" + name + '\'' +
+				", daysToLive=" + daysToLive +
+				", redundant=" + redundant +
+				'}';
 	}
 }

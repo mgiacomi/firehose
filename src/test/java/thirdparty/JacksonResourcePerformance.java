@@ -30,7 +30,7 @@ ChannelMetaData channelMetaData = null;
 		for (int i = 0; i < numEvents; i++)
 		{
 			String payload = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			bigBatch.addEvent(new Message(1, payload.getBytes()));
+			bigBatch.addEvent(new Message(MediaType.APPLICATION_JSON_TYPE, payload.getBytes()));
 		}
 
 		return bigBatch;
@@ -169,7 +169,7 @@ ChannelMetaData channelMetaData = null;
 		for (int i = 0; i < 100000000; i++)
 		{
 			String payload = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			Message event = new Message(1, payload.getBytes());
+			Message event = new Message(MediaType.APPLICATION_JSON_TYPE, payload.getBytes());
 
 			g.writeStartObject();
 //			g.writeStringField("customer", event.getCustomer());

@@ -24,6 +24,9 @@ public class InboundResource
 	private int periodSeconds;
 
 	@Context
+	private HttpHeaders httpHeaders;
+
+	@Context
 	UriInfo uriInfo;
 
 	@Inject
@@ -39,7 +42,7 @@ public class InboundResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response post(@PathParam("channelName") String channelName, byte[] payload)
 	{
-		inboundService.addEvent(channelName, payload);
+		inboundService.addEvent(channelName, httpHeaders.getMediaType(), payload);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
@@ -102,9 +105,6 @@ return null;
 	{
 		try
 		{
-			// Get bucket for customer to determine event group interval.
-			final ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
-
 			StreamingOutput out = new StreamingOutput()
 			{
 				public void write(OutputStream outputStream) throws IOException, WebApplicationException
@@ -118,7 +118,7 @@ return null;
 						// If our period is less the 60 and a time with seconds was requested, then make a single request.
 						if (sec > -1)
 						{
-							recordsWritten = inboundService.writeEventsToOutputStream(channelMetaData, new DateTime(year, month, day, hour, min, sec), outputStream, recordsWritten);
+							recordsWritten = inboundService.writeEventsToOutputStream(channelName, new DateTime(year, month, day, hour, min, sec), outputStream, recordsWritten);
 						}
 
 						// If our period is less the 60 and a time with no secs, but minutes was requested, then query all periods for this minute.
@@ -130,7 +130,7 @@ return null;
 
 								if (dateTime.isBeforeNow())
 								{
-									recordsWritten = inboundService.writeEventsToOutputStream(channelMetaData, dateTime, outputStream, recordsWritten);
+									recordsWritten = inboundService.writeEventsToOutputStream(channelName, dateTime, outputStream, recordsWritten);
 								}
 							}
 						}
@@ -146,7 +146,7 @@ return null;
 
 									if (dateTime.isBeforeNow())
 									{
-										recordsWritten = inboundService.writeEventsToOutputStream(channelMetaData, dateTime, outputStream, recordsWritten);
+										recordsWritten = inboundService.writeEventsToOutputStream(channelName, dateTime, outputStream, recordsWritten);
 									}
 								}
 							}
@@ -164,7 +164,7 @@ return null;
 										DateTime dateTime = new DateTime(year, month, day, h, m, s);
 										if (dateTime.isBeforeNow())
 										{
-											recordsWritten = inboundService.writeEventsToOutputStream(channelMetaData, dateTime, outputStream, recordsWritten);
+											recordsWritten = inboundService.writeEventsToOutputStream(channelName, dateTime, outputStream, recordsWritten);
 										}
 									}
 								}

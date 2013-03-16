@@ -1,43 +1,33 @@
 package com.gltech.scale.core.model;
 
+import com.dyuproject.protostuff.JsonIOUtil;
+import com.dyuproject.protostuff.Schema;
+import com.dyuproject.protostuff.runtime.ExplicitIdStrategy;
+import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.gltech.scale.core.model.Message;
 import org.junit.Test;
+
+import javax.ws.rs.core.MediaType;
 
 import static junit.framework.Assert.*;
 
 public class MessageTest
 {
-/*
 	@Test
-	public void testToJsonAndBack() throws Exception
-	{
-		Message ep = new Message("1", "2", "[\"data\": \"test\"]".getBytes());
-		String json = ep.toJson().toString();
+	public void testToJsonAndBack() throws Exception{
+		ExplicitIdStrategy.Registry registry = new ExplicitIdStrategy.Registry();
+		registry.registerPojo(Message.class, 1);
+		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 
-		Message ep1 = new Message(json);
+		Message before = new Message(MediaType.APPLICATION_JSON_TYPE, "my test string".getBytes());
+		byte[] json = JsonIOUtil.toByteArray(before, schema, false);
 
-		assertEquals(ep.getCustomer(), ep1.getCustomer());
-		assertEquals(ep.getBucket(), ep1.getBucket());
-		assertEquals(ep.getUuid(), ep1.getUuid());
-		assertEquals(ep.getReceived_at(), ep1.getReceived_at());
-		assertEquals(new String(ep.getPayload()), new String(ep1.getPayload()));
-		assertFalse(ep.isStored());
+		Message after = new Message();
+		JsonIOUtil.mergeFrom(json, after, schema, false);
+
+		assertEquals(before.getUuid(), after.getUuid());
+		assertEquals(before.getMimeTypeId(), after.getMimeTypeId());
+		assertEquals(new String(before.getPayload()), new String(after.getPayload()));
+		assertEquals(before.getReceived_at().getMillis(), after.getReceived_at().getMillis());
 	}
-
-	@Test
-	public void testToJsonAndBackStored() throws Exception
-	{
-		Message ep = new Message("1", "2");
-		String json = ep.toJson().toString();
-
-		Message ep1 = new Message(json);
-
-		assertEquals(ep.getCustomer(), ep1.getCustomer());
-		assertEquals(ep.getBucket(), ep1.getBucket());
-		assertEquals(ep.getUuid(), ep1.getUuid());
-		assertEquals(ep.getReceived_at(), ep1.getReceived_at());
-		assertEquals("", new String(ep.getPayload()));
-		assertTrue(ep.isStored());
-	}
-*/
 }
