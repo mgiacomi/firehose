@@ -108,7 +108,7 @@ public class EmbeddedServer
 		final ClusterService clusterService = injector.getInstance(ClusterService.class);
 		LifeCycleManager.getInstance().add(clusterService, LifeCycle.Priority.FINAL);
 
-		if (props.get("enable.event_service", true))
+		if (props.get("enable.inbound_service", true))
 		{
 			// Registered EventService for shutdown
 			InboundService inboundService = injector.getInstance(InboundService.class);

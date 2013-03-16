@@ -13,13 +13,13 @@ import java.util.concurrent.ConcurrentMap;
 public class ChannelCache
 {
 	static private ConcurrentMap<String, ChannelMetaData> bucketMetaDataCache = new ConcurrentHashMap<>();
-	private StorageServiceClient storageServiceClient;
+	private StorageClient storageClient;
 	private ClusterService clusterService;
 
 	@Inject
-	public ChannelCache(ClusterService clusterService, StorageServiceClient storageServiceClient)
+	public ChannelCache(ClusterService clusterService, StorageClient storageClient)
 	{
-		this.storageServiceClient = storageServiceClient;
+		this.storageClient = storageClient;
 		this.clusterService = clusterService;
 	}
 
@@ -31,12 +31,11 @@ public class ChannelCache
 
 		if (channelMetaData == null)
 		{
-			ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
 			ChannelMetaData newChannelMetaData = null;
 
 			try
 			{
-				newChannelMetaData = storageServiceClient.getChannelMetaData(storageService, name);
+				newChannelMetaData = storageClient.getChannelMetaData(name);
 			}
 			catch (Http404Exception e)
 			{
@@ -52,16 +51,9 @@ public class ChannelCache
 
 				ChannelMetaData bmd = new ChannelMetaData(name, 60, false);
 
-				try
-				{
-					storageServiceClient.putBucketMetaData(storageService, bmd);
-				}
-				catch (DuplicateBucketException dbe)
-				{
-					// It is fine if the bucket already exists.  Some thread beat us to it.
-				}
+				storageClient.putBucketMetaData(bmd);
 
-				newChannelMetaData = storageServiceClient.getChannelMetaData(storageService, name);
+				newChannelMetaData = storageClient.getChannelMetaData(name);
 			}
 
 			channelMetaData = bucketMetaDataCache.putIfAbsent(key, newChannelMetaData);

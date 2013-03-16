@@ -6,7 +6,6 @@ import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.ChannelCache;
-import com.gltech.scale.core.storage.StorageServiceRestClient;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;

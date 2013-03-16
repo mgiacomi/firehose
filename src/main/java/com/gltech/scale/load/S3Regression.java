@@ -3,7 +3,7 @@ package com.gltech.scale.load;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.storage.stream.AwsS3Storage;
+import com.gltech.scale.core.storage.providers.AwsS3Storage;
 import org.slf4j.LoggerFactory;
 
 public class S3Regression

@@ -4,7 +4,6 @@ import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.storage.StorageServiceRestClient;
 import com.gltech.scale.util.Http404Exception;
 import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
@@ -41,12 +40,12 @@ public class EventResourceRegression
 
 		// Pops and test classes have to be static to be used by embedded server.
 		eventService = new ServiceMetaData();
-		eventService.setListenAddress(props.get("event_service.rest_host", "localhost"));
-		eventService.setListenPort(props.get("event_service.rest_port", 9090));
+		eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+		eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
 		storageService = new ServiceMetaData();
-		storageService.setListenAddress(props.get("event_service.rest_host", "localhost"));
-		storageService.setListenPort(props.get("event_service.rest_port", 9090));
+		storageService.setListenAddress(props.get("storage.rest_host", Defaults.REST_HOST));
+		storageService.setListenPort(props.get("storage.rest_port", Defaults.REST_PORT));
 
 		inboundRestClient = new InboundRestClient();
 		storageServiceRestClient = new StorageServiceRestClient();

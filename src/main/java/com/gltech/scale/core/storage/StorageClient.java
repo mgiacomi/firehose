@@ -12,27 +12,27 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 
-public class StorageServiceLocalClient implements StorageServiceClient
+public class StorageClient
 {
 	private Storage storage;
 
 	@Inject
-	public StorageServiceLocalClient(Storage storage)
+	public StorageClient(Storage storage)
 	{
 		this.storage = storage;
 	}
 
-	public ChannelMetaData getChannelMetaData(ServiceMetaData storageService, String channelName)
+	public ChannelMetaData getChannelMetaData(String channelName)
 	{
 		return storage.getBucket(channelName);
 	}
 
-	public void putBucketMetaData(ServiceMetaData storageService, ChannelMetaData channelMetaData)
+	public void putBucketMetaData(ChannelMetaData channelMetaData)
 	{
 		storage.putBucket(channelMetaData);
 	}
 
-	public InputStream getEventStream(ServiceMetaData storageService, final String channelName, final String id)
+	public InputStream getEventStream(final String channelName, final String id)
 	{
 		return new InputStreamFromOutputStream<Long>()
 		{
@@ -45,21 +45,21 @@ public class StorageServiceLocalClient implements StorageServiceClient
 		};
 	}
 
-	public byte[] get(ServiceMetaData storageService, String channelName, String id)
+	public byte[] get(String channelName, String id)
 	{
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		storage.getPayload(channelName, id, byteArrayOutputStream);
 		return byteArrayOutputStream.toByteArray();
 	}
 
-	public void put(ServiceMetaData storageService, String channelName, String id, InputStream inputStream)
+	public void put(String channelName, String id, InputStream inputStream)
 	{
 		storage.putPayload(channelName, id, inputStream, new HashMap<String, List<String>>());
 	}
 
-	public void put(ServiceMetaData storageService, String channelName, String id, byte[] payload)
+	public void put(String channelName, String id, byte[] payload)
 	{
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(payload);
-		put(storageService, channelName, id, byteArrayInputStream);
+		put(channelName, id, byteArrayInputStream);
 	}
 }

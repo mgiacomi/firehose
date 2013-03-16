@@ -1,4 +1,4 @@
-package com.gltech.scale.core.storage.stream;
+package com.gltech.scale.core.storage.providers;
 
 import static junit.framework.Assert.*;
 

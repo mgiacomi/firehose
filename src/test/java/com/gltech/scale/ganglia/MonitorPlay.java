@@ -6,9 +6,6 @@ import com.google.inject.Module;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.*;
-import com.gltech.scale.core.storage.bytearray.MemoryStorage;
-import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;
-import com.gltech.scale.core.storage.bytearray.ValidatingStorage;
 import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 
@@ -26,8 +23,8 @@ public class MonitorPlay
 		props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/props.properties");
 
 		ServiceMetaData storageService = new ServiceMetaData();
-		storageService.setListenAddress(props.get("event_service.rest_host", "localhost"));
-		storageService.setListenPort(props.get("event_service.rest_port", 9090));
+		storageService.setListenAddress(props.get("storage_service.rest_host", "localhost"));
+		storageService.setListenPort(props.get("storage_service.rest_port", 9090));
 
 		testingServer = new TestingServer(21818);
 		EmbeddedServer.start(9090, new Module()

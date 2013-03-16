@@ -4,6 +4,7 @@ import com.gc.iotools.stream.is.InputStreamFromOutputStream;
 import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.BatchMetaData;
+import com.gltech.scale.core.storage.StorageClient;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
@@ -11,7 +12,6 @@ import com.gltech.scale.ganglia.Timer;
 import com.gltech.scale.core.aggregator.PrimaryBackupSet;
 import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.storage.StorageServiceClient;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -27,16 +27,16 @@ public class BatchCollectorImpl implements BatchCollector
 	private DateTime nearestPeriodCeiling;
 	private ChannelMetaData channelMetaData;
 	private AggregatorRestClient aggregatorRestClient;
-	private StorageServiceClient storageServiceClient;
+	private StorageClient storageClient;
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;
 	private Timer timer;
 
 	@Inject
-	public BatchCollectorImpl(AggregatorRestClient aggregatorRestClient, StorageServiceClient storageServiceClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
+	public BatchCollectorImpl(AggregatorRestClient aggregatorRestClient, StorageClient storageClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
 	{
 		this.aggregatorRestClient = aggregatorRestClient;
-		this.storageServiceClient = storageServiceClient;
+		this.storageClient = storageClient;
 		this.clusterService = clusterService;
 		this.channelCoordinator = channelCoordinator;
 	}
@@ -114,8 +114,7 @@ public class BatchCollectorImpl implements BatchCollector
 			};
 
 			// Write the stream to the storage service.
-			ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
-			storageServiceClient.put(storageService, channelName, nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), inputStream);
+			storageClient.put(channelName, nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), inputStream);
 			inputStream.close();
 
 			// Remove time bucket references from the coordination service.

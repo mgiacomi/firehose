@@ -4,6 +4,7 @@ import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.inbound.InboundRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.storage.*;
 import com.gltech.scale.util.ClientCreator;
@@ -75,15 +76,15 @@ static private ChannelMetaData bmd3 = null;
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/props.properties");
 
-			ServiceMetaData storageService = new ServiceMetaData();
-			storageService.setListenAddress(props.get("event_service.rest_host", "localhost"));
-			storageService.setListenPort(props.get("event_service.rest_port", 9090));
+			ServiceMetaData eventService = new ServiceMetaData();
+			eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+			eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
-			StorageServiceRestClient storageServiceRestClient = new StorageServiceRestClient();
+			InboundRestClient inboundRestClient = new InboundRestClient();
 
-			storageServiceRestClient.putBucketMetaData(storageService, bmd1);
-			storageServiceRestClient.putBucketMetaData(storageService, bmd2);
-			storageServiceRestClient.putBucketMetaData(storageService, bmd3);
+			inboundRestClient.putBucketMetaData(eventService, bmd1.getName());
+			inboundRestClient.putBucketMetaData(eventService, bmd2.getName());
+			inboundRestClient.putBucketMetaData(eventService, bmd3.getName());
 		}
 	}
 
@@ -127,8 +128,8 @@ static private ChannelMetaData bmd3 = null;
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/props.properties");
 
 			ServiceMetaData eventService = new ServiceMetaData();
-			eventService.setListenAddress(props.get("event_service.rest_host", "localhost"));
-			eventService.setListenPort(props.get("event_service.rest_port", 9090));
+			eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+			eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
 			InboundRestClient inboundRestClient = new InboundRestClient();
 

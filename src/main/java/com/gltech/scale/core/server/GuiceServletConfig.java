@@ -2,6 +2,7 @@ package com.gltech.scale.core.server;
 
 import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.inbound.InboundServiceImpl;
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.ganglia.MonitorResource;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -19,8 +20,7 @@ import com.gltech.scale.core.inbound.InboundResource;
 import com.gltech.scale.core.inbound.InboundService;
 import com.gltech.scale.core.aggregator.*;
 import com.gltech.scale.core.storage.*;
-import com.gltech.scale.core.storage.bytearray.*;
-import com.gltech.scale.core.storage.stream.AwsS3Storage;
+import com.gltech.scale.core.storage.providers.AwsS3Storage;
 import com.gltech.scale.util.Props;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
@@ -63,7 +63,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 						//bind(EventService.class).to(EventServiceImpl.class).in(Singleton.class);
 					}
 
-					if (props.get("enable.event_service", true))
+					if (props.get("enable.inbound_service", true))
 					{
 						bind(InboundResource.class);
 						bind(InboundService.class).to(InboundServiceImpl.class).in(Singleton.class);
@@ -87,44 +87,19 @@ public class GuiceServletConfig extends GuiceServletContextListener
 						bind(BatchCollector.class).to(BatchCollectorImpl.class);
 					}
 
-					if (props.get("storage_service.local", false))
+					// Setup storage provider
+					String storageServiceStore = props.get("storage_store", Defaults.STORAGE_STORE);
+
+					if ("voldemort".equalsIgnoreCase(storageServiceStore))
 					{
-						bind(StorageServiceClient.class).to(StorageServiceLocalClient.class).in(Singleton.class);
+					}
+					else if ("s3".equalsIgnoreCase(storageServiceStore))
+					{
+						bind(Storage.class).to(AwsS3Storage.class).in(Singleton.class);
 					}
 					else
 					{
-						bind(StorageServiceClient.class).to(StorageServiceRestClient.class).in(Singleton.class);
-					}
-
-					if (props.get("enable.storage_service", true) || props.get("storage_service.local", false))
-					{
-						bind(StorageResource.class);
-
-						String storageServiceStore = props.get("storage_service.store", "voldemort");
-
-						if ("memory".equalsIgnoreCase(storageServiceStore))
-						{
-							bind(ByteArrayStorage.class).to(MemoryStorage.class).in(Singleton.class);
-							bind(Storage.class).to(ByteArrayStorageAdapter.class).in(Singleton.class);
-						}
-						else if ("voldemort".equalsIgnoreCase(storageServiceStore))
-						{
-							bind(ByteArrayStorage.class).to(VoldemortStorage.class).in(Singleton.class);
-							bind(Storage.class).to(ByteArrayStorageAdapter.class).in(Singleton.class);
-						}
-						else if ("bucket_only".equalsIgnoreCase(storageServiceStore))
-						{
-							bind(ByteArrayStorage.class).to(BucketOnlyStorage.class).in(Singleton.class);
-							bind(Storage.class).to(ByteArrayStorageAdapter.class).in(Singleton.class);
-						}
-						else if ("s3".equalsIgnoreCase(storageServiceStore))
-						{
-							bind(Storage.class).to(AwsS3Storage.class).in(Singleton.class);
-						}
-						else
-						{
-							throw new RuntimeException("storage_service.store type " + storageServiceStore + " is not available.");
-						}
+						throw new RuntimeException("storage_service.store type " + storageServiceStore + " is not available.");
 					}
 
 					serve("/*").with(GuiceContainer.class);

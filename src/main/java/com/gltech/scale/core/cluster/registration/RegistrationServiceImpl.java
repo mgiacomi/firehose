@@ -1,6 +1,7 @@
 package com.gltech.scale.core.cluster.registration;
 
 import com.gltech.scale.core.cluster.ClusterException;
+import com.gltech.scale.core.model.Defaults;
 import com.google.common.base.Throwables;
 import com.gltech.scale.util.Props;
 import com.netflix.curator.framework.CuratorFramework;
@@ -40,7 +41,7 @@ public class RegistrationServiceImpl implements RegistrationService
 
 	public RegistrationServiceImpl()
 	{
-		eventServiceAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.EVENT_SERVICE);
+		eventServiceAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.INBOUND_SERVICE);
 		eventServiceCache = eventServiceAdvertiser.getServiceCache();
 		eventServiceCache.addListener(new EventServiceCacheListener());
 
@@ -71,8 +72,8 @@ public class RegistrationServiceImpl implements RegistrationService
 
 	public void registerAsEventService()
 	{
-		String host = props.get("server_host", "localhost");
-		int port = props.get("server_port", 8080);
+		String host = props.get("server_host", Defaults.REST_HOST);
+		int port = props.get("server_port", Defaults.REST_PORT);
 
 		try
 		{
@@ -98,8 +99,8 @@ public class RegistrationServiceImpl implements RegistrationService
 
 	public void registerAsCollectorManager()
 	{
-		String host = props.get("server_host", "localhost");
-		int port = props.get("server_port", 8080);
+		String host = props.get("server_host", Defaults.REST_HOST);
+		int port = props.get("server_port", Defaults.REST_PORT);
 
 		try
 		{
@@ -120,8 +121,8 @@ public class RegistrationServiceImpl implements RegistrationService
 
 	public void registerAsAggregator()
 	{
-		String host = props.get("server_host", "localhost");
-		int port = props.get("server_port", 8080);
+		String host = props.get("server_host", Defaults.REST_HOST);
+		int port = props.get("server_port", Defaults.REST_PORT);
 
 		try
 		{
@@ -160,8 +161,8 @@ public class RegistrationServiceImpl implements RegistrationService
 
 	public void registerAsStorageService()
 	{
-		String host = props.get("server_host", "localhost");
-		int port = props.get("server_port", 8080);
+		String host = props.get("server_host", Defaults.REST_HOST);
+		int port = props.get("server_port", Defaults.REST_PORT);
 
 		try
 		{

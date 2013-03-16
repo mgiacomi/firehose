@@ -2,6 +2,8 @@ package com.gltech.scale.core.inbound;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.core.storage.BucketMetaDataException;
+import com.gltech.scale.core.storage.DuplicateBucketException;
 import com.gltech.scale.util.ClientCreator;
 import com.gltech.scale.util.Http404Exception;
 import com.sun.jersey.api.client.Client;
@@ -33,6 +35,24 @@ public class InboundRestClient
 
 //		return new ChannelMetaData(channelName, response.getEntity(String.class));
 return null;
+	}
+
+	public void putBucketMetaData(ServiceMetaData eventService, String channelName)
+	{
+		String url = "http://" + eventService.getListenAddress() + ":" + eventService.getListenPort() + "/" + channelName;
+		WebResource webResource = client.resource(url);
+//		ClientResponse response = webResource.put(ClientResponse.class, channelMetaData.toJson().toString());
+ClientResponse response = null;
+
+		if (response.getStatus() == 403)
+		{
+			throw new DuplicateBucketException("Bucket already exists.");
+		}
+
+		if (response.getStatus() != 201)
+		{
+			throw new BucketMetaDataException("Failed : HTTP error code: " + response.getStatus());
+		}
 	}
 
 	public void postEvent(ServiceMetaData eventService, String customer, String bucket, String json)

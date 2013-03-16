@@ -1,6 +1,4 @@
-package com.gltech.scale.core.storage.stream;
-
-import java.io.*;
+package com.gltech.scale.core.storage.providers;
 
 public class AwsS3StroageRegression
 {

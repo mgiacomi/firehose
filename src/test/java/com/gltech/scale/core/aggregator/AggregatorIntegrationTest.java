@@ -8,8 +8,6 @@ import com.google.inject.Singleton;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.storage.bytearray.ByteArrayStorage;
-import com.gltech.scale.core.storage.bytearray.StoragePayload;
 import com.gltech.scale.util.Props;
 import com.netflix.curator.test.TestingServer;
 import org.joda.time.DateTime;
@@ -65,12 +63,12 @@ public class AggregatorIntegrationTest
 	public void testEventToAggregatorAndCollect() throws Exception
 	{
 		ServiceMetaData aggregator = new ServiceMetaData();
-		aggregator.setListenAddress(props.get("aggregator.rest_host", "localhost"));
-		aggregator.setListenPort(props.get("aggregator.rest_port", 9090));
+		aggregator.setListenAddress(props.get("aggregator.rest_host", Defaults.REST_HOST));
+		aggregator.setListenPort(props.get("aggregator.rest_port", Defaults.REST_PORT));
 
 		ServiceMetaData eventService = new ServiceMetaData();
-		eventService.setListenAddress(props.get("event_service.rest_host", "localhost"));
-		eventService.setListenPort(props.get("event_service.rest_port", 9090));
+		eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+		eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
 		List<String> requests = new ArrayList<>();
 		requests.add("{\"singer\":\"Metallica\",\"title\":\"Fade To Black\"}");

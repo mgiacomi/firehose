@@ -2,12 +2,12 @@ package com.gltech.scale.load;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.inbound.InboundRestClient;
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.pipeline.Pipeline;
 import com.gltech.scale.pipeline.PipelineBuilder;
 import com.gltech.scale.pipeline.Processor;
 import com.gltech.scale.pipeline.Timed;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.storage.StorageServiceRestClient;
 import com.gltech.scale.util.Props;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -61,14 +61,10 @@ public class LoadClient
 		bucketName = "LoadBucket";
 		restClient = new InboundRestClient();
 
-		ServiceMetaData storageService = new ServiceMetaData();
-		storageService.setListenAddress(props.get("storage_service.rest_host", "localhost"));
-		storageService.setListenPort(props.get("storage_service.rest_port", 9090));
-
 		try
 		{
-			new StorageServiceRestClient().putBucketMetaData(storageService,
-					new ChannelMetaData("LoadClient", 10, false));
+//			new StorageServiceRestClient().putBucketMetaData(storageService,
+//					new ChannelMetaData("LoadClient", 10, false));
 		}
 		catch (Exception e)
 		{
@@ -97,8 +93,8 @@ public class LoadClient
 
 			//todo - gfm - 11/6/12 - insert an event via REST api
 			ServiceMetaData eventService = new ServiceMetaData();
-			eventService.setListenAddress(props.get("event_service.rest_host", "localhost"));
-			eventService.setListenPort(props.get("event_service.rest_port", 9090));
+			eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+			eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
 			restClient.postEvent(eventService, "LoadClient", bucketName, payload);
 

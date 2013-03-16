@@ -6,7 +6,9 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.core.storage.StorageClient;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
@@ -15,7 +17,6 @@ import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.ChannelCache;
-import com.gltech.scale.core.storage.StorageServiceClient;
 import com.gltech.scale.util.Http404Exception;
 import com.gltech.scale.util.Props;
 import org.joda.time.DateTime;
@@ -36,18 +37,18 @@ public class InboundServiceImpl implements InboundService
 	private ConcurrentMap<DateTime, AggregatorsByPeriod> aggregatorPeriodMatrices = new ConcurrentHashMap<>();
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;
-	private StorageServiceClient storageServiceClient;
+	private StorageClient storageClient;
 	private AggregatorRestClient aggregatorRestClient;
 	private ChannelCache channelCache;
 	private TimePeriodUtils timePeriodUtils;
 	private Props props = Props.getProps();
 
 	@Inject
-	public InboundServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, StorageServiceClient storageServiceClient, AggregatorRestClient aggregatorRestClient, ChannelCache channelCache, TimePeriodUtils timePeriodUtils)
+	public InboundServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, StorageClient storageClient, AggregatorRestClient aggregatorRestClient, ChannelCache channelCache, TimePeriodUtils timePeriodUtils)
 	{
 		this.clusterService = clusterService;
 		this.channelCoordinator = channelCoordinator;
-		this.storageServiceClient = storageServiceClient;
+		this.storageClient = storageClient;
 		this.aggregatorRestClient = aggregatorRestClient;
 		this.channelCache = channelCache;
 		this.timePeriodUtils = timePeriodUtils;
@@ -59,7 +60,7 @@ public class InboundServiceImpl implements InboundService
 	@Override
 	public void addEvent(String channelName, MediaType mediaTypes, byte[] payload)
 	{
-		int maxPayLoadSize = props.get("event_service.max_payload_size_kb", 50) * 1024;
+		int maxPayLoadSize = props.get("inbound.max_payload_size_kb", Defaults.MAX_PAYLOAD_SIZE_KB) * 1024;
 
 		Message message = new Message(mediaTypes, payload);
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
@@ -69,9 +70,8 @@ public class InboundServiceImpl implements InboundService
 		if (payload.length > maxPayLoadSize)
 		{
 			message = new Message(MediaType.APPLICATION_JSON_TYPE);
-			ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
-			storageServiceClient.put(storageService, channelName, message.getUuid(), payload);
-			logger.debug("Pre-storing event payload data to storage service: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
+			storageClient.put(channelName, message.getUuid(), payload);
+			logger.debug("Pre-storing event payload data to data store: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
 		}
 
 		AggregatorsByPeriod aggregatorsByPeriod = aggregatorPeriodMatrices.get(nearestPeriodCeiling);
@@ -115,14 +115,13 @@ public class InboundServiceImpl implements InboundService
 	public int writeEventsToOutputStream(String channelName, DateTime dateTime, OutputStream outputStream, int recordsWritten)
 	{
 		String id = timePeriodUtils.nearestPeriodCeiling(dateTime).toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
-		ServiceMetaData storageService = clusterService.getRegistrationService().getStorageServiceRoundRobin();
 
 		try
 		{
 			int origRecordsWritten = recordsWritten;
 
 			// Make sure the stream gets closed.
-			try (InputStream inputStream = storageServiceClient.getEventStream(storageService, channelName, id))
+			try (InputStream inputStream = storageClient.getEventStream(channelName, id))
 			{
 				JsonFactory f = new MappingJsonFactory();
 				JsonParser jp = f.createJsonParser(inputStream);
@@ -142,7 +141,7 @@ Message message = null;
 
 						if (message.isStored())
 						{
-							byte[] payload = storageServiceClient.get(storageService, channelName, message.getUuid());
+							byte[] payload = storageClient.get(channelName, message.getUuid());
 							outputStream.write(payload);
 							logger.debug("Reading pre-stored event payload data from storage service: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
 						}

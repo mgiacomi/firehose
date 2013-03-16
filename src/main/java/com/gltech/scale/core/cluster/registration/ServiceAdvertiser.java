@@ -16,10 +16,11 @@ import java.util.UUID;
 
 public class ServiceAdvertiser
 {
-	public static final String EVENT_SERVICE = "EventService";
+	public static final String INBOUND_SERVICE = "InboundService";
 	public static final String COLLECTOR_SERVICE = "CollectorService";
 	public static final String AGGREGATOR_SERVICE = "AggregatorService";
 	public static final String STORAGE_SERVICE = "StorageService";
+	public static final String OUTBOUND_SERVICE = "OutboundService";
 
 	private static final Logger logger = LoggerFactory.getLogger(ServiceAdvertiser.class);
 	private final String serviceName;
