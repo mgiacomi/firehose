@@ -1,7 +1,13 @@
 package com.gltech.scale.core.writer;
 
+import com.dyuproject.protostuff.LinkedBuffer;
+import com.dyuproject.protostuff.ProtostuffIOUtil;
+import com.dyuproject.protostuff.Schema;
+import com.dyuproject.protostuff.runtime.RuntimeSchema;
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.util.ModelIO;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -18,50 +24,43 @@ import java.util.Set;
 public class BatchStreamsManager
 {
 	private static final Logger logger = LoggerFactory.getLogger(BatchStreamsManager.class);
-	private List<MessageStream> timeBucketStreams = new ArrayList<>();
+	private List<MessageStream> batchStreams = new ArrayList<>();
 	private int totalStreams = 0;
-	private Set<String> processedEvents = new HashSet<>();
-	private String customerBucketPeriod;
+	private Set<String> processedMessages = new HashSet<>();
+	private String customerBatchPeriod;
 	private long bytesWritten;
 
 	public BatchStreamsManager(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
-		customerBucketPeriod = channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + "|" + channelMetaData.isRedundant();
+		customerBatchPeriod = channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + "|" + channelMetaData.isRedundant();
 	}
 
 	public void registerInputStream(InputStream aggregatorStream)
 	{
-		timeBucketStreams.add(new MessageInputStream(customerBucketPeriod, aggregatorStream));
+		batchStreams.add(new MessageInputStream(customerBatchPeriod, aggregatorStream));
 		totalStreams++;
 	}
 
-	public void registerEventList(List<Message> events)
+	public long writeMessages(OutputStream outputStream)
 	{
-		timeBucketStreams.add(new MessageListStream(customerBucketPeriod, events));
-		totalStreams++;
-	}
-
-	public long writeEvents(OutputStream outputStream)
-	{
-		logger.debug("Starting aggregator -> storage stream merge. " + customerBucketPeriod);
+		logger.debug("Starting aggregator -> storage stream merge. " + customerBatchPeriod);
 
 		long recordsReceived = 0;
 
 		try
 		{
-			byte[] start = "[".getBytes();
-			outputStream.write(start);
-			bytesWritten = bytesWritten + start.length;
+			Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
+			LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 
-			while (timeBucketStreams.size() > 0)
+			while (batchStreams.size() > 0)
 			{
 				MessageStream candidateNextRecord = null;
-				for (MessageStream messageStream : new ArrayList<>(timeBucketStreams))
+				for (MessageStream messageStream : new ArrayList<>(batchStreams))
 				{
 					// If the stream is out of records then remove it from the list and continue loop.
 					if (messageStream.getCurrentMessage() == null)
 					{
-						timeBucketStreams.remove(messageStream);
+						batchStreams.remove(messageStream);
 						messageStream.close();
 						continue;
 					}
@@ -73,14 +72,14 @@ public class BatchStreamsManager
 					}
 					else
 					{
-						// Is this record has already been processed (because of doublewrite), then ignore it and advance the stream.
-						if (processedEvents.contains(messageStream.getCurrentMessage().getUuid()))
+						// Is this record has already been processed (because of redundancy), then ignore it and advance the stream.
+						if (processedMessages.contains(messageStream.getCurrentMessage().getUuid()))
 						{
 							messageStream.nextRecord();
 							recordsReceived++;
 						}
 
-						// Is this record the same as the candidateNextRecord (because of doublewrite), then ignore it and advance the stream.
+						// Is this record the same as the candidateNextRecord (because of redundancy), then ignore it and advance the stream.
 						else if (messageStream.getCurrentMessage().equals(candidateNextRecord.getCurrentMessage()))
 						{
 							messageStream.nextRecord();
@@ -98,31 +97,18 @@ public class BatchStreamsManager
 				// If we have a candidate then write it to the stream.
 				if (candidateNextRecord != null)
 				{
-					if (processedEvents.size() > 0)
-					{
-						byte[] comma = ",".getBytes();
-						outputStream.write(comma);
-						bytesWritten = bytesWritten + comma.length;
-
-					}
-
-//					byte[] data = candidateNextRecord.getCurrentMessage().toJson().toString().getBytes();
-byte[] data = null;
-					outputStream.write(data);
-					bytesWritten = bytesWritten + data.length;
-					processedEvents.add(candidateNextRecord.getCurrentMessage().getUuid());
+System.out.println("writing current Message: "+ candidateNextRecord.getCurrentMessage());
+					bytesWritten =+ ProtostuffIOUtil.writeDelimitedTo(outputStream, candidateNextRecord.getCurrentMessage(), schema, linkedBuffer);
+					processedMessages.add(candidateNextRecord.getCurrentMessage().getUuid());
 					candidateNextRecord.nextRecord();
 					recordsReceived++;
+					linkedBuffer.clear();
 				}
 			}
-
-			byte[] end = "]".getBytes();
-			outputStream.write(end);
-			bytesWritten = bytesWritten + end.length;
 		}
 		catch (IOException e)
 		{
-			logger.error("TimeBucketStreamManager interrupted " + customerBucketPeriod, e);
+			logger.error("BatchStreamManager interrupted " + customerBatchPeriod, e);
 		}
 		finally
 		{
@@ -135,14 +121,14 @@ byte[] data = null;
 				// Ignore
 			}
 
-			for (MessageStream messageStream : timeBucketStreams)
+			for (MessageStream messageStream : batchStreams)
 			{
 				messageStream.close();
 			}
 		}
 
-		logger.info("Merged " + totalStreams + " streams, " + processedEvents.size() + " of " + recordsReceived + " events " + customerBucketPeriod + " totaling " + bytesWritten + "mb.");
+		logger.info("customerBatchPeriod={}, streams merged={}, processed messages={}, total messages={}, size={}mb", customerBatchPeriod, totalStreams, processedMessages.size(), recordsReceived, bytesWritten / Defaults.MEGABYTES);
 
-		return processedEvents.size();
+		return processedMessages.size();
 	}
 }

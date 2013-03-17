@@ -12,6 +12,8 @@ public class StreamDelimiterTest
 	@Test
 	public void testStream() throws Exception
 	{
+		StreamDelimiter streamDelimiter = new StreamDelimiter();
+
 		String shortStr = "123";
 		String medStr = "asdfqwreasdfqweradfqewrasdfqweradfqweradsfqwerasdfqwerafdsqwre";
 		String longStr = "298347012357091735409813750917345908173450987132459087129430712904371920834" +
@@ -20,21 +22,21 @@ public class StreamDelimiterTest
 		String nullStr = "";
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		StreamDelimiter.write(bos, shortStr.getBytes());
-		StreamDelimiter.write(bos, null);
-		StreamDelimiter.write(bos, medStr.getBytes());
-		StreamDelimiter.write(bos, nullStr.getBytes());
-		StreamDelimiter.write(bos, longStr.getBytes());
+		streamDelimiter.write(bos, shortStr.getBytes());
+		streamDelimiter.write(bos, null);
+		streamDelimiter.write(bos, medStr.getBytes());
+		streamDelimiter.write(bos, nullStr.getBytes());
+		streamDelimiter.write(bos, longStr.getBytes());
 
 		ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-		Assert.assertEquals(shortStr, new String(StreamDelimiter.readNext(bis)));
-		Assert.assertEquals(medStr, new String(StreamDelimiter.readNext(bis)));
-		Assert.assertEquals(longStr, new String(StreamDelimiter.readNext(bis)));
+		Assert.assertEquals(shortStr, new String(streamDelimiter.readNext(bis)));
+		Assert.assertEquals(medStr, new String(streamDelimiter.readNext(bis)));
+		Assert.assertEquals(longStr, new String(streamDelimiter.readNext(bis)));
 
 		boolean gotEOF = false;
 		try
 		{
-		StreamDelimiter.readNext(bis);
+			streamDelimiter.readNext(bis);
 		}
 		catch(EOFException e) {
 			gotEOF = true;

@@ -42,22 +42,22 @@ public class AggregatorStats implements Aggregator
 		{
 			public String getValue()
 			{
-				return Integer.toString(aggregator.getActiveTimeBuckets().size());
+				return Integer.toString(aggregator.getActiveBatches().size());
 			}
 		}));
 
 	}
 
-	public void addEvent(String channelName, Message message)
+	public void addMessage(String channelName, byte[] bytes)
 	{
-		aggregator.addEvent(channelName, message);
-		addEventTimer.add(message.getPayload().length);
+		aggregator.addMessage(channelName, bytes);
+		addEventTimer.add(bytes.length);
 	}
 
-	public void addBackupEvent(String channelName, Message message)
+	public void addBackupMessage(String channelName, byte[] bytes)
 	{
-		aggregator.addBackupEvent(channelName, message);
-		addBackupEventTimer.add(message.getPayload().length);
+		aggregator.addBackupMessage(channelName, bytes);
+		addBackupEventTimer.add(bytes.length);
 	}
 
 	public void clear(String channelName, DateTime dateTime)
@@ -67,40 +67,40 @@ public class AggregatorStats implements Aggregator
 		clearTimer.stop();
 	}
 
-	public List<Batch> getActiveTimeBuckets()
+	public List<Batch> getActiveBatches()
 	{
-		return aggregator.getActiveTimeBuckets();
+		return aggregator.getActiveBatches();
 	}
 
-	public List<Batch> getActiveBackupTimeBuckets()
+	public List<Batch> getActiveBackupBatches()
 	{
-		return aggregator.getActiveBackupTimeBuckets();
+		return aggregator.getActiveBackupBatches();
 	}
 
-	public long writeTimeBucketEvents(OutputStream outputStream, String channelName, DateTime dateTime)
+	public long writeBatchMessages(OutputStream outputStream, String channelName, DateTime dateTime)
 	{
 		long start = System.nanoTime();
-		long processed = aggregator.writeTimeBucketEvents(outputStream, channelName, dateTime);
+		long processed = aggregator.writeBatchMessages(outputStream, channelName, dateTime);
 		writtenEventsTimer.add(System.nanoTime() - start, processed);
 		return processed;
 	}
 
-	public long writeBackupTimeBucketEvents(OutputStream outputStream, String channelName, DateTime dateTime)
+	public long writeBackupBatchMessages(OutputStream outputStream, String channelName, DateTime dateTime)
 	{
 		long start = System.nanoTime();
-		long processed = aggregator.writeBackupTimeBucketEvents(outputStream, channelName, dateTime);
+		long processed = aggregator.writeBackupBatchMessages(outputStream, channelName, dateTime);
 		writtenBackupEventsTimer.add(System.nanoTime() - start, processed);
 		return processed;
 	}
 
-	public BatchMetaData getTimeBucketMetaData(String channelName, DateTime dateTime)
+	public BatchMetaData getBatchMetaData(String channelName, DateTime dateTime)
 	{
-		return aggregator.getTimeBucketMetaData(channelName, dateTime);
+		return aggregator.getBatchMetaData(channelName, dateTime);
 	}
 
-	public BatchMetaData getBackupTimeBucketMetaData(String channelName, DateTime dateTime)
+	public BatchMetaData getBatchBucketMetaData(String channelName, DateTime dateTime)
 	{
-		return aggregator.getBackupTimeBucketMetaData(channelName, dateTime);
+		return aggregator.getBatchBucketMetaData(channelName, dateTime);
 	}
 
 	public void shutdown()

@@ -1,7 +1,6 @@
 package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.Defaults;
-import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.ganglia.*;
@@ -32,16 +31,16 @@ public class ChannelStats implements Channel
 			{
 				DateTime firstEventTime = null;
 
-				for (Batch batch : channel.getTimeBuckets())
+				for (Batch batch : channel.getBatches())
 				{
 					if (firstEventTime == null)
 					{
-						firstEventTime = batch.getFirstEventTime();
+						firstEventTime = batch.getFirstMessageTime();
 					}
 
-					if (batch.getFirstEventTime().isBefore(firstEventTime))
+					if (batch.getFirstMessageTime().isBefore(firstEventTime))
 					{
-						firstEventTime = batch.getFirstEventTime();
+						firstEventTime = batch.getFirstMessageTime();
 					}
 
 				}
@@ -58,7 +57,7 @@ public class ChannelStats implements Channel
 		{
 			public String getValue()
 			{
-				return Integer.toString(channel.getTimeBuckets().size());
+				return Integer.toString(channel.getBatches().size());
 			}
 		}));
 		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " TimeBuckets.Size", groupName, "size in kb", new PublishCallback()
@@ -67,7 +66,7 @@ public class ChannelStats implements Channel
 			{
 				long channelPayloadSize = 0;
 
-				for (Batch batch : channel.getTimeBuckets())
+				for (Batch batch : channel.getBatches())
 				{
 					channelPayloadSize += batch.getBytes();
 				}
@@ -84,7 +83,7 @@ public class ChannelStats implements Channel
 			{
 				public String getValue()
 				{
-					return Integer.toString(channel.getBackupTimeBuckets().size());
+					return Integer.toString(channel.getBackupBatches().size());
 				}
 			}));
 			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupTimeBuckets.Size", groupName, "size in kb", new PublishCallback()
@@ -93,7 +92,7 @@ public class ChannelStats implements Channel
 				{
 					long channelPayloadSize = 0;
 
-					for (Batch batch : channel.getBackupTimeBuckets())
+					for (Batch batch : channel.getBackupBatches())
 					{
 						channelPayloadSize += batch.getBytes();
 					}
@@ -109,36 +108,36 @@ public class ChannelStats implements Channel
 		return channel.getChannelMetaData();
 	}
 
-	public void addEvent(Message message)
+	public void addMessage(byte[] bytes)
 	{
-		channel.addEvent(message);
-		addEventTimer.add(message.getPayload().length);
+		channel.addMessage(bytes);
+		addEventTimer.add(bytes.length);
 	}
 
-	public void addBackupEvent(Message message)
+	public void addBackupMessage(byte[] bytes)
 	{
-		channel.addBackupEvent(message);
-		addBackupEventTimer.add(message.getPayload().length);
+		channel.addBackupMessage(bytes);
+		addBackupEventTimer.add(bytes.length);
 	}
 
-	public Collection<Batch> getTimeBuckets()
+	public Collection<Batch> getBatches()
 	{
-		return channel.getTimeBuckets();
+		return channel.getBatches();
 	}
 
-	public Collection<Batch> getBackupTimeBuckets()
+	public Collection<Batch> getBackupBatches()
 	{
-		return channel.getBackupTimeBuckets();
+		return channel.getBackupBatches();
 	}
 
-	public Batch getTimeBucket(DateTime nearestPeriodCeiling)
+	public Batch getBatch(DateTime nearestPeriodCeiling)
 	{
-		return channel.getTimeBucket(nearestPeriodCeiling);
+		return channel.getBatch(nearestPeriodCeiling);
 	}
 
-	public Batch getBackupTimeBucket(DateTime nearestPeriodCeiling)
+	public Batch getBackupBatch(DateTime nearestPeriodCeiling)
 	{
-		return channel.getBackupTimeBucket(nearestPeriodCeiling);
+		return channel.getBackupBatch(nearestPeriodCeiling);
 	}
 
 	public void clear(DateTime nearestPeriodCeiling)

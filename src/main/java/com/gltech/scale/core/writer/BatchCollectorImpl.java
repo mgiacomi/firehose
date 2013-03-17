@@ -73,7 +73,7 @@ public class BatchCollectorImpl implements BatchCollector
 				if (channelMetaData.isRedundant())
 				{
 					BatchMetaData primaryMetaData = aggregatorRestClient.getTimeBucketMetaData(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
-					BatchMetaData backupMetaData = aggregatorRestClient.getTimeBucketMetaData(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
+					BatchMetaData backupMetaData = aggregatorRestClient.getBackupTimeBucketMetaData(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
 
 					aggregators.add(primaryBackupSet.getPrimary());
 
@@ -109,7 +109,7 @@ public class BatchCollectorImpl implements BatchCollector
 				@Override
 				public Long produce(final OutputStream outputStream) throws Exception
 				{
-					return batchStreamsManager.writeEvents(outputStream);
+					return batchStreamsManager.writeMessages(outputStream);
 				}
 			};
 

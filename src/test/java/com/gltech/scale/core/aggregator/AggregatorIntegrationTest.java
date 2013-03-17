@@ -66,9 +66,9 @@ public class AggregatorIntegrationTest
 		aggregator.setListenAddress(props.get("aggregator.rest_host", Defaults.REST_HOST));
 		aggregator.setListenPort(props.get("aggregator.rest_port", Defaults.REST_PORT));
 
-		ServiceMetaData eventService = new ServiceMetaData();
-		eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
-		eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
+		ServiceMetaData inboundService = new ServiceMetaData();
+		inboundService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+		inboundService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
 		List<String> requests = new ArrayList<>();
 		requests.add("{\"singer\":\"Metallica\",\"title\":\"Fade To Black\"}");
@@ -84,7 +84,7 @@ public class AggregatorIntegrationTest
 
 		for (String json : requests)
 		{
-			ecrc.postEvent(eventService, "customer1", "bucket1", json);
+			ecrc.postEvent(inboundService, "customer1", "bucket1", json);
 		}
 		DateTime first = DateTime.now();
 
@@ -97,7 +97,7 @@ public class AggregatorIntegrationTest
 
 		for (String json : requests2)
 		{
-			ecrc.postEvent(eventService, "customer1", "bucket1", json);
+			ecrc.postEvent(inboundService, "customer1", "bucket1", json);
 		}
 		DateTime second = DateTime.now();
 

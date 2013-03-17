@@ -3,6 +3,7 @@ package com.gltech.scale.core.aggregator;
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.Batch;
+import com.gltech.scale.util.StreamDelimiter;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
@@ -26,20 +27,22 @@ public class AggregatorImpl implements Aggregator
 	private ChannelCache channelCache;
 	private ClusterService clusterService;
 	private TimePeriodUtils timePeriodUtils;
+	private StreamDelimiter streamDelimiter;
 
 	@Inject
-	public AggregatorImpl(ChannelCache channelCache, ClusterService clusterService, TimePeriodUtils timePeriodUtils)
+	public AggregatorImpl(ChannelCache channelCache, ClusterService clusterService, TimePeriodUtils timePeriodUtils, StreamDelimiter streamDelimiter)
 	{
 		this.channelCache = channelCache;
 		this.clusterService = clusterService;
 		this.timePeriodUtils = timePeriodUtils;
+		this.streamDelimiter = streamDelimiter;
 
 		// Register the aggregator with the coordination service, so that collectors can find us
 		clusterService.getRegistrationService().registerAsAggregator();
 	}
 
 	@Override
-	public void addEvent(String channelName, Message message)
+	public void addMessage(String channelName, byte[] bytes)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 		Channel channel = channels.get(channelMetaData);
@@ -55,11 +58,11 @@ public class AggregatorImpl implements Aggregator
 			}
 		}
 
-		channel.addEvent(message);
+		channel.addMessage(bytes);
 	}
 
 	@Override
-	public void addBackupEvent(String channelName, Message message)
+	public void addBackupMessage(String channelName, byte[] bytes)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 
@@ -76,7 +79,7 @@ public class AggregatorImpl implements Aggregator
 			}
 		}
 
-		channel.addBackupEvent(message);
+		channel.addBackupMessage(bytes);
 	}
 
 	@Override
@@ -96,13 +99,13 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public List<Batch> getActiveTimeBuckets()
+	public List<Batch> getActiveBatches()
 	{
 		List<Batch> activeBatches = new ArrayList<>();
 
 		for (Channel channel : channels.values())
 		{
-			for (Batch batch : channel.getTimeBuckets())
+			for (Batch batch : channel.getBatches())
 			{
 				activeBatches.add(batch);
 			}
@@ -112,13 +115,13 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public List<Batch> getActiveBackupTimeBuckets()
+	public List<Batch> getActiveBackupBatches()
 	{
 		List<Batch> activeBackupBatches = new ArrayList<>();
 
 		for (Channel channel : channels.values())
 		{
-			for (Batch batch : channel.getBackupTimeBuckets())
+			for (Batch batch : channel.getBackupBatches())
 			{
 				activeBackupBatches.add(batch);
 			}
@@ -128,7 +131,7 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public long writeTimeBucketEvents(OutputStream outputStream, String ChannelName, DateTime dateTime)
+	public long writeBatchMessages(OutputStream outputStream, String ChannelName, DateTime dateTime)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(ChannelName, false);
 
@@ -138,7 +141,7 @@ public class AggregatorImpl implements Aggregator
 
 			if (channel != null)
 			{
-				Batch batch = channels.get(channelMetaData).getTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime));
+				Batch batch = channels.get(channelMetaData).getBatch(timePeriodUtils.nearestPeriodCeiling(dateTime));
 
 				if (batch != null)
 				{
@@ -151,7 +154,7 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public long writeBackupTimeBucketEvents(OutputStream outputStream, String ChannelName, DateTime dateTime)
+	public long writeBackupBatchMessages(OutputStream outputStream, String ChannelName, DateTime dateTime)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(ChannelName, false);
 
@@ -161,7 +164,7 @@ public class AggregatorImpl implements Aggregator
 
 			if (channel != null)
 			{
-				Batch batch = channel.getBackupTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime));
+				Batch batch = channel.getBackupBatch(timePeriodUtils.nearestPeriodCeiling(dateTime));
 
 				if (batch != null)
 				{
@@ -175,22 +178,25 @@ public class AggregatorImpl implements Aggregator
 
 	private long timeBucketEventsToStream(OutputStream outputStream, Batch batch)
 	{
-		batch.eventsToJson(outputStream);
-		return batch.getEvents().size();
+		for(byte[] bytes : batch.getMessages())
+		{
+			streamDelimiter.write(outputStream, bytes);
+		}
+		return batch.getMessages().size();
 	}
 
 	@Override
-	public BatchMetaData getTimeBucketMetaData(String channelName, DateTime dateTime)
+	public BatchMetaData getBatchMetaData(String channelName, DateTime dateTime)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
-		return channels.get(channelMetaData).getTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
+		return channels.get(channelMetaData).getBatch(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
 	}
 
 	@Override
-	public BatchMetaData getBackupTimeBucketMetaData(String channelName, DateTime dateTime)
+	public BatchMetaData getBatchBucketMetaData(String channelName, DateTime dateTime)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
-		return channels.get(channelMetaData).getBackupTimeBucket(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
+		return channels.get(channelMetaData).getBackupBatch(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
 	}
 
 	@Override

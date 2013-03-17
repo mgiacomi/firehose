@@ -54,7 +54,7 @@ public class InboundServiceImpl implements InboundService
 		this.timePeriodUtils = timePeriodUtils;
 
 		// Register the event service with the coordination service
-		clusterService.getRegistrationService().registerAsEventService();
+		clusterService.getRegistrationService().registerAsInboundService();
 	}
 
 	@Override
@@ -175,6 +175,6 @@ Message message = null;
 	@Override
 	public void shutdown()
 	{
-		clusterService.getRegistrationService().unRegisterAsEventService();
+		clusterService.getRegistrationService().unRegisterAsInboundService();
 	}
 }

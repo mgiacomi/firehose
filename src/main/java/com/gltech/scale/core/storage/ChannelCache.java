@@ -49,7 +49,7 @@ public class ChannelCache
 					return null;
 				}
 
-				ChannelMetaData bmd = new ChannelMetaData(name, 60, false);
+				ChannelMetaData bmd = new ChannelMetaData(name, ChannelMetaData.TTL_MONTH, false);
 
 				storageClient.putBucketMetaData(bmd);
 

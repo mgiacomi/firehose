@@ -1,43 +1,31 @@
 package com.gltech.scale.core.writer;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.util.StreamDelimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class MessageInputStream implements MessageStream
 {
 	private static final Logger logger = LoggerFactory.getLogger(MessageInputStream.class);
-	private final JsonParser jp;
 	private Message currentMessage;
-	private boolean reachedEndArray = false;
 	private final InputStream inputStream;
+	private boolean endOfStream;
 	private int counter = 0;
 	private String customerBucketPeriod;
+	private StreamDelimiter streamDelimiter = new StreamDelimiter();
+	private ModelIO modelIO = new ModelIO();
 
 	public MessageInputStream(String customerBucketPeriod, InputStream inputStream)
 	{
 		this.customerBucketPeriod = customerBucketPeriod;
 		this.inputStream = inputStream;
-
-		try
-		{
-			JsonFactory f = new MappingJsonFactory();
-			jp = f.createJsonParser(inputStream);
-			jp.nextToken();
-			jp.nextToken();
-		}
-		catch (IOException e)
-		{
-			logger.warn("unable to parse json " + customerBucketPeriod, e);
-			throw new RuntimeException("unable to parse json " + customerBucketPeriod, e);
-		}
+		this.endOfStream = false;
 	}
 
 	public Message getCurrentMessage()
@@ -52,24 +40,22 @@ public class MessageInputStream implements MessageStream
 
 	public void nextRecord()
 	{
-		if (!reachedEndArray)
+		if (!endOfStream)
 		{
 			try
 			{
-//				currentMessage = Message.jsonToEvent(jp);
-
-				if (jp.nextToken() == JsonToken.END_ARRAY)
-				{
-					reachedEndArray = true;
-				}
+				currentMessage = modelIO.toMessage(streamDelimiter.readNext(inputStream));
+				counter++;
+			}
+			catch (EOFException e)
+			{
+				endOfStream = true;
+				currentMessage = null;
 			}
 			catch (IOException e)
 			{
-				logger.warn("unable to parse json " + customerBucketPeriod, e);
-				throw new RuntimeException("unable to parse json " + customerBucketPeriod, e);
+				throw new RuntimeException("unable to part messages from InputStream for " + customerBucketPeriod, e);
 			}
-
-			counter++;
 		}
 		else
 		{
@@ -82,7 +68,6 @@ public class MessageInputStream implements MessageStream
 		try
 		{
 			logger.debug("Closing Stream (Input) processed {} events for {}", counter, customerBucketPeriod);
-			jp.close();
 			inputStream.close();
 
 		}

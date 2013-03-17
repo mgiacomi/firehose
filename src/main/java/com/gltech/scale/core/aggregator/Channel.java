@@ -11,17 +11,17 @@ public interface Channel
 {
 	ChannelMetaData getChannelMetaData();
 
-	void addEvent(Message message);
+	void addMessage(byte[] bytes);
 
-	void addBackupEvent(Message message);
+	void addBackupMessage(byte[] bytes);
 
-	Collection<Batch> getTimeBuckets();
+	Collection<Batch> getBatches();
 
-	Collection<Batch> getBackupTimeBuckets();
+	Collection<Batch> getBackupBatches();
 
-	Batch getTimeBucket(DateTime nearestPeriodCeiling);
+	Batch getBatch(DateTime nearestPeriodCeiling);
 
-	Batch getBackupTimeBucket(DateTime nearestPeriodCeiling);
+	Batch getBackupBatch(DateTime nearestPeriodCeiling);
 
 	void clear(DateTime nearestPeriodCeiling);
 

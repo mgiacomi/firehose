@@ -76,15 +76,15 @@ static private ChannelMetaData bmd3 = null;
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/props.properties");
 
-			ServiceMetaData eventService = new ServiceMetaData();
-			eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
-			eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
+			ServiceMetaData inboundService = new ServiceMetaData();
+			inboundService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+			inboundService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
 			InboundRestClient inboundRestClient = new InboundRestClient();
 
-			inboundRestClient.putBucketMetaData(eventService, bmd1.getName());
-			inboundRestClient.putBucketMetaData(eventService, bmd2.getName());
-			inboundRestClient.putBucketMetaData(eventService, bmd3.getName());
+			inboundRestClient.putBucketMetaData(inboundService, bmd1.getName());
+			inboundRestClient.putBucketMetaData(inboundService, bmd2.getName());
+			inboundRestClient.putBucketMetaData(inboundService, bmd3.getName());
 		}
 	}
 
@@ -127,15 +127,15 @@ static private ChannelMetaData bmd3 = null;
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/props.properties");
 
-			ServiceMetaData eventService = new ServiceMetaData();
-			eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
-			eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
+			ServiceMetaData inbound = new ServiceMetaData();
+			inbound.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+			inbound.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
 			InboundRestClient inboundRestClient = new InboundRestClient();
 
-			System.out.println("1s: " + inboundRestClient.getEvents(eventService, "Matt", "1s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
-			System.out.println("2s: " + inboundRestClient.getEvents(eventService, "Matt", "2s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
-			System.out.println("3d: " + inboundRestClient.getEvents(eventService, "Matt", "3d", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("1s: " + inboundRestClient.getEvents(inbound, "Matt", "1s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("2s: " + inboundRestClient.getEvents(inbound, "Matt", "2s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("3d: " + inboundRestClient.getEvents(inbound, "Matt", "3d", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
 		}
 	}
 }

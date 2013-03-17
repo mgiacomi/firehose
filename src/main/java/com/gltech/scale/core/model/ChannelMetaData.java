@@ -4,17 +4,29 @@ import com.dyuproject.protostuff.Tag;
 
 public class ChannelMetaData
 {
+	static public final String TTL_DAY = "day";
+	static public final String TTL_WEEK = "week";
+	static public final String TTL_MONTH = "month";
+	static public final String TTL_YEAR = "year";
+
 	@Tag(1)
 	private final String name;
 	@Tag(2)
-	private final int daysToLive;
+	private final String ttl;
 	@Tag(3)
 	private final boolean redundant;
 
-	public ChannelMetaData(String name, int daysToLive, boolean redundant)
+	public ChannelMetaData()
+	{
+		this.name = null;
+		this.ttl = null;
+		this.redundant = false;
+	}
+
+	public ChannelMetaData(String name, String ttl, boolean redundant)
 	{
 		this.name = name;
-		this.daysToLive = daysToLive;
+		this.ttl = validateTTL(ttl);
 		this.redundant = redundant;
 	}
 
@@ -23,9 +35,9 @@ public class ChannelMetaData
 		return name;
 	}
 
-	public int getDaysToLive()
+	public String getTtl()
 	{
-		return daysToLive;
+		return ttl;
 	}
 
 	public boolean isRedundant()
@@ -54,8 +66,18 @@ public class ChannelMetaData
 	{
 		return "ChannelMetaData{" +
 				"name='" + name + '\'' +
-				", daysToLive=" + daysToLive +
+				", ttl=" + ttl +
 				", redundant=" + redundant +
 				'}';
+	}
+
+	private String validateTTL(String ttl)
+	{
+		if(TTL_DAY.equals(ttl) || TTL_MONTH.equals(ttl) || TTL_WEEK.equals(ttl) || TTL_YEAR.equals(ttl))
+		{
+			return ttl;
+		}
+
+		throw new IllegalArgumentException("TTL is not supported: "+ ttl);
 	}
 }

@@ -17,7 +17,7 @@ public class StreamDelimiter
 
 	private static final String ERR_MALFORMED_VARINT = "encountered a malformed varint.";
 
-	static public void write(final OutputStream out, byte[] bytes)
+	public void write(final OutputStream out, byte[] bytes)
 	{
 		try
 		{
@@ -33,7 +33,7 @@ public class StreamDelimiter
 		}
 	}
 
-	static public byte[] readNext(final InputStream in) throws IOException
+	public byte[] readNext(final InputStream in) throws IOException
 	{
 		final int size = in.read();
 		if (size == -1)
@@ -57,7 +57,7 @@ public class StreamDelimiter
 		throw new RuntimeException(ERR_TRUNCATED_MESSAGE);
 	}
 
-	private static void writeRawVarInt32Bytes(OutputStream out, int value) throws IOException
+	private void writeRawVarInt32Bytes(OutputStream out, int value) throws IOException
 	{
 		while (true)
 		{
@@ -78,7 +78,7 @@ public class StreamDelimiter
 	 * Reads a varint from the input one byte at a time, so that it does not
 	 * read any bytes after the end of the varint.
 	 */
-	private static int readRawVarint32(final InputStream input, final int firstByte) throws IOException
+	private int readRawVarint32(final InputStream input, final int firstByte) throws IOException
 	{
 		int result = firstByte & 0x7f;
 		int offset = 7;

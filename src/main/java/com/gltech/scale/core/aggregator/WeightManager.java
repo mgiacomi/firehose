@@ -29,8 +29,8 @@ public class WeightManager implements Runnable, LifeCycle
 				try
 				{
 					boolean active = true;
-					int primaries = aggregator.getActiveTimeBuckets().size();
-					int backups = aggregator.getActiveBackupTimeBuckets().size();
+					int primaries = aggregator.getActiveBatches().size();
+					int backups = aggregator.getActiveBackupBatches().size();
 					int rested = 999;
 
 					if (primaries == 0 && backups == 0)

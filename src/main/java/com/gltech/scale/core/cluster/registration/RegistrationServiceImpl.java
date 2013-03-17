@@ -70,7 +70,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
-	public void registerAsEventService()
+	public void registerAsInboundService()
 	{
 		String host = props.get("server_host", Defaults.REST_HOST);
 		int port = props.get("server_port", Defaults.REST_PORT);
@@ -86,7 +86,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
-	public void unRegisterAsEventService()
+	public void unRegisterAsInboundService()
 	{
 		eventServiceAdvertiser.unavailable(localEventServiceMetaData);
 		logger.info("Unregistered EventService server host=" + localEventServiceMetaData.getListenAddress() + " port=" + localEventServiceMetaData.getListenPort());

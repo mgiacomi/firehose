@@ -1,5 +1,6 @@
 package com.gltech.scale.core.model;
 
+import com.dyuproject.protostuff.Tag;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -11,13 +12,22 @@ import java.io.IOException;
 
 public class BatchMetaData implements Comparable<BatchMetaData>
 {
-	private static final Logger logger = LoggerFactory.getLogger(BatchMetaData.class);
-	private static final ObjectMapper mapper = new ObjectMapper();
-
+	@Tag(1)
 	private DateTime nearestPeriodCeiling;
+	@Tag(2)
 	private ChannelMetaData channelMetaData;
+	@Tag(3)
 	private long eventsAdded;
+	@Tag(4)
 	private long bytes;
+
+	public BatchMetaData()
+	{
+		nearestPeriodCeiling = null;
+		channelMetaData = null;
+		eventsAdded = -1;
+		bytes = -1;
+	}
 
 	public BatchMetaData(DateTime nearestPeriodCeiling, long eventsAdded, long bytes, ChannelMetaData channelMetaData)
 	{
@@ -25,34 +35,6 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 		this.eventsAdded = eventsAdded;
 		this.bytes = bytes;
 		this.channelMetaData = channelMetaData;
-	}
-
-	public BatchMetaData(String json)
-	{
-		try
-		{
-			JsonNode rootNode = mapper.readTree(json);
-			this.nearestPeriodCeiling = new DateTime(rootNode.path("nearestPeriodCeiling").asText());
-			this.bytes = rootNode.path("bytes").asLong();
-			this.eventsAdded = rootNode.path("eventsAdded").asLong();
-//			this.channelMetaData = new ChannelMetaData(rootNode.path("bucketMetaData").asText());
-		}
-		catch (IOException e)
-		{
-			logger.warn("unable to parse json {}", json, e);
-			throw new RuntimeException("unable to parse json " + json, e);
-		}
-	}
-
-	public JsonNode toJson()
-	{
-		ObjectNode objectNode = mapper.createObjectNode();
-		objectNode.put("nearestPeriodCeiling", nearestPeriodCeiling.toString());
-		objectNode.put("bytes", bytes);
-		objectNode.put("eventsAdded", eventsAdded);
-//		objectNode.put("bucketMetaData", channelMetaData.toJson().toString());
-
-		return objectNode;
 	}
 
 	public DateTime getNearestPeriodCeiling()

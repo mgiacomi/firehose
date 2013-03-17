@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface RegistrationService
 {
-	void registerAsEventService();
+	void registerAsInboundService();
 
-	void unRegisterAsEventService();
+	void unRegisterAsInboundService();
 
 	ServiceMetaData getLocalCollectorManagerMetaData();
 
@@ -18,21 +18,11 @@ public interface RegistrationService
 
 	void unRegisterAsAggregator();
 
+	List<ServiceMetaData> getRegisteredAggregators();
+
 	ServiceMetaData getLocalAggregatorMetaData();
 
 	ServiceMetaData getAggregatorMetaDataById(String id);
-
-	void registerAsStorageService();
-
-	void unRegisterAsStorageService();
-
-	ServiceMetaData getStorageServiceRandom();
-
-	ServiceMetaData getStorageServiceRoundRobin();
-
-	ServiceMetaData getStorageServiceSticky();
-
-	List<ServiceMetaData> getRegisteredAggregators();
 
 	void shutdown();
 }

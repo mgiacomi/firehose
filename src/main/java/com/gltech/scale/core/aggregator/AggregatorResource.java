@@ -2,6 +2,7 @@ package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.util.ModelIO;
 import com.google.inject.Inject;
 import com.gltech.scale.util.Http404Exception;
 import org.joda.time.DateTime;
@@ -17,11 +18,13 @@ import java.io.OutputStream;
 public class AggregatorResource
 {
 	private Aggregator aggregator;
+	private ModelIO modelIO;
 
 	@Inject
-	public AggregatorResource(Aggregator aggregator)
+	public AggregatorResource(Aggregator aggregator, ModelIO modelIO)
 	{
 		this.aggregator = aggregator;
+		this.modelIO = modelIO;
 	}
 
 	@Path("/message/{channelName}")
@@ -29,9 +32,7 @@ public class AggregatorResource
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	public Response postEvent(@PathParam("channelName") String channelName, byte[] data)
 	{
-//		Message event = new Message(new String(data));
-Message message = null;
-		aggregator.addEvent(channelName, message);
+		aggregator.addMessage(channelName, data);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
@@ -40,9 +41,7 @@ Message message = null;
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postBackupEvent(@PathParam("channelName") String channelName, byte[] data)
 	{
-//		Message event = new Message(new String(data));
-Message message = null;
-		aggregator.addBackupEvent(channelName, message);
+		aggregator.addBackupMessage(channelName, data);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
@@ -73,7 +72,7 @@ Message message = null;
 				{
 					try
 					{
-						aggregator.writeTimeBucketEvents(output, channelName, dateTime);
+						aggregator.writeBatchMessages(output, channelName, dateTime);
 					}
 					catch (Exception e)
 					{
@@ -106,7 +105,7 @@ Message message = null;
 				{
 					try
 					{
-						aggregator.writeBackupTimeBucketEvents(output, channelName, dateTime);
+						aggregator.writeBackupBatchMessages(output, channelName, dateTime);
 					}
 					catch (Exception e)
 					{
@@ -133,9 +132,9 @@ Message message = null;
 
 		try
 		{
-			BatchMetaData batchMetaData = aggregator.getTimeBucketMetaData(channelName, dateTime);
+			BatchMetaData batchMetaData = aggregator.getBatchMetaData(channelName, dateTime);
 
-			return Response.ok(batchMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
+			return Response.ok(modelIO.toJson(batchMetaData), MediaType.APPLICATION_JSON).build();
 		}
 		catch (Http404Exception e)
 		{
@@ -153,9 +152,9 @@ Message message = null;
 
 		try
 		{
-			BatchMetaData batchMetaData = aggregator.getBackupTimeBucketMetaData(channelName, dateTime);
+			BatchMetaData batchMetaData = aggregator.getBatchBucketMetaData(channelName, dateTime);
 
-			return Response.ok(batchMetaData.toJson().toString(), MediaType.APPLICATION_JSON).build();
+			return Response.ok(modelIO.toJson(batchMetaData), MediaType.APPLICATION_JSON).build();
 		}
 		catch (Http404Exception e)
 		{

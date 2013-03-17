@@ -1,6 +1,10 @@
 package com.gltech.scale.core.server;
 
+import com.dyuproject.protostuff.runtime.ExplicitIdStrategy;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
+import com.gltech.scale.core.model.Batch;
+import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.core.model.Message;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
@@ -55,6 +59,9 @@ public class EmbeddedServer
 		}
 		logger.info("starting server on port " + port);
 
+		// Register ProtoStuff classes
+		registerProtoClasses();
+
 		// Create the server.
 		server = new Server(port);
 
@@ -102,6 +109,15 @@ public class EmbeddedServer
 		logger.info("server started on port " + port);
 	}
 
+	private static void registerProtoClasses()
+	{
+		ExplicitIdStrategy.Registry registry = new ExplicitIdStrategy.Registry();
+		registry.registerPojo(Message.class, 1);
+		registry.registerPojo(Batch.class, 2);
+		registry.registerPojo(ChannelMetaData.class, 3);
+
+	}
+
 	private static void startServices()
 	{
 		// Registered CoordinationService for shutdown
@@ -139,20 +155,6 @@ public class EmbeddedServer
 			ChannelCoordinator channelCoordinator = injector.getInstance(ChannelCoordinator.class);
 			new Thread(channelCoordinator, "ChannelCoordinator").start();
 			LifeCycleManager.getInstance().add(channelCoordinator, LifeCycle.Priority.INITIAL);
-		}
-
-		if (props.get("enable.storage_service", true))
-		{
-			// Register the storage service with the coordination service and register for shutdown
-			clusterService.getRegistrationService().registerAsStorageService();
-
-			LifeCycleManager.getInstance().add(new LifeCycle()
-			{
-				public void shutdown()
-				{
-					clusterService.getRegistrationService().unRegisterAsStorageService();
-				}
-			}, LifeCycle.Priority.INITIAL);
 		}
 	}
 

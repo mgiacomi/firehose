@@ -154,19 +154,19 @@ public class EventResourceRegression
 
 		Thread.sleep(60000);
 
-		String firstEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(first), TimeUnit.SECONDS);
+		String firstEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(first), TimeUnit.SECONDS);
 		assertEquals("[" + expectedResults1 + "]", firstEvents);
 
-		String secondEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(second), TimeUnit.SECONDS);
+		String secondEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(second), TimeUnit.SECONDS);
 		assertEquals("[" + expectedResults2 + "]", secondEvents);
 
-		String allEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.MINUTES);
+		String allEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.MINUTES);
 		assertEquals("[" + expectedResults1 + "," + expectedResults2 + "]", allEvents);
 
-		allEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.HOURS);
+		allEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.HOURS);
 		assertEquals("[" + expectedResults1 + "," + expectedResults2 + "]", allEvents);
 
-		allEvents = inboundRestClient.getEvents(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.DAYS);
+		allEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.DAYS);
 		assertEquals("[" + expectedResults1 + "," + expectedResults2 + "]", allEvents);
 	}
 

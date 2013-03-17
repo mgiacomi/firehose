@@ -5,6 +5,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import com.gltech.scale.core.model.Defaults;
 import com.google.common.base.Throwables;
 import com.gltech.scale.ganglia.Timer;
 import com.gltech.scale.ganglia.TimerThreadPoolExecutor;
@@ -31,7 +32,6 @@ public class AwsS3Storage implements Storage
 	private Props props = Props.getProps();
 	private AmazonS3 s3Client;
 	private String s3BucketName;
-	private static final int MegaBytes = 1024 * 1024;
 	private Timer awsS3StorageTimer = new Timer();
 	private final ThreadPoolExecutor threadPoolExecutor;
 	private final Semaphore semaphore;
@@ -138,7 +138,7 @@ return null;
 		String key = keyNameWithUniquePrefix(channelName, id);
 
 		// Set part size to 5 MB.
-		int partSize = 5 * MegaBytes;
+		int partSize = 5 * Defaults.MEGABYTES;
 
 		// Create a list of UploadPartResponse objects. You get one of these for each part upload.
 		List<PartETag> partETags = new ArrayList<>();
@@ -239,7 +239,7 @@ return null;
 					.withInputStream(streamPart.getInputStream())
 					.withPartSize(streamPart.getSize());
 
-			logger.debug("Completed S3 Part Upload key={}, part={}, size={}mb", key, part, streamPart.getSize() / MegaBytes);
+			logger.debug("Completed S3 Part Upload key={}, part={}, size={}mb", key, part, streamPart.getSize() / Defaults.MEGABYTES);
 
 			// Upload part and add response to our list.
 			return s3Client.uploadPart(uploadRequest).getPartETag();
