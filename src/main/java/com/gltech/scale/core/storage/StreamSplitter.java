@@ -1,4 +1,4 @@
-package com.gltech.scale.core.storage.providers;
+package com.gltech.scale.core.storage;
 
 import com.google.common.base.Throwables;
 import com.ning.compress.lzf.LZFCompressingInputStream;

@@ -294,7 +294,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		@Override
 		public void cacheChanged()
 		{
-			logger.info("Registered RopeManager list has been updated. " + aggregatorCache.getInstances().size() + " RopeManager(s) are active.");
+			logger.info("Registered aggregator list has been updated. " + aggregatorCache.getInstances().size() + " aggregator(s) are active.");
 		}
 
 		@Override

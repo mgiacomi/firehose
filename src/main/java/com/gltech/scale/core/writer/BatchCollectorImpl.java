@@ -98,9 +98,9 @@ public class BatchCollectorImpl implements BatchCollector
 			final BatchStreamsManager batchStreamsManager = new BatchStreamsManager(channelMetaData, nearestPeriodCeiling);
 
 			// Register aggregator streams with the stream manager.
-			for (ServiceMetaData ropeManager : aggregators)
+			for (ServiceMetaData aggregator : aggregators)
 			{
-				InputStream aggregatorStream = aggregatorRestClient.getTimeBucketEventsStream(ropeManager, channelName, nearestPeriodCeiling);
+				InputStream aggregatorStream = aggregatorRestClient.getTimeBucketEventsStream(aggregator, channelName, nearestPeriodCeiling);
 				batchStreamsManager.registerInputStream(aggregatorStream);
 			}
 

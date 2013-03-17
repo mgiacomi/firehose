@@ -90,6 +90,7 @@ public class EmbeddedServer
 		// This is not needed if web.xml is used instead.
 		sch.addServlet(DefaultServlet.class, "/");
 
+		/*
 		// Setup Handler for html files
 		ResourceHandler resource_handler = new ResourceHandler();
 		resource_handler.setDirectoriesListed(true);
@@ -100,6 +101,7 @@ public class EmbeddedServer
 		HandlerList handlers = new HandlerList();
 		handlers.setHandlers(new Handler[]{resource_handler, new DefaultHandler()});
 		server.setHandler(handlers);
+		*/
 
 		// Handle all non jersey services here
 		startServices();

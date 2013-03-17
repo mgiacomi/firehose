@@ -27,8 +27,8 @@ public class AggregatorResource
 		this.modelIO = modelIO;
 	}
 
-	@Path("/message/{channelName}")
 	@POST
+	@Path("/message/{channelName}")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	public Response postEvent(@PathParam("channelName") String channelName, byte[] data)
 	{
@@ -36,8 +36,8 @@ public class AggregatorResource
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
-	@Path("/message/backup/{channelName}")
 	@POST
+	@Path("/message/backup/{channelName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postBackupEvent(@PathParam("channelName") String channelName, byte[] data)
 	{
@@ -45,8 +45,8 @@ public class AggregatorResource
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
-	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/clear")
 	@DELETE
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/clear")
 	public Response clearTimeBucket(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 									@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
@@ -56,8 +56,8 @@ public class AggregatorResource
 		return Response.ok().build();
 	}
 
-	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/timebucket/events")
 	@GET
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/timebucket/events")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response timeBucketEvents(@PathParam("channelName") final String channelName, @PathParam("year") int year, @PathParam("month") int month,
 									 @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
@@ -89,8 +89,8 @@ public class AggregatorResource
 		}
 	}
 
-	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/backup/timebucket/events")
 	@GET
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/backup/timebucket/events")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response backupTimeBucketEvents(@PathParam("channelName") final String channelName, @PathParam("year") int year, @PathParam("month") int month,
 										   @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
@@ -122,8 +122,8 @@ public class AggregatorResource
 		}
 	}
 
-	@Path("/{channelName}/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
 	@GET
+	@Path("/{channelName}/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response timeBucketMetaData(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 									   @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
@@ -142,8 +142,8 @@ public class AggregatorResource
 		}
 	}
 
-	@Path("/{channelName}/backup/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
 	@GET
+	@Path("/{channelName}/backup/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response backupTimeBucketMetaData(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 											 @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)

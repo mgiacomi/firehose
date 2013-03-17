@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.storage.StreamSplitter;
 import com.google.common.base.Throwables;
 import com.gltech.scale.ganglia.Timer;
 import com.gltech.scale.ganglia.TimerThreadPoolExecutor;
@@ -32,7 +33,7 @@ public class AwsS3Storage implements Storage
 	private Props props = Props.getProps();
 	private AmazonS3 s3Client;
 	private String s3BucketName;
-	private Timer awsS3StorageTimer = new Timer();
+	private Timer storeTimer = new Timer();
 	private final ThreadPoolExecutor threadPoolExecutor;
 	private final Semaphore semaphore;
 
@@ -43,10 +44,10 @@ public class AwsS3Storage implements Storage
 		String secretKey = props.get("secretKey", "NamRAXVSvGh82BuZPau/F6XInqTCbyiQtHOXLNkX");
 		s3Client = new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey));
 
-		int activeUploads = props.get("storage.s3.concurrent_uploads", 10);
+		int activeUploads = props.get("storage.s3.concurrent_writes", Defaults.CONCURRENT_STORE_WRITES);
 
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
-		threadPoolExecutor = new TimerThreadPoolExecutor(activeUploads, activeUploads, 1, TimeUnit.MINUTES, queue, new S3UploadThreadFactory(), awsS3StorageTimer);
+		threadPoolExecutor = new TimerThreadPoolExecutor(activeUploads, activeUploads, 1, TimeUnit.MINUTES, queue, new S3UploadThreadFactory(), storeTimer);
 		semaphore = new Semaphore(activeUploads);
 	}
 

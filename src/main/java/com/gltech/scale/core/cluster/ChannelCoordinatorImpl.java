@@ -93,7 +93,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 			{
 				ZKPaths.mkdirs(client.getZookeeperClient().getZooKeeper(), "/aggregator/weights");
 
-				String newNode = "/rope_manager/weights/" + weight + "|" + aggregator.getWorkerId().toString();
+				String newNode = "/aggregator/weights/" + weight + "|" + aggregator.getWorkerId().toString();
 				String oldNode = null;
 
 				for (String weightToId : client.getChildren().forPath("/aggregator/weights"))

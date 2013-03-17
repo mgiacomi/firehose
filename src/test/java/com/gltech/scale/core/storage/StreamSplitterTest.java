@@ -1,7 +1,8 @@
-package com.gltech.scale.core.storage.providers;
+package com.gltech.scale.core.storage;
 
 import static junit.framework.Assert.*;
 
+import com.gltech.scale.core.storage.StreamSplitter;
 import com.ning.compress.lzf.LZFDecoder;
 import org.junit.Test;
 

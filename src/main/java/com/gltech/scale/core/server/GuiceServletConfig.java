@@ -3,6 +3,7 @@ package com.gltech.scale.core.server;
 import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.inbound.InboundServiceImpl;
 import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.storage.providers.VoldemortStore;
 import com.gltech.scale.ganglia.MonitorResource;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -92,6 +93,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 
 					if ("voldemort".equalsIgnoreCase(storageServiceStore))
 					{
+						bind(Storage.class).to(VoldemortStore.class).in(Singleton.class);
 					}
 					else if ("s3".equalsIgnoreCase(storageServiceStore))
 					{

@@ -8,5 +8,5 @@ public class Defaults
 	static public final String REST_HOST = "localhost";
 	static public final int REST_PORT = 9090;
 	static public final String STORAGE_STORE = "voldemort";
-	static public final boolean STORAGE_SERVICE_LOCAL = false;
+	static public final int CONCURRENT_STORE_WRITES = 10;
 }

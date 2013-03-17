@@ -38,8 +38,8 @@ public class InboundResource
 		this.periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
 	}
 
-	@Path("/{channelName}")
 	@POST
+	@Path("/{channelName}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response post(@PathParam("channelName") String channelName, byte[] payload)
 	{
@@ -47,8 +47,8 @@ public class InboundResource
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
-	@Path("/{channelName}")
 	@GET
+	@Path("/{channelName}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response post(@PathParam("channelName") String channelName)
 	{
@@ -65,8 +65,8 @@ return null;
 		}
 	}
 
-	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}")
 	@GET
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 						@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
@@ -74,8 +74,8 @@ return null;
 		return getEventsOrRedirect(channelName, year, month, day, hour, min, sec);
 	}
 
-	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}")
 	@GET
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 						@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min)
@@ -83,8 +83,8 @@ return null;
 		return getEventsOrRedirect(channelName, year, month, day, hour, min, -1);
 	}
 
-	@Path("/{channelName}/{year}/{month}/{day}/{hour}")
 	@GET
+	@Path("/{channelName}/{year}/{month}/{day}/{hour}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year,
 						@PathParam("month") int month, @PathParam("day") int day, @PathParam("hour") int hour)
@@ -92,8 +92,8 @@ return null;
 		return getEventsOrRedirect(channelName, year, month, day, hour, -1, -1);
 	}
 
-	@Path("/{channelName}/{year}/{month}/{day}")
 	@GET
+	@Path("/{channelName}/{year}/{month}/{day}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year,
 						@PathParam("month") int month, @PathParam("day") int day)

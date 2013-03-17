@@ -55,9 +55,9 @@ public class RetryClientFilterTest
 	@Test
 	public void testSuccess() throws Exception
 	{
-		ClientCreator.createCached().resource("http://localhost:2222/TheResource/").get(String.class);
+		ClientCreator.createCached().resource("http://localhost:2222/TheResource/test").get(String.class);
 		long start = System.currentTimeMillis();
-		ClientCreator.createCached().resource("http://localhost:2222/TheResource/").get(String.class);
+		ClientCreator.createCached().resource("http://localhost:2222/TheResource/test").get(String.class);
 		long end = System.currentTimeMillis();
 		assertTrue(RESPONSE_TIME > (end - start));
 	}
@@ -66,7 +66,7 @@ public class RetryClientFilterTest
 	public void testMethodNotAllowed() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		ClientResponse response = ClientCreator.createCached().resource("http://localhost:2222/TheResource/").post(ClientResponse.class, "stuff");
+		ClientResponse response = ClientCreator.createCached().resource("http://localhost:2222/TheResource/test").post(ClientResponse.class, "stuff");
 		assertEquals(405, response.getStatus());
 		long end = System.currentTimeMillis();
 		assertTrue(RESPONSE_TIME > (end - start));
@@ -76,7 +76,7 @@ public class RetryClientFilterTest
 	public void testMediaType() throws Exception
 	{
 		long start = System.currentTimeMillis();
-		ClientCreator.createCached().resource("http://localhost:2222/TheResource/").get(List.class);
+		ClientCreator.createCached().resource("http://localhost:2222/TheResource/test").get(List.class);
 		long end = System.currentTimeMillis();
 		assertTrue(RESPONSE_TIME > (end - start));
 	}
@@ -86,7 +86,7 @@ public class RetryClientFilterTest
 	{
 		try
 		{
-			ClientCreator.createCached().resource("http://blah:2222/TheResource/").get(String.class);
+			ClientCreator.createCached().resource("http://blah:2222/TheResource/test").get(String.class);
 		}
 		catch (ClientHandlerException e)
 		{
@@ -101,11 +101,11 @@ public class RetryClientFilterTest
 		Props.getProps().get("RetryClientFilter.SleepMillis", 1);
 		try
 		{
-			ClientCreator.createCached().resource("http://localhost:2223/TheResource/").get(String.class);
+			ClientCreator.createCached().resource("http://localhost:2223/TheResource/test").get(String.class);
 		}
 		catch (ClientHandlerException e)
 		{
-			assertEquals("Connection retries limit 3 exceeded for uri http://localhost:2223/TheResource/", e.getMessage());
+			assertEquals("Connection retries limit 3 exceeded for uri http://localhost:2223/TheResource/test", e.getMessage());
 		}
 
 	}
