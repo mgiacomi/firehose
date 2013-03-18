@@ -1,7 +1,11 @@
 package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.inbound.InboundRestClient;
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.core.storage.Storage;
+import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.util.StreamDelimiter;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
@@ -14,14 +18,17 @@ import org.joda.time.DateTime;
 import org.junit.*;
 
 import javax.ws.rs.core.MediaType;
+import java.io.EOFException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 
 public class AggregatorIntegrationTest
 {
-/*
 	static private Props props;
 	private TestingServer testingServer;
 
@@ -33,7 +40,7 @@ public class AggregatorIntegrationTest
 		{
 			public void configure(Binder binder)
 			{
-				binder.bind(ByteArrayStorage.class).to(VerySimpleStorage.class).in(Singleton.class);
+				binder.bind(Storage.class).to(TestStore.class).in(Singleton.class);
 			}
 		});
 	}
@@ -62,6 +69,9 @@ public class AggregatorIntegrationTest
 	@Test
 	public void testEventToAggregatorAndCollect() throws Exception
 	{
+		ModelIO modelIO = new ModelIO();
+		StreamDelimiter streamDelimiter = new StreamDelimiter();
+
 		ServiceMetaData aggregator = new ServiceMetaData();
 		aggregator.setListenAddress(props.get("aggregator.rest_host", Defaults.REST_HOST));
 		aggregator.setListenPort(props.get("aggregator.rest_port", Defaults.REST_PORT));
@@ -80,75 +90,123 @@ public class AggregatorIntegrationTest
 		requests2.add("{\"singer\":\"AC/DC2\",\"title\":\"Back In Black2\"}");
 		requests2.add("{\"singer\":\"Tori Amos2\",\"title\":\"Little Earthquakes2\"}");
 
-		InboundRestClient ecrc = new InboundRestClient();
+		InboundRestClient ecrc = new InboundRestClient(modelIO);
 
 		for (String json : requests)
 		{
-			ecrc.postEvent(inboundService, "customer1", "bucket1", json);
+			ecrc.postEvent(inboundService, "test1", json);
 		}
 		DateTime first = DateTime.now();
 
 		// Test injecting fake events to the aggregator to make sure they are collected too.
-		AggregatorRestClient rrc = new AggregatorRestClient();
-		Message backupMessage = new Message("customer1", "bucket1", "event from failed server".getBytes());
-		rrc.postBackupEvent(aggregator, backupMessage);
+		AggregatorRestClient aggregatorClient = new AggregatorRestClient(new ModelIO());
+		Message backupMessage = new Message(MediaType.APPLICATION_JSON_TYPE, "event from failed server".getBytes());
+		aggregatorClient.postBackupMessage(aggregator, "test1", backupMessage);
 
 		Thread.sleep(5000);
 
 		for (String json : requests2)
 		{
-			ecrc.postEvent(inboundService, "customer1", "bucket1", json);
+			ecrc.postEvent(inboundService, "test1", json);
 		}
 		DateTime second = DateTime.now();
 
-		AggregatorRestClient aggregatorClient = new AggregatorRestClient();
-		List<Message> events = aggregatorClient.getTimeBucketEvents(aggregator, "customer1", "bucket1", first);
-		assertEquals(3, events.size());
+		// Get first set of messages
+		InputStream inputStream = aggregatorClient.getBatchMessagesStream(aggregator, "test1", first);
 
-		for (int i = 0; i < events.size(); i++)
+		List<Message> messages = new ArrayList<>();
+		while (true)
 		{
-			Message message = events.get(i);
+			try
+			{
+				messages.add(modelIO.toMessage(streamDelimiter.readNext(inputStream)));
+			}
+			catch (EOFException e)
+			{
+				break;
+			}
+		}
+
+		inputStream.close();
+
+		assertEquals(3, messages.size());
+
+		for (int i = 0; i < messages.size(); i++)
+		{
+			Message message = messages.get(i);
 			assertEquals(requests.get(i), new String(message.getPayload()));
 		}
 
-		events = aggregatorClient.getTimeBucketEvents(aggregator, "customer1", "bucket1", second);
-		assertEquals(3, events.size());
+		// Get Second set of messages
+		inputStream = aggregatorClient.getBatchMessagesStream(aggregator, "test1", second);
 
-		for (int i = 0; i < events.size(); i++)
+		messages = new ArrayList<>();
+		while (true)
 		{
-			Message message = events.get(i);
+			try
+			{
+				messages.add(modelIO.toMessage(streamDelimiter.readNext(inputStream)));
+			}
+			catch (EOFException e)
+			{
+				break;
+			}
+		}
+
+		inputStream.close();
+
+		assertEquals(3, messages.size());
+
+		for (int i = 0; i < messages.size(); i++)
+		{
+			Message message = messages.get(i);
 			assertEquals(requests2.get(i), new String(message.getPayload()));
 		}
 
-		List<Message> backupsEvents = aggregatorClient.getBackupTimeBucketEvents(aggregator, "customer1", "bucket1", first);
-		assertEquals(1, backupsEvents.size());
-		assertEquals("event from failed server", new String(backupsEvents.get(0).getPayload()));
+		// Get backup messages
+		inputStream = aggregatorClient.getBackupBatchMessagesStream(aggregator, "test", first);
+
+		messages = new ArrayList<>();
+		while (true)
+		{
+			try
+			{
+				messages.add(modelIO.toMessage(streamDelimiter.readNext(inputStream)));
+			}
+			catch (EOFException e)
+			{
+				break;
+			}
+		}
+
+		inputStream.close();
+
+		assertEquals(1, messages.size());
+		assertEquals("event from failed server", new String(messages.get(0).getPayload()));
 	}
 
 	// Just a quick dirty inner class to verify that bind overrides are working.
-	static class VerySimpleStorage implements ByteArrayStorage
+	static class TestStore implements Storage
 	{
+		@Override
+		public ChannelMetaData getBucket(String channelName)
+		{
+			return new ChannelMetaData("test", ChannelMetaData.TTL_DAY, true);
+		}
+
 		@Override
 		public void putBucket(ChannelMetaData channelMetaData)
 		{
 		}
 
 		@Override
-		public ChannelMetaData getBucket(String customer, String bucket)
-		{
-			return new ChannelMetaData("customer1", "bucket1", ChannelMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.doublewritesync);
-		}
-
-		@Override
-		public void putPayload(StoragePayload storagePayload)
+		public void putPayload(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
 		{
 		}
 
 		@Override
-		public StoragePayload getPayload(String customer, String bucket, String id)
+		public void getPayload(String cchannelName, String id, OutputStream outputStream)
 		{
-			throw new RuntimeException("I would love to get that for you, but I don't know how...");
 		}
 	}
-*/
 }

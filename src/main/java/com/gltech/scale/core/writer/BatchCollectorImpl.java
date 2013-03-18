@@ -72,8 +72,8 @@ public class BatchCollectorImpl implements BatchCollector
 			{
 				if (channelMetaData.isRedundant())
 				{
-					BatchMetaData primaryMetaData = aggregatorRestClient.getTimeBucketMetaData(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
-					BatchMetaData backupMetaData = aggregatorRestClient.getBackupTimeBucketMetaData(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
+					BatchMetaData primaryMetaData = aggregatorRestClient.getBatchMetaData(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
+					BatchMetaData backupMetaData = aggregatorRestClient.getBackupBatchMetaData(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
 
 					aggregators.add(primaryBackupSet.getPrimary());
 
@@ -100,7 +100,7 @@ public class BatchCollectorImpl implements BatchCollector
 			// Register aggregator streams with the stream manager.
 			for (ServiceMetaData aggregator : aggregators)
 			{
-				InputStream aggregatorStream = aggregatorRestClient.getTimeBucketEventsStream(aggregator, channelName, nearestPeriodCeiling);
+				InputStream aggregatorStream = aggregatorRestClient.getBatchMessagesStream(aggregator, channelName, nearestPeriodCeiling);
 				batchStreamsManager.registerInputStream(aggregatorStream);
 			}
 
@@ -124,7 +124,7 @@ public class BatchCollectorImpl implements BatchCollector
 			for (ServiceMetaData aggregator : aggregators)
 			{
 				// Aggregator can now remove the time bucket
-				aggregatorRestClient.clearTimeBucket(aggregator, channelName, nearestPeriodCeiling);
+				aggregatorRestClient.clearBatch(aggregator, channelName, nearestPeriodCeiling);
 			}
 
 			long completedIn = System.nanoTime() - start;

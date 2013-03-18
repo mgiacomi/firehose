@@ -97,7 +97,6 @@ public class BatchStreamsManager
 				// If we have a candidate then write it to the stream.
 				if (candidateNextRecord != null)
 				{
-System.out.println("writing current Message: "+ candidateNextRecord.getCurrentMessage());
 					bytesWritten =+ ProtostuffIOUtil.writeDelimitedTo(outputStream, candidateNextRecord.getCurrentMessage(), schema, linkedBuffer);
 					processedMessages.add(candidateNextRecord.getCurrentMessage().getUuid());
 					candidateNextRecord.nextRecord();

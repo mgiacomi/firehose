@@ -3,6 +3,7 @@ package com.gltech.scale.core.server;
 import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.inbound.InboundServiceImpl;
 import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.storage.providers.AwsS3Store;
 import com.gltech.scale.core.storage.providers.VoldemortStore;
 import com.gltech.scale.ganglia.MonitorResource;
 import com.google.inject.Guice;
@@ -21,7 +22,6 @@ import com.gltech.scale.core.inbound.InboundResource;
 import com.gltech.scale.core.inbound.InboundService;
 import com.gltech.scale.core.aggregator.*;
 import com.gltech.scale.core.storage.*;
-import com.gltech.scale.core.storage.providers.AwsS3Storage;
 import com.gltech.scale.util.Props;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
@@ -97,7 +97,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					}
 					else if ("s3".equalsIgnoreCase(storageServiceStore))
 					{
-						bind(Storage.class).to(AwsS3Storage.class).in(Singleton.class);
+						bind(Storage.class).to(AwsS3Store.class).in(Singleton.class);
 					}
 					else
 					{

@@ -15,7 +15,7 @@ import javax.ws.rs.core.*;
 import java.io.IOException;
 import java.io.OutputStream;
 
-@Path("/events")
+@Path("/inbound")
 public class InboundResource
 {
 	private static final Logger logger = LoggerFactory.getLogger(InboundResource.class);

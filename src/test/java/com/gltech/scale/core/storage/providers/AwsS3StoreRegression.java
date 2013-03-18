@@ -1,6 +1,6 @@
 package com.gltech.scale.core.storage.providers;
 
-public class AwsS3StroageRegression
+public class AwsS3StoreRegression
 {
 /*
 	public static void main(String[] args) throws IOException

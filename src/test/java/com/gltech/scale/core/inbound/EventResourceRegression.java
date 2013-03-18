@@ -93,7 +93,7 @@ public class EventResourceRegression
 	@Test
 	public void postEvenIfBucketDoesNotExist() throws Exception
 	{
-		inboundRestClient.postEvent(eventService, "test1", "test2", "{}");
+		inboundRestClient.postMessage(eventService, "test1", "test2", "{}");
 	}
 
 
@@ -127,7 +127,7 @@ public class EventResourceRegression
 		StringBuilder expectedResults1 = new StringBuilder();
 		for (String json : requests)
 		{
-			inboundRestClient.postEvent(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), json);
+			inboundRestClient.postMessage(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), json);
 			if (expectedResults1.length() > 0)
 			{
 				expectedResults1.append(",");
@@ -141,7 +141,7 @@ public class EventResourceRegression
 		StringBuilder expectedResults2 = new StringBuilder();
 		for (String json : requests2)
 		{
-			inboundRestClient.postEvent(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), json);
+			inboundRestClient.postMessage(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), json);
 			if (expectedResults2.length() > 0)
 			{
 				expectedResults2.append(",");

@@ -61,7 +61,6 @@ public class InboundServiceImpl implements InboundService
 	public void addEvent(String channelName, MediaType mediaTypes, byte[] payload)
 	{
 		int maxPayLoadSize = props.get("inbound.max_payload_size_kb", Defaults.MAX_PAYLOAD_SIZE_KB) * 1024;
-
 		Message message = new Message(mediaTypes, payload);
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
 
@@ -92,11 +91,11 @@ public class InboundServiceImpl implements InboundService
 		{
 			// This gets a primary and backup aggregator.  Each call with round robin though available sets.
 			PrimaryBackupSet primaryBackupSet = aggregatorsByPeriod.nextPrimaryBackupSet();
-			aggregatorRestClient.postEvent(primaryBackupSet.getPrimary(), message);
+			aggregatorRestClient.postMessage(primaryBackupSet.getPrimary(), channelName, message);
 
 			if (primaryBackupSet.getBackup() != null)
 			{
-				aggregatorRestClient.postBackupEvent(primaryBackupSet.getBackup(), message);
+				aggregatorRestClient.postBackupMessage(primaryBackupSet.getBackup(), channelName, message);
 			}
 			else
 			{
@@ -107,7 +106,7 @@ public class InboundServiceImpl implements InboundService
 		{
 			// This gets a aggregator.  Each call with round robin though all (primary and backup) rope managers.
 			ServiceMetaData aggregator = aggregatorsByPeriod.next();
-			aggregatorRestClient.postEvent(aggregator, message);
+			aggregatorRestClient.postMessage(aggregator, channelName, message);
 		}
 	}
 

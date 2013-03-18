@@ -7,13 +7,11 @@ import com.gltech.scale.pipeline.Pipeline;
 import com.gltech.scale.pipeline.PipelineBuilder;
 import com.gltech.scale.pipeline.Processor;
 import com.gltech.scale.pipeline.Timed;
-import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.util.ModelIO;
 import com.gltech.scale.util.Props;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.MediaType;
 
 /**
  * This class will fire up various load scenarios from the client side
@@ -38,7 +36,7 @@ public class LoadClient
 	private static Pipeline<TimedWork> pipeline;
 	private static int bytes;
 	private static InboundRestClient restClient;
-	private static String bucketName;
+	private static String channelName;
 	private static String payload;
 
 	public static void main(String[] args) throws Exception
@@ -58,8 +56,8 @@ public class LoadClient
 		Props props = Props.getProps();
 		props.loadFromFile(System.getProperty("user.dir") + "/load_client.properties");
 
-		bucketName = "LoadBucket";
-		restClient = new InboundRestClient();
+		channelName = "LoadBucket";
+		restClient = new InboundRestClient(new ModelIO());
 
 		try
 		{
@@ -92,11 +90,11 @@ public class LoadClient
 			props.loadFromFile(System.getProperty("user.dir") + "/load_client.properties");
 
 			//todo - gfm - 11/6/12 - insert an event via REST api
-			ServiceMetaData eventService = new ServiceMetaData();
-			eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
-			eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
+			ServiceMetaData inboundService = new ServiceMetaData();
+			inboundService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+			inboundService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
-			restClient.postEvent(eventService, "LoadClient", bucketName, payload);
+			restClient.postEvent(inboundService, channelName, payload);
 
 			//todo - gfm - 11/6/12 - sleep where?
 

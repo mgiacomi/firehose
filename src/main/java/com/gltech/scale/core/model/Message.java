@@ -181,41 +181,41 @@ public class Message
 
 	private int getIdForMediaType(MediaType mediaType)
 	{
-		if(mediaType == MediaType.APPLICATION_XML_TYPE) {
+		if(mediaType.equals(MediaType.APPLICATION_XML_TYPE)) {
 			return 1;
 		}
-		if(mediaType == MediaType.APPLICATION_ATOM_XML_TYPE) {
+		if(mediaType.equals(MediaType.APPLICATION_ATOM_XML_TYPE)) {
 			return 2;
 		}
-		if(mediaType == MediaType.APPLICATION_XHTML_XML_TYPE) {
+		if(mediaType.equals(MediaType.APPLICATION_XHTML_XML_TYPE)) {
 			return 3;
 		}
-		if(mediaType == MediaType.APPLICATION_SVG_XML_TYPE) {
+		if(mediaType.equals(MediaType.APPLICATION_SVG_XML_TYPE)) {
 			return 4;
 		}
-		if(mediaType == MediaType.APPLICATION_JSON_TYPE) {
+		if(mediaType.equals(MediaType.APPLICATION_JSON_TYPE)) {
 			return 5;
 		}
-		if(mediaType == MediaType.APPLICATION_FORM_URLENCODED_TYPE) {
+		if(mediaType.equals(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
 			return 6;
 		}
-		if(mediaType == MediaType.MULTIPART_FORM_DATA_TYPE) {
+		if(mediaType.equals(MediaType.MULTIPART_FORM_DATA_TYPE)) {
 			return 7;
 		}
-		if(mediaType == MediaType.APPLICATION_OCTET_STREAM_TYPE) {
+		if(mediaType.equals(MediaType.APPLICATION_OCTET_STREAM_TYPE)) {
 			return 8;
 		}
-		if(mediaType == MediaType.TEXT_PLAIN_TYPE) {
+		if(mediaType.equals(MediaType.TEXT_PLAIN_TYPE)) {
 			return 9;
 		}
-		if(mediaType == MediaType.TEXT_XML_TYPE) {
+		if(mediaType.equals(MediaType.TEXT_XML_TYPE)) {
 			return 10;
 		}
-		if(mediaType == MediaType.TEXT_HTML_TYPE) {
+		if(mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
 			return 11;
 		}
 
-		throw new IllegalStateException("No MediaType match found.");
+		throw new IllegalStateException("No MediaType match found: "+ mediaType.toString());
 	}
 
 	public String toString()

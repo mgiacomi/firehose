@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
-public class AwsS3Storage implements Storage
+public class AwsS3Store implements Storage
 {
-	private static final Logger logger = LoggerFactory.getLogger(AwsS3Storage.class);
+	private static final Logger logger = LoggerFactory.getLogger(AwsS3Store.class);
 	private Props props = Props.getProps();
 	private AmazonS3 s3Client;
 	private String s3BucketName;
@@ -37,7 +37,7 @@ public class AwsS3Storage implements Storage
 	private final ThreadPoolExecutor threadPoolExecutor;
 	private final Semaphore semaphore;
 
-	public AwsS3Storage()
+	public AwsS3Store()
 	{
 		s3BucketName = props.get("s3BucketName", "gltech");
 		String accessKey = props.get("accessKey", "AKIAIMCO3L5X25HGADAQ");
