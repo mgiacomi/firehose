@@ -29,7 +29,7 @@ public class AggregatorResource
 	@POST
 	@Path("/message/{channelName}")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response postEvent(@PathParam("channelName") String channelName, byte[] data)
+	public Response postMessage(@PathParam("channelName") String channelName, byte[] data)
 	{
 		aggregator.addMessage(channelName, data);
 		return Response.status(Response.Status.ACCEPTED).build();
@@ -38,7 +38,7 @@ public class AggregatorResource
 	@POST
 	@Path("/backup/message/{channelName}")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response postBackupEvent(@PathParam("channelName") String channelName, byte[] data)
+	public Response postBackupMessage(@PathParam("channelName") String channelName, byte[] data)
 	{
 		aggregator.addBackupMessage(channelName, data);
 		return Response.status(Response.Status.ACCEPTED).build();

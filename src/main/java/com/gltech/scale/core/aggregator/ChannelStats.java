@@ -14,8 +14,8 @@ public class ChannelStats implements Channel
 	private static final long KBytes = 1024L;
 	private Props props = Props.getProps();
 	private final Channel channel;
-	private Timer addEventTimer = new Timer();
-	private Timer addBackupEventTimer = new Timer();
+	private Timer addMessageTimer = new Timer();
+	private Timer addBackupMessageTimer = new Timer();
 
 	public ChannelStats(final Channel channel)
 	{
@@ -23,34 +23,34 @@ public class ChannelStats implements Channel
 
 		String channelName = channel.getChannelMetaData().getName() + "/" + props.get("period_seconds", Defaults.PERIOD_SECONDS);
 		String groupName = "Channel (" + channelName + ")";
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddEvent.Count", groupName, "count", new TimerCountPublisher("", addEventTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addEventTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " OldestEvent.Time", groupName, "oldest event seconds", new PublishCallback()
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddMessage.Count", groupName, "count", new TimerCountPublisher("", addMessageTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addMessageTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " OldestMessage.Time", groupName, "oldest message seconds", new PublishCallback()
 		{
 			public String getValue()
 			{
-				DateTime firstEventTime = null;
+				DateTime firstMessageTime = null;
 
 				for (Batch batch : channel.getBatches())
 				{
-					if (firstEventTime == null)
+					if (firstMessageTime == null)
 					{
-						firstEventTime = batch.getFirstMessageTime();
+						firstMessageTime = batch.getFirstMessageTime();
 					}
 
-					if (batch.getFirstMessageTime().isBefore(firstEventTime))
+					if (batch.getFirstMessageTime().isBefore(firstMessageTime))
 					{
-						firstEventTime = batch.getFirstMessageTime();
+						firstMessageTime = batch.getFirstMessageTime();
 					}
 
 				}
 
-				if (firstEventTime == null)
+				if (firstMessageTime == null)
 				{
 					return "0";
 				}
 
-				return Long.toString(System.currentTimeMillis() - firstEventTime.getMillis() / 1000);
+				return Long.toString(System.currentTimeMillis() - firstMessageTime.getMillis() / 1000);
 			}
 		}));
 		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " Batches.Count", groupName, "count", new PublishCallback()
@@ -77,8 +77,8 @@ public class ChannelStats implements Channel
 
 		if (channel.getChannelMetaData().isRedundant())
 		{
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupMessage.Count", groupName, "count", new TimerCountPublisher("", addBackupEventTimer)));
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupEventTimer)));
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupMessage.Count", groupName, "count", new TimerCountPublisher("", addBackupMessageTimer)));
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupMessageTimer)));
 			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupBatches.Count", groupName, "count", new PublishCallback()
 			{
 				public String getValue()
@@ -111,13 +111,13 @@ public class ChannelStats implements Channel
 	public void addMessage(byte[] bytes)
 	{
 		channel.addMessage(bytes);
-		addEventTimer.add(bytes.length);
+		addMessageTimer.add(bytes.length);
 	}
 
 	public void addBackupMessage(byte[] bytes)
 	{
 		channel.addBackupMessage(bytes);
-		addBackupEventTimer.add(bytes.length);
+		addBackupMessageTimer.add(bytes.length);
 	}
 
 	public Collection<Batch> getBatches()

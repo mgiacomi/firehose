@@ -144,7 +144,7 @@ public class AggregatorImpl implements Aggregator
 
 				if (batch != null)
 				{
-					return batchEventsToStream(outputStream, batch);
+					return batchMessagesToStream(outputStream, batch);
 				}
 			}
 		}
@@ -167,7 +167,7 @@ public class AggregatorImpl implements Aggregator
 
 				if (batch != null)
 				{
-					return batchEventsToStream(outputStream, batch);
+					return batchMessagesToStream(outputStream, batch);
 				}
 			}
 		}
@@ -175,7 +175,7 @@ public class AggregatorImpl implements Aggregator
 		return 0;
 	}
 
-	private long batchEventsToStream(OutputStream outputStream, Batch batch)
+	private long batchMessagesToStream(OutputStream outputStream, Batch batch)
 	{
 		for (byte[] bytes : batch.getMessages())
 		{

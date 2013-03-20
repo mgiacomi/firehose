@@ -31,7 +31,7 @@ public class StorageClient
 		storage.put(channelMetaData);
 	}
 
-	public InputStream getEventStream(final String channelName, final String id)
+	public InputStream getMessageStream(final String channelName, final String id)
 	{
 		return new InputStreamFromOutputStream<Long>()
 		{

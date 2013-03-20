@@ -1,14 +1,7 @@
 package com.gltech.scale.core.model;
 
 import com.dyuproject.protostuff.Tag;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class BatchMetaData implements Comparable<BatchMetaData>
 {
@@ -17,7 +10,7 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 	@Tag(2)
 	private ChannelMetaData channelMetaData;
 	@Tag(3)
-	private long eventsAdded;
+	private long messagesAdded;
 	@Tag(4)
 	private long bytes;
 
@@ -25,14 +18,14 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 	{
 		nearestPeriodCeiling = null;
 		channelMetaData = null;
-		eventsAdded = -1;
+		messagesAdded = -1;
 		bytes = -1;
 	}
 
-	public BatchMetaData(DateTime nearestPeriodCeiling, long eventsAdded, long bytes, ChannelMetaData channelMetaData)
+	public BatchMetaData(DateTime nearestPeriodCeiling, long messagesAdded, long bytes, ChannelMetaData channelMetaData)
 	{
 		this.nearestPeriodCeiling = nearestPeriodCeiling;
-		this.eventsAdded = eventsAdded;
+		this.messagesAdded = messagesAdded;
 		this.bytes = bytes;
 		this.channelMetaData = channelMetaData;
 	}
@@ -47,9 +40,9 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 		return channelMetaData;
 	}
 
-	public long getEventsAdded()
+	public long getMessagesAdded()
 	{
-		return eventsAdded;
+		return messagesAdded;
 	}
 
 	public long getBytes()
@@ -65,7 +58,7 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 		BatchMetaData that = (BatchMetaData) o;
 
 		if (bytes != that.bytes) return false;
-		if (eventsAdded != that.eventsAdded) return false;
+		if (messagesAdded != that.messagesAdded) return false;
 		if (channelMetaData != null ? !channelMetaData.equals(that.channelMetaData) : that.channelMetaData != null)
 			return false;
 		if (nearestPeriodCeiling != null ? !nearestPeriodCeiling.equals(that.nearestPeriodCeiling) : that.nearestPeriodCeiling != null)
@@ -78,7 +71,7 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 	{
 		int result = nearestPeriodCeiling != null ? nearestPeriodCeiling.hashCode() : 0;
 		result = 31 * result + (channelMetaData != null ? channelMetaData.hashCode() : 0);
-		result = 31 * result + (int) (eventsAdded ^ (eventsAdded >>> 32));
+		result = 31 * result + (int) (messagesAdded ^ (messagesAdded >>> 32));
 		result = 31 * result + (int) (bytes ^ (bytes >>> 32));
 		return result;
 	}
@@ -94,7 +87,7 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 		return "BatchMetaData{" +
 				"nearestPeriodCeiling=" + nearestPeriodCeiling +
 				", bytes=" + bytes +
-				", eventsAdded=" + eventsAdded +
+				", messagesAdded=" + messagesAdded +
 				", bucketMetaData=" + channelMetaData +
 				'}' +
 				channelMetaData.toString();

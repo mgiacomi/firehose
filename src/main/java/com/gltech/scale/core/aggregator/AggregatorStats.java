@@ -1,7 +1,6 @@
 package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
-import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.ganglia.*;
 import com.google.inject.Inject;
@@ -16,11 +15,11 @@ public class AggregatorStats implements Aggregator
 	public static final String BASE = "AggregatorStats";
 
 	private final Aggregator aggregator;
-	private Timer addEventTimer = new Timer();
-	private Timer addBackupEventTimer = new Timer();
+	private Timer addMessageTimer = new Timer();
+	private Timer addBackupMessageTimer = new Timer();
 	private Timer clearTimer = new Timer();
-	private Timer writtenEventsTimer = new Timer();
-	private Timer writtenBackupEventsTimer = new Timer();
+	private Timer writtenMessagesTimer = new Timer();
+	private Timer writtenBackupMessagesTimer = new Timer();
 
 	@Inject
 	public AggregatorStats(@Named(BASE) final Aggregator aggregator)
@@ -28,16 +27,16 @@ public class AggregatorStats implements Aggregator
 		this.aggregator = aggregator;
 
 		String groupName = "Aggregator";
-		MonitoringPublisher.getInstance().register(new PublishMetric("AddEvent.Count", groupName, "count", new TimerCountPublisher("", addEventTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("AddEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addEventTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("AddBackupEvent.Count", groupName, "count", new TimerCountPublisher("", addBackupEventTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("AddBackupEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupEventTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric("AddMessage.Count", groupName, "count", new TimerCountPublisher("", addMessageTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric("AddMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addMessageTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric("AddBackupMessage.Count", groupName, "count", new TimerCountPublisher("", addBackupMessageTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric("AddBackupMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupMessageTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("Clear.Count", groupName, "count", new TimerCountPublisher("", clearTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("Clear.Time", groupName, "millis per call", new TimerAveragePublisher("", clearTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("EventsWritten.Count", groupName, "count", new TimerCountPublisher("", writtenEventsTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("EventsWritten.Time", groupName, "millis per call", new TimerAveragePublisher("", writtenEventsTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("BackupEventsWritten.Count", groupName, "count", new TimerCountPublisher("", writtenBackupEventsTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("BackupEventsWritten.Time", groupName, "millis per call", new TimerAveragePublisher("", writtenBackupEventsTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric("MessagesWritten.Count", groupName, "count", new TimerCountPublisher("", writtenMessagesTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric("MessagesWritten.Time", groupName, "millis per call", new TimerAveragePublisher("", writtenMessagesTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric("BackupMessagesWritten.Count", groupName, "count", new TimerCountPublisher("", writtenBackupMessagesTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric("BackupMessagesWritten.Time", groupName, "millis per call", new TimerAveragePublisher("", writtenBackupMessagesTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("ActiveBatches.Count", groupName, "count", new PublishCallback()
 		{
 			public String getValue()
@@ -51,13 +50,13 @@ public class AggregatorStats implements Aggregator
 	public void addMessage(String channelName, byte[] bytes)
 	{
 		aggregator.addMessage(channelName, bytes);
-		addEventTimer.add(bytes.length);
+		addMessageTimer.add(bytes.length);
 	}
 
 	public void addBackupMessage(String channelName, byte[] bytes)
 	{
 		aggregator.addBackupMessage(channelName, bytes);
-		addBackupEventTimer.add(bytes.length);
+		addBackupMessageTimer.add(bytes.length);
 	}
 
 	public void clear(String channelName, DateTime dateTime)
@@ -81,7 +80,7 @@ public class AggregatorStats implements Aggregator
 	{
 		long start = System.nanoTime();
 		long processed = aggregator.writeBatchMessages(outputStream, channelName, dateTime);
-		writtenEventsTimer.add(System.nanoTime() - start, processed);
+		writtenMessagesTimer.add(System.nanoTime() - start, processed);
 		return processed;
 	}
 
@@ -89,7 +88,7 @@ public class AggregatorStats implements Aggregator
 	{
 		long start = System.nanoTime();
 		long processed = aggregator.writeBackupBatchMessages(outputStream, channelName, dateTime);
-		writtenBackupEventsTimer.add(System.nanoTime() - start, processed);
+		writtenBackupMessagesTimer.add(System.nanoTime() - start, processed);
 		return processed;
 	}
 

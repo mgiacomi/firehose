@@ -79,7 +79,7 @@ public class BatchCollectorImpl implements BatchCollector
 
 					// If there is any discrepancy between the primary and backup rope for a double write bucket,
 					// then pull both and let BatchStreamsManager figure it out. Otherwise only primary is used.
-					if (primaryMetaData.getEventsAdded() != backupMetaData.getEventsAdded() || primaryMetaData.getBytes() != backupMetaData.getBytes())
+					if (primaryMetaData.getMessagesAdded() != backupMetaData.getMessagesAdded() || primaryMetaData.getBytes() != backupMetaData.getBytes())
 					{
 						aggregators.add(primaryBackupSet.getBackup());
 					}

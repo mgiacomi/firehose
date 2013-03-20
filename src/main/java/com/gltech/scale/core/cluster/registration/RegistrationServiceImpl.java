@@ -22,15 +22,15 @@ import java.util.List;
 public class RegistrationServiceImpl implements RegistrationService
 {
 	private static final Logger logger = LoggerFactory.getLogger(RegistrationServiceImpl.class);
-	private ServiceAdvertiser eventServiceAdvertiser;
+	private ServiceAdvertiser inboundServiceAdvertiser;
 	private ServiceAdvertiser collectorManagerAdvertiser;
 	private ServiceAdvertiser aggregatorAdvertiser;
 	private ServiceAdvertiser storageServiceAdvertiser;
-	private ServiceMetaData localEventServiceMetaData;
+	private ServiceMetaData localInboundServiceMetaData;
 	private ServiceMetaData localCollectorManagerMetaData;
 	private ServiceMetaData localAggregatorMetaData;
 	private ServiceMetaData localStorageServiceMetaData;
-	private ServiceCache<ServiceMetaData> eventServiceCache;
+	private ServiceCache<ServiceMetaData> inboundServiceCache;
 	private ServiceCache<ServiceMetaData> collectorManagerCache;
 	private ServiceCache<ServiceMetaData> aggregatorCache;
 	private ServiceCache<ServiceMetaData> storageServiceCache;
@@ -41,9 +41,9 @@ public class RegistrationServiceImpl implements RegistrationService
 
 	public RegistrationServiceImpl()
 	{
-		eventServiceAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.INBOUND_SERVICE);
-		eventServiceCache = eventServiceAdvertiser.getServiceCache();
-		eventServiceCache.addListener(new EventServiceCacheListener());
+		inboundServiceAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.INBOUND_SERVICE);
+		inboundServiceCache = inboundServiceAdvertiser.getServiceCache();
+		inboundServiceCache.addListener(new InboundServiceCacheListener());
 
 		collectorManagerAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.COLLECTOR_SERVICE);
 		collectorManagerCache = collectorManagerAdvertiser.getServiceCache();
@@ -59,7 +59,7 @@ public class RegistrationServiceImpl implements RegistrationService
 
 		try
 		{
-			eventServiceCache.start();
+			inboundServiceCache.start();
 			collectorManagerCache.start();
 			aggregatorCache.start();
 			storageServiceCache.start();
@@ -77,19 +77,19 @@ public class RegistrationServiceImpl implements RegistrationService
 
 		try
 		{
-			localEventServiceMetaData = eventServiceAdvertiser.available(host, port);
-			logger.info("Registering EventService server host=" + host + " port=" + port);
+			localInboundServiceMetaData = inboundServiceAdvertiser.available(host, port);
+			logger.info("Registering InboundService server host=" + host + " port=" + port);
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to register EventService host=" + host + " port=" + port, e);
+			throw new ClusterException("Failed to register InboundService host=" + host + " port=" + port, e);
 		}
 	}
 
 	public void unRegisterAsInboundService()
 	{
-		eventServiceAdvertiser.unavailable(localEventServiceMetaData);
-		logger.info("Unregistered EventService server host=" + localEventServiceMetaData.getListenAddress() + " port=" + localEventServiceMetaData.getListenPort());
+		inboundServiceAdvertiser.unavailable(localInboundServiceMetaData);
+		logger.info("Unregistered InboundService server host=" + localInboundServiceMetaData.getListenAddress() + " port=" + localInboundServiceMetaData.getListenPort());
 	}
 
 	public ServiceMetaData getLocalCollectorManagerMetaData()
@@ -248,7 +248,7 @@ public class RegistrationServiceImpl implements RegistrationService
 	{
 		try
 		{
-			eventServiceCache.close();
+			inboundServiceCache.close();
 			collectorManagerCache.close();
 			aggregatorCache.close();
 			storageServiceCache.close();
@@ -261,12 +261,12 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
-	private class EventServiceCacheListener implements ServiceCacheListener
+	private class InboundServiceCacheListener implements ServiceCacheListener
 	{
 		@Override
 		public void cacheChanged()
 		{
-			logger.info("Registered EventService list has been updated. " + eventServiceCache.getInstances().size() + " EventService(s) are active.");
+			logger.info("Registered InboundService list has been updated. " + inboundServiceCache.getInstances().size() + " InboundService(s) are active.");
 		}
 
 		@Override

@@ -78,7 +78,7 @@ public class InboundResourceTest
 		when(channelCache.getChannelMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
 		InboundResource inboundResource = new InboundResource(channelCache, inboundService);
-		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, 15);
+		Response response = inboundResource.getMessagesOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, 15);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
 		verify(storageServiceRestClient).getEventStream(null, "c1", "b1", "20121012104015");
@@ -92,7 +92,7 @@ public class InboundResourceTest
 		when(channelCache.getChannelMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
 		InboundResource inboundResource = new InboundResource(channelCache, inboundService);
-		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, 13);
+		Response response = inboundResource.getMessagesOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, 13);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
 		verify(storageServiceRestClient).getEventStream(null, "c1", "b1", "20121012104015");
@@ -106,7 +106,7 @@ public class InboundResourceTest
 		when(channelCache.getChannelMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
 		InboundResource inboundResource = new InboundResource(channelCache, inboundService);
-		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, -1);
+		Response response = inboundResource.getMessagesOrRedirect("c1", "b1", 2012, 10, 12, 10, 40, -1);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
 		verify(storageServiceRestClient).getEventStream(null, "c1", "b1", "20121012104000");
@@ -133,7 +133,7 @@ public class InboundResourceTest
 		when(channelCache.getChannelMetaData(anyString(), anyString(), anyBoolean())).thenReturn(channelMetaData);
 
 		InboundResource inboundResource = new InboundResource(channelCache, inboundService);
-		Response response = inboundResource.getEventsOrRedirect("c1", "b1", 2012, 10, 12, 10, -1, -1);
+		Response response = inboundResource.getMessagesOrRedirect("c1", "b1", 2012, 10, 12, 10, -1, -1);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
 		verify(storageServiceRestClient).getEventStream(null, "c1", "b1", "20121012104000");

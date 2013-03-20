@@ -3,10 +3,6 @@ package com.gltech.scale.core.inbound;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Defaults;
@@ -56,24 +52,24 @@ public class InboundServiceImpl implements InboundService
 		this.channelCache = channelCache;
 		this.timePeriodUtils = timePeriodUtils;
 
-		// Register the event service with the coordination service
+		// Register the inbound service with the coordination service
 		clusterService.getRegistrationService().registerAsInboundService();
 	}
 
 	@Override
-	public void addEvent(String channelName, MediaType mediaTypes, byte[] payload)
+	public void addMessage(String channelName, MediaType mediaTypes, byte[] payload)
 	{
 		int maxPayLoadSize = props.get("inbound.max_payload_size_kb", Defaults.MAX_PAYLOAD_SIZE_KB) * 1024;
 		Message message = new Message(mediaTypes, payload);
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
 
 		// If the payload is too large then write it to the storage engine now
-		// and create and event object with no payload, which will flag it as stored.
+		// and create and message object with no payload, which will flag it as stored.
 		if (payload.length > maxPayLoadSize)
 		{
 			message = new Message(MediaType.APPLICATION_JSON_TYPE);
 			storageClient.put(channelName, message.getUuid(), payload);
-			logger.debug("Pre-storing event payload data to data store: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
+			logger.debug("Pre-storing message payload data to data store: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
 		}
 
 		AggregatorsByPeriod aggregatorsByPeriod = aggregatorPeriodMatrices.get(nearestPeriodCeiling);
@@ -114,7 +110,7 @@ public class InboundServiceImpl implements InboundService
 	}
 
 	@Override
-	public int writeEventsToOutputStream(String channelName, DateTime dateTime, OutputStream outputStream, int recordsWritten)
+	public int writeMessagesToOutputStream(String channelName, DateTime dateTime, OutputStream outputStream, int recordsWritten)
 	{
 		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 		String id = timePeriodUtils.nearestPeriodCeiling(dateTime).toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
@@ -122,7 +118,7 @@ public class InboundServiceImpl implements InboundService
 		int origRecordsWritten = recordsWritten;
 
 		// Make sure the stream gets closed.
-		try (InputStream inputStream = storageClient.getEventStream(channelName, id))
+		try (InputStream inputStream = storageClient.getMessageStream(channelName, id))
 		{
 			try
 			{
@@ -140,7 +136,7 @@ public class InboundServiceImpl implements InboundService
 					{
 						byte[] payload = storageClient.get(channelName, message.getUuid());
 						outputStream.write(payload);
-						logger.debug("Reading pre-stored event payload data from storage service: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
+						logger.debug("Reading pre-stored message payload data from storage service: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
 					}
 					else
 					{
@@ -161,7 +157,7 @@ public class InboundServiceImpl implements InboundService
 			throw new RuntimeException("unable to parse json", e);
 		}
 
-		logger.debug("Querying events for channelName={} id={} returned {} events.", channelName, id, (recordsWritten - origRecordsWritten));
+		logger.debug("Querying messages for channelName={} id={} returned {} messages.", channelName, id, (recordsWritten - origRecordsWritten));
 
 		return recordsWritten;
 	}

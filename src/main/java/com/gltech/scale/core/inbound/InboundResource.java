@@ -48,7 +48,7 @@ public class InboundResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response post(@PathParam("channelName") String channelName, byte[] payload)
 	{
-		inboundService.addEvent(channelName, httpHeaders.getMediaType(), payload);
+		inboundService.addMessage(channelName, httpHeaders.getMediaType(), payload);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
@@ -89,7 +89,7 @@ public class InboundResource
 	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 						@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
-		return getEventsOrRedirect(channelName, year, month, day, hour, min, sec);
+		return getMessagesOrRedirect(channelName, year, month, day, hour, min, sec);
 	}
 
 	@GET
@@ -98,7 +98,7 @@ public class InboundResource
 	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
 						@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min)
 	{
-		return getEventsOrRedirect(channelName, year, month, day, hour, min, -1);
+		return getMessagesOrRedirect(channelName, year, month, day, hour, min, -1);
 	}
 
 	@GET
@@ -107,7 +107,7 @@ public class InboundResource
 	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year,
 						@PathParam("month") int month, @PathParam("day") int day, @PathParam("hour") int hour)
 	{
-		return getEventsOrRedirect(channelName, year, month, day, hour, -1, -1);
+		return getMessagesOrRedirect(channelName, year, month, day, hour, -1, -1);
 	}
 
 	@GET
@@ -116,11 +116,11 @@ public class InboundResource
 	public Response get(@PathParam("channelName") String channelName, @PathParam("year") int year,
 						@PathParam("month") int month, @PathParam("day") int day)
 	{
-		return getEventsOrRedirect(channelName, year, month, day, -1, -1, -1);
+		return getMessagesOrRedirect(channelName, year, month, day, -1, -1, -1);
 	}
 
-	// Right now we only support getting events by second, minute, or hour.
-	Response getEventsOrRedirect(final String channelName, final int year, final int month, final int day, final int hour, final int min, final int sec)
+	// Right now we only support getting messages by second, minute, or hour.
+	Response getMessagesOrRedirect(final String channelName, final int year, final int month, final int day, final int hour, final int min, final int sec)
 	{
 		StreamingOutput out = new StreamingOutput()
 		{
@@ -135,7 +135,7 @@ public class InboundResource
 					// If our period is less the 60 and a time with seconds was requested, then make a single request.
 					if (sec > -1)
 					{
-						recordsWritten = inboundService.writeEventsToOutputStream(channelName, new DateTime(year, month, day, hour, min, sec), outputStream, recordsWritten);
+						recordsWritten = inboundService.writeMessagesToOutputStream(channelName, new DateTime(year, month, day, hour, min, sec), outputStream, recordsWritten);
 					}
 
 					// If our period is less the 60 and a time with no secs, but minutes was requested, then query all periods for this minute.
@@ -147,7 +147,7 @@ public class InboundResource
 
 							if (dateTime.isBeforeNow())
 							{
-								recordsWritten = inboundService.writeEventsToOutputStream(channelName, dateTime, outputStream, recordsWritten);
+								recordsWritten = inboundService.writeMessagesToOutputStream(channelName, dateTime, outputStream, recordsWritten);
 							}
 						}
 					}
@@ -163,7 +163,7 @@ public class InboundResource
 
 								if (dateTime.isBeforeNow())
 								{
-									recordsWritten = inboundService.writeEventsToOutputStream(channelName, dateTime, outputStream, recordsWritten);
+									recordsWritten = inboundService.writeMessagesToOutputStream(channelName, dateTime, outputStream, recordsWritten);
 								}
 							}
 						}
@@ -181,7 +181,7 @@ public class InboundResource
 									DateTime dateTime = new DateTime(year, month, day, h, m, s);
 									if (dateTime.isBeforeNow())
 									{
-										recordsWritten = inboundService.writeEventsToOutputStream(channelName, dateTime, outputStream, recordsWritten);
+										recordsWritten = inboundService.writeMessagesToOutputStream(channelName, dateTime, outputStream, recordsWritten);
 									}
 								}
 							}

@@ -76,8 +76,7 @@ public class EmbeddedServer
 		TimerMap timerMap = new TimerMap();
 		MonitoringPublisher.getInstance().register(new TimerMapPublishMetricGroup("REST", timerMap));
 		StatisticsFilter.add(timerMap);
-		StatisticsFilter.add("/events/", "Events");
-		StatisticsFilter.add("/storage/", "Storage");
+		StatisticsFilter.add("/inbound/", "Events");
 		StatisticsFilter.add("/aggregator/", "Aggregator");
 		sch.addFilter(StatisticsFilter.class, "/*", null);
 
