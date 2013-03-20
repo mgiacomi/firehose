@@ -40,7 +40,6 @@ public class BatchStreamsManager
 
 	public long writeMessages(OutputStream outputStream)
 	{
-//ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		logger.debug("Starting aggregator -> storage stream merge. " + customerBatchPeriod);
 
 		long recordsReceived = 0;
@@ -100,10 +99,6 @@ public class BatchStreamsManager
 					candidateNextRecord.nextRecord();
 					recordsReceived++;
 					linkedBuffer.clear();
-/*
-					ProtostuffIOUtil.writeDelimitedTo(baos, candidateNextRecord.getCurrentMessage(), schema, linkedBuffer);
-					linkedBuffer.clear();
-*/
 				}
 			}
 		}
@@ -129,27 +124,6 @@ public class BatchStreamsManager
 		}
 
 		logger.info("Completed stream merge: customerBatchPeriod={}, streams merged={}, processed messages={}, total messages={}, size={}mb", customerBatchPeriod, totalStreams, processedMessages.size(), recordsReceived, bytesWritten / Defaults.MEGABYTES);
-/*
-Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
-ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-try
-{
-	while (true)
-	{
-		Message message = new Message();
-		ProtostuffIOUtil.mergeDelimitedFrom(bais, message, schema);
-		System.out.println("MESSAGE: "+ message);
-	}
-}
-catch (EOFException e)
-{
-	// no prob just end of file.
-}
-catch (IOException e)
-{
-	e.printStackTrace();
-}
-*/
 
 		return processedMessages.size();
 	}
