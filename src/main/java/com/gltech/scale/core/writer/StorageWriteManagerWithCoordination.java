@@ -35,30 +35,30 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 		this.channelCache = channelCache;
 		this.periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
 
-		String groupName = "Collector";
+		String groupName = "Storage Writer";
 		MonitoringPublisher.getInstance().register(new PublishMetric("CollectBatch.Count", groupName, "count", new TimerCountPublisher("", collectBatchTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("CollectBatch.AvgTime", groupName, "avg time in millis", new TimerAveragePublisher("", collectBatchTimer)));
 		MonitoringPublisher.getInstance().register(new TimerMapPublishMetricGroup(groupName, timerMap));
 
 		// Register the event service with the coordination service
-		clusterService.getRegistrationService().registerAsCollectorManager();
+		clusterService.getRegistrationService().registerAsStorageWriter();
 	}
 
 	@Override
 	public void run()
 	{
-		int checkForWorkInterval = props.get("collector.manager.check_for_work_interval_secs", 5) * 1000;
-		int activeCollectors = props.get("collector.manager.active_collectors", 100);
+		int checkForWorkInterval = props.get("storage_writer.check_for_work_interval_secs", Defaults.STORAGE_WRITER_CHECK_FOR_WORK_INTERVAL_SECS) * 1000;
+		int activeStorageWriters = props.get("storage_writer.active_collectors", Defaults.STORAGE_WRITER_ACTIVE_WRITERS);
 
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
-		ThreadPoolExecutor threadPoolExecutor = new TimerThreadPoolExecutor(activeCollectors, activeCollectors, 1, TimeUnit.MINUTES, queue, new CollectorManagerThreadFactory(), collectBatchTimer);
-		logger.info("ThreadPoolExecutor started with " + activeCollectors + " active collectors.");
+		ThreadPoolExecutor threadPoolExecutor = new TimerThreadPoolExecutor(activeStorageWriters, activeStorageWriters, 1, TimeUnit.MINUTES, queue, new StorageWriterThreadFactory(), collectBatchTimer);
+		logger.info("ThreadPoolExecutor started with " + activeStorageWriters + " active collectors.");
 
 		try
 		{
 			while (!shutdown)
 			{
-				if (threadPoolExecutor.getActiveCount() < activeCollectors)
+				if (threadPoolExecutor.getActiveCount() < activeStorageWriters)
 				{
 					BatchPeriodMapper batchPeriodMapper = clusterService.getOldestCollectibleBatch();
 
@@ -68,14 +68,14 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 						{
 							ChannelMetaData channelMetaData = channelCache.getChannelMetaData(batchPeriodMapper.getChannelName(), true);
 
-							BatchCollector batchCollector = injector.getInstance(BatchCollector.class);
-							batchCollector.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());
+							BatchWriter batchWriter = injector.getInstance(BatchWriter.class);
+							batchWriter.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());
 
 							// Get a Timer from the timermap based on the bucket being collected.
 							String timerName = batchPeriodMapper.getChannelName() + "/" + Integer.toString(periodSeconds);
-							batchCollector.setTimer(timerMap.get(timerName));
+							batchWriter.setTimer(timerMap.get(timerName));
 
-							threadPoolExecutor.submit(batchCollector);
+							threadPoolExecutor.submit(batchWriter);
 						}
 						catch (Exception e)
 						{
@@ -90,13 +90,13 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 				}
 				else
 				{
-					logger.debug("Could not take on new work.  All threads busy. ActiveCollectors={}", threadPoolExecutor.getActiveCount());
+					logger.debug("Could not take on new work.  All threads busy. ActiveWriters={}", threadPoolExecutor.getActiveCount());
 				}
 
 				Thread.sleep(checkForWorkInterval);
 			}
 
-			int waitForShutdown = props.get("collector.manager.wait_for_shutdown_mins", 15);
+			int waitForShutdown = props.get("storage_writer.wait_for_shutdown_mins", Defaults.STORAGE_WRITER_WAIT_FOR_SHUTDOWN_MINS);
 
 			logger.info("ThreadPoolExecutor shutdown requested. " + threadPoolExecutor.getActiveCount() + " threads still active.");
 			threadPoolExecutor.shutdown();
@@ -112,7 +112,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 		}
 		catch (InterruptedException e)
 		{
-			logger.error("CollectorManager was inturrupted.", e);
+			logger.error("StorageWriter was inturrupted.", e);
 		}
 
 		confirmShutdown = true;
@@ -123,9 +123,9 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 	{
 		shutdown = true;
 
-		clusterService.getRegistrationService().unRegisterAsCollectorManager();
+		clusterService.getRegistrationService().unRegisterAsStorageWriter();
 
-		if (props.get("collector.manager.clean_shutdown", false))
+		if (props.get("storage_writer.clean_shutdown", Defaults.STORAGE_WRITER_CLEAN_SHUTDOWN))
 		{
 			while (!confirmShutdown)
 			{
@@ -141,7 +141,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 			}
 		}
 
-		logger.warn("CollectorManager has been shutdown.");
+		logger.warn("StorageWriter has been shutdown.");
 	}
 
 	@Override
@@ -150,11 +150,11 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 		this.injector = injector;
 	}
 
-	private class CollectorManagerThreadFactory implements ThreadFactory
+	private class StorageWriterThreadFactory implements ThreadFactory
 	{
 		public Thread newThread(Runnable r)
 		{
-			return new Thread(r, "BatchCollector");
+			return new Thread(r, "StorageWriter");
 		}
 	}
 }

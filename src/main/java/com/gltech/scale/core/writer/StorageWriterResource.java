@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/collector")
-public class StorageWriteResource
+public class StorageWriterResource
 {
 	@Context
 	UriInfo uriInfo;

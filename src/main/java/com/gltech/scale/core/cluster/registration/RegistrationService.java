@@ -8,11 +8,11 @@ public interface RegistrationService
 
 	void unRegisterAsInboundService();
 
-	ServiceMetaData getLocalCollectorManagerMetaData();
+	ServiceMetaData getLocalStorageWriterMetaData();
 
-	void registerAsCollectorManager();
+	void registerAsStorageWriter();
 
-	void unRegisterAsCollectorManager();
+	void unRegisterAsStorageWriter();
 
 	void registerAsAggregator();
 

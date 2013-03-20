@@ -24,9 +24,9 @@ public class StorageWriteManagerTest
 	}
 
 	@Test
-	public void testCollectorManagerStartAndStop() throws Exception
+	public void testStorageWriterStartAndStop() throws Exception
 	{
-		final StorageWriteTestManager collectorManager = new StorageWriteTestManager();
+		final StorageWriteTestManager storageWriter = new StorageWriteTestManager();
 
 		TestingServer testingServer = new TestingServer(21818);
 
@@ -34,18 +34,18 @@ public class StorageWriteManagerTest
 		{
 			public void configure(Binder binder)
 			{
-				binder.bind(StorageWriteManager.class).toInstance(collectorManager);
+				binder.bind(StorageWriteManager.class).toInstance(storageWriter);
 			}
 		});
 
-		assertTrue(collectorManager.isGotInjector());
-		assertTrue(collectorManager.isDidRun());
-		assertFalse(collectorManager.isShutdown());
+		assertTrue(storageWriter.isGotInjector());
+		assertTrue(storageWriter.isDidRun());
+		assertFalse(storageWriter.isShutdown());
 
 		EmbeddedServer.stop();
 
-		assertTrue(collectorManager.isShutdown());
-		assertTrue(collectorManager.isConfirmShutdown());
+		assertTrue(storageWriter.isShutdown());
+		assertTrue(storageWriter.isConfirmShutdown());
 
 		testingServer.stop();
 	}
@@ -64,7 +64,7 @@ public class StorageWriteManagerTest
 				while (!shutdown)
 				{
 					didRun = true;
-					System.out.println("CollectorTestManager running shutdown loop.");
+					System.out.println("StorageWriterTest running shutdown loop.");
 					Thread.sleep(1000);
 				}
 			}

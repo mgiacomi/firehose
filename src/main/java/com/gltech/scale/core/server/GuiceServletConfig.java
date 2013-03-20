@@ -79,13 +79,13 @@ public class GuiceServletConfig extends GuiceServletContextListener
 						bind(Aggregator.class).annotatedWith(Names.named(AggregatorStats.BASE)).to(AggregatorImpl.class).in(Singleton.class);
 					}
 
-					if (props.get("enable.collector_manager", true))
+					if (props.get("enable.storage_writer", true))
 					{
-						bind(StorageWriteResource.class);
+						bind(StorageWriterResource.class);
 
 						// These should not be singletons we want to get a new one with each injector call.
 						bind(StorageWriteManager.class).to(StorageWriteManagerWithCoordination.class);
-						bind(BatchCollector.class).to(BatchCollectorImpl.class);
+						bind(BatchWriter.class).to(BatchWriterImpl.class);
 					}
 
 					// Setup storage provider

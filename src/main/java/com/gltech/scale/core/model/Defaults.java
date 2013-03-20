@@ -9,4 +9,8 @@ public class Defaults
 	static public final int REST_PORT = 9090;
 	static public final String STORAGE_STORE = "voldemort";
 	static public final int CONCURRENT_STORE_WRITES = 10;
+	static public final int STORAGE_WRITER_CHECK_FOR_WORK_INTERVAL_SECS = 5;
+	static public final int STORAGE_WRITER_ACTIVE_WRITERS = 100;
+	static public final int STORAGE_WRITER_WAIT_FOR_SHUTDOWN_MINS = 5;
+	static public final boolean STORAGE_WRITER_CLEAN_SHUTDOWN = true;
 }

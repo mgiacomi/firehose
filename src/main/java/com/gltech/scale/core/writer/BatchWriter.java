@@ -6,7 +6,7 @@ import org.joda.time.DateTime;
 
 import java.util.concurrent.Callable;
 
-public interface BatchCollector extends Callable<Object>
+public interface BatchWriter extends Callable<Object>
 {
 	void assign(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling);
 

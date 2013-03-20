@@ -85,11 +85,11 @@ public class ZookeeperClusterService implements ClusterService
 						{
 							// Convert the ServiceMetaData to a JSON byte[]
 							ObjectMapper mapper = new ObjectMapper();
-							byte[] collectorManagerMetaData = mapper.writeValueAsBytes(registrationService.getLocalCollectorManagerMetaData());
+							byte[] storageWriterMetaData = mapper.writeValueAsBytes(registrationService.getLocalStorageWriterMetaData());
 
-							// Write to collector time bucket node.
-							client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/writer/batches/" + shortName, collectorManagerMetaData);
-							logger.info("Registering collector for time bucket: " + nodeName);
+							// Write to storage writer batch node.
+							client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/writer/batches/" + shortName, storageWriterMetaData);
+							logger.info("Registering storage writer for batch: " + nodeName);
 
 							return activeBatch;
 						}
@@ -160,18 +160,18 @@ public class ZookeeperClusterService implements ClusterService
 	}
 
 	@Override
-	public void clearCollectorLock(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
+	public void clearStorageWriterLock(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
 		BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(channelMetaData, nearestPeriodCeiling);
 
 		try
 		{
 			client.delete().forPath("/writer/batches/" + batchPeriodMapper.getNodeName());
-			logger.info("Clear collector lock for batch: " + batchPeriodMapper.getNodeName());
+			logger.info("Clear storage writer lock for batch: " + batchPeriodMapper.getNodeName());
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to remove channel and collector for time bucket: " + batchPeriodMapper.getNodeName(), e);
+			throw new ClusterException("Failed to remove channel and storage writer for batch: " + batchPeriodMapper.getNodeName(), e);
 		}
 	}
 
@@ -187,7 +187,7 @@ public class ZookeeperClusterService implements ClusterService
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to remove channel and collector for batch: " + batchPeriodMapper.getNodeName(), e);
+			throw new ClusterException("Failed to remove channel and storage writer for batch: " + batchPeriodMapper.getNodeName(), e);
 		}
 	}
 

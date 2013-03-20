@@ -21,9 +21,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BatchCollectorImpl implements BatchCollector
+public class BatchWriterImpl implements BatchWriter
 {
-	private static final Logger logger = LoggerFactory.getLogger(BatchCollectorImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(BatchWriterImpl.class);
 	private DateTime nearestPeriodCeiling;
 	private ChannelMetaData channelMetaData;
 	private AggregatorRestClient aggregatorRestClient;
@@ -33,7 +33,7 @@ public class BatchCollectorImpl implements BatchCollector
 	private Timer timer;
 
 	@Inject
-	public BatchCollectorImpl(AggregatorRestClient aggregatorRestClient, StorageClient storageClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
+	public BatchWriterImpl(AggregatorRestClient aggregatorRestClient, StorageClient storageClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
 	{
 		this.aggregatorRestClient = aggregatorRestClient;
 		this.storageClient = storageClient;
@@ -53,7 +53,7 @@ public class BatchCollectorImpl implements BatchCollector
 	{
 		if (channelMetaData == null || nearestPeriodCeiling == null)
 		{
-			String error = "BatchCollector can not be started without configuring a ChannelMetaData and nearestPeriodCeiling first.";
+			String error = "BatchWriter can not be started without configuring a ChannelMetaData and nearestPeriodCeiling first.";
 			logger.error(error);
 			throw new RuntimeException(error);
 		}
@@ -117,13 +117,13 @@ public class BatchCollectorImpl implements BatchCollector
 			storageClient.put(channelName, nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), inputStream);
 			inputStream.close();
 
-			// Remove time bucket references from the coordination service.
+			// Remove batch references from the coordination service.
 			clusterService.clearBatchMetaData(channelMetaData, nearestPeriodCeiling);
 
 			// Data has been written so remove it from all active aggregator.
 			for (ServiceMetaData aggregator : aggregators)
 			{
-				// Aggregator can now remove the time bucket
+				// Aggregator can now remove the batch
 				aggregatorRestClient.clearBatch(aggregator, channelName, nearestPeriodCeiling);
 			}
 
@@ -139,7 +139,7 @@ public class BatchCollectorImpl implements BatchCollector
 		catch (Exception e)
 		{
 			logger.error("Failed to collect Batch. " + nearestPeriodCeiling + ", " + channelMetaData.toString(), e);
-			clusterService.clearCollectorLock(channelMetaData, nearestPeriodCeiling);
+			clusterService.clearStorageWriterLock(channelMetaData, nearestPeriodCeiling);
 		}
 
 		return null;

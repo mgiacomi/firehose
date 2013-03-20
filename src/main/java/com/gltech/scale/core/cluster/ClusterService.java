@@ -15,5 +15,5 @@ public interface ClusterService extends LifeCycle
 
 	void clearBatchMetaData(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling);
 
-	void clearCollectorLock(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling);
+	void clearStorageWriterLock(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling);
 }

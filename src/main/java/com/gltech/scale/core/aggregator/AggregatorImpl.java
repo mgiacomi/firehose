@@ -36,7 +36,7 @@ public class AggregatorImpl implements Aggregator
 		this.timePeriodUtils = timePeriodUtils;
 		this.streamDelimiter = streamDelimiter;
 
-		// Register the aggregator with the coordination service, so that collectors can find us
+		// Register the aggregator with the coordination service, so that the storage writer can find us
 		clusterService.getRegistrationService().registerAsAggregator();
 	}
 

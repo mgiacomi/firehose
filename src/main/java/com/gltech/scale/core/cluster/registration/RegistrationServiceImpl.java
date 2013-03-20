@@ -23,17 +23,14 @@ public class RegistrationServiceImpl implements RegistrationService
 {
 	private static final Logger logger = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 	private ServiceAdvertiser inboundServiceAdvertiser;
-	private ServiceAdvertiser collectorManagerAdvertiser;
+	private ServiceAdvertiser storageWriterAdvertiser;
 	private ServiceAdvertiser aggregatorAdvertiser;
-	private ServiceAdvertiser storageServiceAdvertiser;
 	private ServiceMetaData localInboundServiceMetaData;
-	private ServiceMetaData localCollectorManagerMetaData;
+	private ServiceMetaData localStorageWriterMetaData;
 	private ServiceMetaData localAggregatorMetaData;
-	private ServiceMetaData localStorageServiceMetaData;
 	private ServiceCache<ServiceMetaData> inboundServiceCache;
-	private ServiceCache<ServiceMetaData> collectorManagerCache;
+	private ServiceCache<ServiceMetaData> storageWriterCache;
 	private ServiceCache<ServiceMetaData> aggregatorCache;
-	private ServiceCache<ServiceMetaData> storageServiceCache;
 	private RandomStrategy<ServiceMetaData> randomStorageStrategy = new RandomStrategy<>();
 	private RoundRobinStrategy<ServiceMetaData> roundRobinStorageStrategy = new RoundRobinStrategy<>();
 	private StickyStrategy<ServiceMetaData> stickyStorageStrategy = new StickyStrategy<>(randomStorageStrategy);
@@ -45,24 +42,19 @@ public class RegistrationServiceImpl implements RegistrationService
 		inboundServiceCache = inboundServiceAdvertiser.getServiceCache();
 		inboundServiceCache.addListener(new InboundServiceCacheListener());
 
-		collectorManagerAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.COLLECTOR_SERVICE);
-		collectorManagerCache = collectorManagerAdvertiser.getServiceCache();
-		collectorManagerCache.addListener(new CollectorManagerCacheListener());
+		storageWriterAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.STORAGE_WRITER);
+		storageWriterCache = storageWriterAdvertiser.getServiceCache();
+		storageWriterCache.addListener(new StorageWriterCacheListener());
 
 		aggregatorAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.AGGREGATOR_SERVICE);
 		aggregatorCache = aggregatorAdvertiser.getServiceCache();
 		aggregatorCache.addListener(new AggregatorCacheListener());
 
-		storageServiceAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.STORAGE_SERVICE);
-		storageServiceCache = storageServiceAdvertiser.getServiceCache();
-		storageServiceCache.addListener(new StorageServiceCacheListener());
-
 		try
 		{
 			inboundServiceCache.start();
-			collectorManagerCache.start();
+			storageWriterCache.start();
 			aggregatorCache.start();
-			storageServiceCache.start();
 		}
 		catch (Exception e)
 		{
@@ -92,37 +84,37 @@ public class RegistrationServiceImpl implements RegistrationService
 		logger.info("Unregistered InboundService server host=" + localInboundServiceMetaData.getListenAddress() + " port=" + localInboundServiceMetaData.getListenPort());
 	}
 
-	public ServiceMetaData getLocalCollectorManagerMetaData()
+	public ServiceMetaData getLocalStorageWriterMetaData()
 	{
-		return localCollectorManagerMetaData;
+		return localStorageWriterMetaData;
 	}
 
-	public void registerAsCollectorManager()
+	public void registerAsStorageWriter()
 	{
-		String host = props.get("server_host", Defaults.REST_HOST);
-		int port = props.get("server_port", Defaults.REST_PORT);
+		String host = props.get("storage_writer.rest_host", Defaults.REST_HOST);
+		int port = props.get("storage_writer.rest_port", Defaults.REST_PORT);
 
 		try
 		{
-			localCollectorManagerMetaData = collectorManagerAdvertiser.available(host, port);
-			logger.info("Registering CollectorManager server host=" + host + " port=" + port);
+			localStorageWriterMetaData = storageWriterAdvertiser.available(host, port);
+			logger.info("Registering StorageWriter server host=" + host + " port=" + port);
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to register CollectorManager host=" + host + " port=" + port, e);
+			throw new ClusterException("Failed to register StorageWriter host=" + host + " port=" + port, e);
 		}
 	}
 
-	public void unRegisterAsCollectorManager()
+	public void unRegisterAsStorageWriter()
 	{
-		collectorManagerAdvertiser.unavailable(localCollectorManagerMetaData);
-		logger.info("Unregistered CollectorManager server host=" + localCollectorManagerMetaData.getListenAddress() + " port=" + localCollectorManagerMetaData.getListenPort());
+		storageWriterAdvertiser.unavailable(localStorageWriterMetaData);
+		logger.info("Unregistered StorageWriter server host=" + localStorageWriterMetaData.getListenAddress() + " port=" + localStorageWriterMetaData.getListenPort());
 	}
 
 	public void registerAsAggregator()
 	{
-		String host = props.get("server_host", Defaults.REST_HOST);
-		int port = props.get("server_port", Defaults.REST_PORT);
+		String host = props.get("aggregator.rest_host", Defaults.REST_HOST);
+		int port = props.get("aggregator.rest_port", Defaults.REST_PORT);
 
 		try
 		{
@@ -159,79 +151,6 @@ public class RegistrationServiceImpl implements RegistrationService
 		return null;
 	}
 
-	public void registerAsStorageService()
-	{
-		String host = props.get("server_host", Defaults.REST_HOST);
-		int port = props.get("server_port", Defaults.REST_PORT);
-
-		try
-		{
-			localStorageServiceMetaData = storageServiceAdvertiser.available(host, port);
-			logger.info("Registering StorageService server host=" + host + " port=" + port);
-		}
-		catch (Exception e)
-		{
-			throw new ClusterException("Failed to register StorageService host=" + host + " port=" + port, e);
-		}
-	}
-
-	public void unRegisterAsStorageService()
-	{
-		storageServiceAdvertiser.unavailable(localStorageServiceMetaData);
-		logger.info("Unregistered StorageService server host=" + localStorageServiceMetaData.getListenAddress() + " port=" + localStorageServiceMetaData.getListenPort());
-	}
-
-	public ServiceMetaData getStorageServiceRandom()
-	{
-		try
-		{
-			ServiceInstance<ServiceMetaData> serviceInstance = randomStorageStrategy.getInstance(storageServiceCache);
-			if (serviceInstance != null)
-			{
-				return serviceInstance.getPayload();
-			}
-			return null;
-		}
-		catch (Exception e)
-		{
-			throw Throwables.propagate(e);
-		}
-	}
-
-	public ServiceMetaData getStorageServiceRoundRobin()
-	{
-		try
-		{
-			ServiceInstance<ServiceMetaData> serviceInstance = roundRobinStorageStrategy.getInstance(storageServiceCache);
-			if (serviceInstance != null)
-			{
-				return serviceInstance.getPayload();
-			}
-			return null;
-		}
-		catch (Exception e)
-		{
-			throw Throwables.propagate(e);
-		}
-	}
-
-	public ServiceMetaData getStorageServiceSticky()
-	{
-		try
-		{
-			ServiceInstance<ServiceMetaData> serviceInstance = stickyStorageStrategy.getInstance(storageServiceCache);
-			if (serviceInstance != null)
-			{
-				return serviceInstance.getPayload();
-			}
-			return null;
-		}
-		catch (Exception e)
-		{
-			throw Throwables.propagate(e);
-		}
-	}
-
 	public List<ServiceMetaData> getRegisteredAggregators()
 	{
 		List<ServiceMetaData> serviceMetaDataList = new ArrayList<>();
@@ -249,9 +168,8 @@ public class RegistrationServiceImpl implements RegistrationService
 		try
 		{
 			inboundServiceCache.close();
-			collectorManagerCache.close();
+			storageWriterCache.close();
 			aggregatorCache.close();
-			storageServiceCache.close();
 
 			logger.info("Registration ServiceCache is shutdown.");
 		}
@@ -275,12 +193,12 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
-	private class CollectorManagerCacheListener implements ServiceCacheListener
+	private class StorageWriterCacheListener implements ServiceCacheListener
 	{
 		@Override
 		public void cacheChanged()
 		{
-			logger.info("Registered CollectorManager list has been updated. " + collectorManagerCache.getInstances().size() + " CollectorManager(s) are active.");
+			logger.info("Registered StorageWriter list has been updated. " + storageWriterCache.getInstances().size() + " StorageWriters(s) are active.");
 		}
 
 		@Override
@@ -302,19 +220,4 @@ public class RegistrationServiceImpl implements RegistrationService
 		{
 		}
 	}
-
-	private class StorageServiceCacheListener implements ServiceCacheListener
-	{
-		@Override
-		public void cacheChanged()
-		{
-			logger.info("Registered StorageService list has been updated. " + storageServiceCache.getInstances().size() + " StorageService(s) are active.");
-		}
-
-		@Override
-		public void stateChanged(CuratorFramework curatorFramework, ConnectionState connectionState)
-		{
-		}
-	}
-
 }

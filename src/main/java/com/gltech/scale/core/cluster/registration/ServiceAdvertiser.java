@@ -17,9 +17,8 @@ import java.util.UUID;
 public class ServiceAdvertiser
 {
 	public static final String INBOUND_SERVICE = "InboundService";
-	public static final String COLLECTOR_SERVICE = "CollectorService";
+	public static final String STORAGE_WRITER = "StorageWriter";
 	public static final String AGGREGATOR_SERVICE = "AggregatorService";
-	public static final String STORAGE_SERVICE = "StorageService";
 	public static final String OUTBOUND_SERVICE = "OutboundService";
 
 	private static final Logger logger = LoggerFactory.getLogger(ServiceAdvertiser.class);

@@ -144,12 +144,12 @@ public class EmbeddedServer
 			LifeCycleManager.getInstance().add(weightManager, LifeCycle.Priority.INITIAL);
 		}
 
-		if (props.get("enable.collector_manager", true))
+		if (props.get("enable.storage_writer", true))
 		{
 			// Start the CollectorManager and register it for shutdown
 			StorageWriteManager storageWriteManager = injector.getInstance(StorageWriteManager.class);
 			storageWriteManager.setInjector(injector);
-			new Thread(storageWriteManager, "CollectorManager").start();
+			new Thread(storageWriteManager, "StorageWriter").start();
 			LifeCycleManager.getInstance().add(storageWriteManager, LifeCycle.Priority.INITIAL);
 
 			// Start the ChannelCoordinator and register it for shutdown
