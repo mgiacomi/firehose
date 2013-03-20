@@ -34,16 +34,16 @@ public class ZookeeperClusterService implements ClusterService
 	}
 
 	@Override
-	public void addTimeBucket(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
+	public void registerBatch(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
 		try
 		{
 			BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(channelMetaData, nearestPeriodCeiling);
 
-			if (client.checkExists().forPath("/aggregator/timebuckets/" + batchPeriodMapper.getNodeName()) == null)
+			if (client.checkExists().forPath("/channel/batches/" + batchPeriodMapper.getNodeName()) == null)
 			{
-				client.create().creatingParentsIfNeeded().forPath("/aggregator/timebuckets/" + batchPeriodMapper.getNodeName());
-				logger.info("Registering time Bucket on channel: " + batchPeriodMapper.getNodeName());
+				client.create().creatingParentsIfNeeded().forPath("/channel/batches/" + batchPeriodMapper.getNodeName());
+				logger.info("Registering batch on channel: " + batchPeriodMapper.getNodeName());
 			}
 		}
 		catch (KeeperException.NodeExistsException nee)
@@ -57,13 +57,13 @@ public class ZookeeperClusterService implements ClusterService
 	}
 
 	@Override
-	public BatchPeriodMapper getOldestCollectibleTimeBucket()
+	public BatchPeriodMapper getOldestCollectibleBatch()
 	{
 		List<BatchPeriodMapper> activeBatches = getOrderedActiveBucketList();
 
 		try
 		{
-			ZKPaths.mkdirs(client.getZookeeperClient().getZooKeeper(), "/collector/timebuckets");
+			ZKPaths.mkdirs(client.getZookeeperClient().getZooKeeper(), "/writer/batches");
 
 			List<BatchPeriodMapper> collecting = getCollectingBucketList();
 
@@ -88,7 +88,7 @@ public class ZookeeperClusterService implements ClusterService
 							byte[] collectorManagerMetaData = mapper.writeValueAsBytes(registrationService.getLocalCollectorManagerMetaData());
 
 							// Write to collector time bucket node.
-							client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/collector/timebuckets/" + shortName, collectorManagerMetaData);
+							client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/writer/batches/" + shortName, collectorManagerMetaData);
 							logger.info("Registering collector for time bucket: " + nodeName);
 
 							return activeBatch;
@@ -107,7 +107,7 @@ public class ZookeeperClusterService implements ClusterService
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to get oldest collectible TimeBucketMetaData.", e);
+			throw new ClusterException("Failed to get oldest collectible Batch.", e);
 		}
 
 		return null;
@@ -119,9 +119,9 @@ public class ZookeeperClusterService implements ClusterService
 		{
 			List<BatchPeriodMapper> mappers = new ArrayList<>();
 
-			if (client.checkExists().forPath("/collector/timebuckets") != null)
+			if (client.checkExists().forPath("/writer/batches") != null)
 			{
-				for (String nodeName : client.getChildren().forPath("/collector/timebuckets"))
+				for (String nodeName : client.getChildren().forPath("/writer/batches"))
 				{
 					mappers.add(new BatchPeriodMapper(nodeName));
 				}
@@ -141,9 +141,9 @@ public class ZookeeperClusterService implements ClusterService
 		{
 			List<BatchPeriodMapper> mappers = new ArrayList<>();
 
-			if (client.checkExists().forPath("/channel/timebuckets") != null)
+			if (client.checkExists().forPath("/channel/batches") != null)
 			{
-				for (String nodeName : client.getChildren().forPath("/channel/timebuckets"))
+				for (String nodeName : client.getChildren().forPath("/channel/batches"))
 				{
 					mappers.add(new BatchPeriodMapper(nodeName));
 				}
@@ -166,8 +166,8 @@ public class ZookeeperClusterService implements ClusterService
 
 		try
 		{
-			client.delete().forPath("/collector/timebuckets/" + batchPeriodMapper.getNodeName());
-			logger.info("Clear collector lock for time bucket: " + batchPeriodMapper.getNodeName());
+			client.delete().forPath("/writer/batches/" + batchPeriodMapper.getNodeName());
+			logger.info("Clear collector lock for batch: " + batchPeriodMapper.getNodeName());
 		}
 		catch (Exception e)
 		{
@@ -176,18 +176,18 @@ public class ZookeeperClusterService implements ClusterService
 	}
 
 	@Override
-	public void clearTimeBucketMetaData(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
+	public void clearBatchMetaData(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
 		BatchPeriodMapper batchPeriodMapper = new BatchPeriodMapper(channelMetaData, nearestPeriodCeiling);
 
 		try
 		{
-			client.delete().forPath("/channel/timebuckets/" + batchPeriodMapper.getNodeName());
-			logger.info("Removed TimeBucket: " + batchPeriodMapper.getNodeName());
+			client.delete().forPath("/channel/batches/" + batchPeriodMapper.getNodeName());
+			logger.info("Removed batch: " + batchPeriodMapper.getNodeName());
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to remove channel and collector for time bucket: " + batchPeriodMapper.getNodeName(), e);
+			throw new ClusterException("Failed to remove channel and collector for batch: " + batchPeriodMapper.getNodeName(), e);
 		}
 	}
 

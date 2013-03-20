@@ -56,14 +56,15 @@ public class BatchPeriodMapper implements Comparable<BatchPeriodMapper>
 
 		BatchPeriodMapper that = (BatchPeriodMapper) o;
 
-		if (channelName != null ? !channelName.equals(that.channelName) : that.channelName != null) return false;
+		if (getNodeName() != null ? !getNodeName().equals(that.getNodeName()) : that.getNodeName() != null)
+			return false;
 
 		return true;
 	}
 
 	public int hashCode()
 	{
-		return channelName != null ? channelName.hashCode() : 0;
+		return getNodeName() != null ? getNodeName().hashCode() : 0;
 	}
 
 	public int compareTo(BatchPeriodMapper that)

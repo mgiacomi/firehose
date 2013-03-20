@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public class PerformanceRegression
 {
-private static final long MegaBytes = 1024L * 1024L;
+	private static final long MegaBytes = 1024L * 1024L;
 
 	@Test
 	public void writeProtoStuffToFile() throws Exception
@@ -166,7 +166,7 @@ private static final long MegaBytes = 1024L * 1024L;
 				ProtostuffIOUtil.mergeDelimitedFrom(fis, message, schema);
 				lastMessage = message;
 				message = new Message();
-				//System.out.println(new String(message.getPayload()));
+				//System.out.println(new String(message.getMessages()));
 				counter++;
 			}
 		}

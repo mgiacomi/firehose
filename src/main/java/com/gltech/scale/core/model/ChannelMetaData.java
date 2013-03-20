@@ -73,11 +73,11 @@ public class ChannelMetaData
 
 	private String validateTTL(String ttl)
 	{
-		if(TTL_DAY.equals(ttl) || TTL_MONTH.equals(ttl) || TTL_WEEK.equals(ttl) || TTL_YEAR.equals(ttl))
+		if (TTL_DAY.equals(ttl) || TTL_MONTH.equals(ttl) || TTL_WEEK.equals(ttl) || TTL_YEAR.equals(ttl))
 		{
 			return ttl;
 		}
 
-		throw new IllegalArgumentException("TTL is not supported: "+ ttl);
+		throw new IllegalArgumentException("TTL is not supported: " + ttl);
 	}
 }

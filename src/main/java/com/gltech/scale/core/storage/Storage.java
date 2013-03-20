@@ -9,13 +9,11 @@ import java.util.Map;
 
 public interface Storage
 {
-	void putBucket(ChannelMetaData channelMetaData);
+	void put(ChannelMetaData channelMetaData);
 
-	ChannelMetaData getBucket(String channelName);
+	ChannelMetaData get(String channelName);
 
-	void putPayload(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers);
+	void putMessages(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers);
 
-	void getPayload(String cchannelName, String id, OutputStream outputStream);
-
-	//todo - gfm - 9/24/12 - implement delete
+	void getMessages(String channelName, String id, OutputStream outputStream);
 }

@@ -38,7 +38,8 @@ public class StreamDelimiterTest
 		{
 			streamDelimiter.readNext(bis);
 		}
-		catch(EOFException e) {
+		catch (EOFException e)
+		{
 			gotEOF = true;
 		}
 

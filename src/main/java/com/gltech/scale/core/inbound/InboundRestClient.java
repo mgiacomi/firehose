@@ -3,11 +3,11 @@ package com.gltech.scale.core.inbound;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataException;
-import com.gltech.scale.core.storage.DuplicateBucketException;
+import com.gltech.scale.core.storage.DuplicateChannelException;
 import com.gltech.scale.util.ClientCreator;
-import com.gltech.scale.util.Http404Exception;
 import com.gltech.scale.util.ModelIO;
 import com.google.inject.Inject;
+import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -29,13 +29,13 @@ public class InboundRestClient
 
 	public ChannelMetaData getChannelMetaData(ServiceMetaData inboundService, String channelName)
 	{
-		String url = "http://" + inboundService.getListenAddress() + ":" + inboundService.getListenPort() + "/inbound/" + channelName;
+		String url = "http://" + inboundService.getListenAddress() + ":" + inboundService.getListenPort() + "/inbound/channel/" + channelName;
 		WebResource webResource = client.resource(url);
-		ClientResponse response = webResource.accept("application/json").get(ClientResponse.class);
+		ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
 
 		if (response.getStatus() == 404)
 		{
-			throw new Http404Exception("Bucket does not exist.");
+			throw new NotFoundException();
 		}
 
 		if (response.getStatus() != 200)
@@ -48,13 +48,13 @@ public class InboundRestClient
 
 	public void putChannelMetaData(ServiceMetaData inboundService, ChannelMetaData channelMetaData)
 	{
-		String url = "http://" + inboundService.getListenAddress() + ":" + inboundService.getListenPort() + "/inbound/" + channelMetaData.getName();
+		String url = "http://" + inboundService.getListenAddress() + ":" + inboundService.getListenPort() + "/inbound/channel/new";
 		WebResource webResource = client.resource(url);
-		ClientResponse response = webResource.put(ClientResponse.class, modelIO.toJson(channelMetaData));
+		ClientResponse response = webResource.type(MediaType.APPLICATION_JSON_TYPE).put(ClientResponse.class, modelIO.toJson(channelMetaData));
 
 		if (response.getStatus() == 403)
 		{
-			throw new DuplicateBucketException("Bucket already exists.");
+			throw new DuplicateChannelException("Bucket already exists.");
 		}
 
 		if (response.getStatus() != 201)
@@ -63,7 +63,7 @@ public class InboundRestClient
 		}
 	}
 
-	public void postEvent(ServiceMetaData inboundService, String channelName, String json)
+	public void postMessage(ServiceMetaData inboundService, String channelName, String json)
 	{
 		String url = "http://" + inboundService.getListenAddress() + ":" + inboundService.getListenPort() + "/inbound/" + channelName;
 		WebResource webResource = client.resource(url);
@@ -75,7 +75,7 @@ public class InboundRestClient
 		}
 	}
 
-	public String getEvents(ServiceMetaData inboundService, String channelName, DateTime dateTime, TimeUnit timeUnit)
+	public String getMessages(ServiceMetaData inboundService, String channelName, DateTime dateTime, TimeUnit timeUnit)
 	{
 		String url = "http://" + inboundService.getListenAddress() + ":" + inboundService.getListenPort() + "/inbound/" + channelName + "/";
 

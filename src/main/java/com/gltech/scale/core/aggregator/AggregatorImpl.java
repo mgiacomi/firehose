@@ -1,7 +1,6 @@
 package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
-import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.util.StreamDelimiter;
 import com.google.inject.Inject;
@@ -70,7 +69,7 @@ public class AggregatorImpl implements Aggregator
 
 		if (channel == null)
 		{
-			logger.info("Creating Channel: "+ channelName);
+			logger.info("Creating Channel: " + channelName);
 			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils));
 			channel = channels.putIfAbsent(channelMetaData, newChannel);
 			if (channel == null)
@@ -145,7 +144,7 @@ public class AggregatorImpl implements Aggregator
 
 				if (batch != null)
 				{
-					return timeBucketEventsToStream(outputStream, batch);
+					return batchEventsToStream(outputStream, batch);
 				}
 			}
 		}
@@ -168,7 +167,7 @@ public class AggregatorImpl implements Aggregator
 
 				if (batch != null)
 				{
-					return timeBucketEventsToStream(outputStream, batch);
+					return batchEventsToStream(outputStream, batch);
 				}
 			}
 		}
@@ -176,9 +175,9 @@ public class AggregatorImpl implements Aggregator
 		return 0;
 	}
 
-	private long timeBucketEventsToStream(OutputStream outputStream, Batch batch)
+	private long batchEventsToStream(OutputStream outputStream, Batch batch)
 	{
-		for(byte[] bytes : batch.getMessages())
+		for (byte[] bytes : batch.getMessages())
 		{
 			streamDelimiter.write(outputStream, bytes);
 		}

@@ -74,7 +74,7 @@ public class EmbeddedServer
 		injector = guiceServletConfig.getInjector();
 
 		TimerMap timerMap = new TimerMap();
-		MonitoringPublisher.getInstance().register(new TimerMapPublishMetricGroup("Loki REST", timerMap));
+		MonitoringPublisher.getInstance().register(new TimerMapPublishMetricGroup("REST", timerMap));
 		StatisticsFilter.add(timerMap);
 		StatisticsFilter.add("/events/", "Events");
 		StatisticsFilter.add("/storage/", "Storage");

@@ -53,14 +53,14 @@ public class ChannelStats implements Channel
 				return Long.toString(System.currentTimeMillis() - firstEventTime.getMillis() / 1000);
 			}
 		}));
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " TimeBuckets.Count", groupName, "count", new PublishCallback()
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " Batches.Count", groupName, "count", new PublishCallback()
 		{
 			public String getValue()
 			{
 				return Integer.toString(channel.getBatches().size());
 			}
 		}));
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " TimeBuckets.Size", groupName, "size in kb", new PublishCallback()
+		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " Batches.Size", groupName, "size in kb", new PublishCallback()
 		{
 			public String getValue()
 			{
@@ -77,16 +77,16 @@ public class ChannelStats implements Channel
 
 		if (channel.getChannelMetaData().isRedundant())
 		{
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupEvent.Count", groupName, "count", new TimerCountPublisher("", addBackupEventTimer)));
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupEvent.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupEventTimer)));
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupTimeBuckets.Count", groupName, "count", new PublishCallback()
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupMessage.Count", groupName, "count", new TimerCountPublisher("", addBackupEventTimer)));
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupEventTimer)));
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupBatches.Count", groupName, "count", new PublishCallback()
 			{
 				public String getValue()
 				{
 					return Integer.toString(channel.getBackupBatches().size());
 				}
 			}));
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupTimeBuckets.Size", groupName, "size in kb", new PublishCallback()
+			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupBatches.Size", groupName, "size in kb", new PublishCallback()
 			{
 				public String getValue()
 				{

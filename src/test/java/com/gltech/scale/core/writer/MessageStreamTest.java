@@ -35,7 +35,7 @@ public class MessageStreamTest
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-		for(byte[] bytes : batch.getMessages())
+		for (byte[] bytes : batch.getMessages())
 		{
 			streamDelimiter.write(bos, bytes);
 		}

@@ -38,7 +38,7 @@ public class AggregatorStats implements Aggregator
 		MonitoringPublisher.getInstance().register(new PublishMetric("EventsWritten.Time", groupName, "millis per call", new TimerAveragePublisher("", writtenEventsTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("BackupEventsWritten.Count", groupName, "count", new TimerCountPublisher("", writtenBackupEventsTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("BackupEventsWritten.Time", groupName, "millis per call", new TimerAveragePublisher("", writtenBackupEventsTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("ActiveTimeBuckets.Count", groupName, "count", new PublishCallback()
+		MonitoringPublisher.getInstance().register(new PublishMetric("ActiveBatches.Count", groupName, "count", new PublishCallback()
 		{
 			public String getValue()
 			{

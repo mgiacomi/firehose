@@ -9,11 +9,11 @@ public interface ClusterService extends LifeCycle
 {
 	RegistrationService getRegistrationService();
 
-	BatchPeriodMapper getOldestCollectibleTimeBucket();
+	BatchPeriodMapper getOldestCollectibleBatch();
 
-	void addTimeBucket(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling);
+	void registerBatch(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling);
 
-	void clearTimeBucketMetaData(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling);
+	void clearBatchMetaData(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling);
 
 	void clearCollectorLock(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling);
 }

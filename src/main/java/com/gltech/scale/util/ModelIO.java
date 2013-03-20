@@ -44,6 +44,11 @@ public class ModelIO
 		return new String(JsonIOUtil.toByteArray(message, messageSchema, false));
 	}
 
+	public byte[] toJsonBytes(ChannelMetaData channelMetaData)
+	{
+		return JsonIOUtil.toByteArray(channelMetaData, channelMetaDataSchema, false);
+	}
+
 	public String toJson(ChannelMetaData channelMetaData)
 	{
 		return new String(JsonIOUtil.toByteArray(channelMetaData, channelMetaDataSchema, false));
@@ -59,7 +64,8 @@ public class ModelIO
 		Message message = new Message();
 		ProtostuffIOUtil.mergeFrom(bytes, message, messageSchema);
 
-		if(message.getUuid() == null) {
+		if (message.getUuid() == null)
+		{
 			throw new IllegalArgumentException("The byte[] supplied was not a Protostuff binary array.");
 		}
 

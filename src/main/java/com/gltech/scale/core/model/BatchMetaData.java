@@ -91,7 +91,7 @@ public class BatchMetaData implements Comparable<BatchMetaData>
 
 	public String toString()
 	{
-		return "TimeBucketMetaData{" +
+		return "BatchMetaData{" +
 				"nearestPeriodCeiling=" + nearestPeriodCeiling +
 				", bytes=" + bytes +
 				", eventsAdded=" + eventsAdded +

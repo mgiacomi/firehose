@@ -37,21 +37,21 @@ public class VoldemortStore implements Storage
 		semaphore = new Semaphore(activeUploads);
 	}
 
-	public void putBucket(ChannelMetaData channelMetaData)
+	public void put(ChannelMetaData channelMetaData)
 	{
 		String key = channelMetaData.getName();
 	}
 
-	public ChannelMetaData getBucket(String channelName)
+	public ChannelMetaData get(String channelName)
 	{
 		return new ChannelMetaData(channelName, ChannelMetaData.TTL_DAY, false);
 	}
 
-	public void getPayload(String channelName, String id, OutputStream outputStream)
+	public void getMessages(String channelName, String id, OutputStream outputStream)
 	{
 	}
 
-	public void putPayload(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
+	public void putMessages(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
 	{
 	}
 

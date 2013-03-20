@@ -41,16 +41,16 @@ public class InboundResourceTest
 				return mock(RegistrationService.class);
 			}
 
-			public BatchPeriodMapper getOldestCollectibleTimeBucket()
+			public BatchPeriodMapper getOldestCollectibleBatch()
 			{
 				return null;
 			}
 
-			public void addTimeBucket(ChannelMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+			public void registerBatch(ChannelMetaData bucketMetaData, DateTime nearestPeriodCeiling)
 			{
 			}
 
-			public void clearTimeBucketMetaData(ChannelMetaData bucketMetaData, DateTime nearestPeriodCeiling)
+			public void clearBatchMetaData(ChannelMetaData bucketMetaData, DateTime nearestPeriodCeiling)
 			{
 			}
 

@@ -7,12 +7,14 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.storage.StreamSplitter;
+import com.gltech.scale.util.ModelIO;
 import com.google.common.base.Throwables;
 import com.gltech.scale.ganglia.Timer;
 import com.gltech.scale.ganglia.TimerThreadPoolExecutor;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.Storage;
 import com.gltech.scale.util.Props;
+import com.google.inject.Inject;
 import com.ning.compress.lzf.LZFInputStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -36,9 +38,12 @@ public class AwsS3Store implements Storage
 	private Timer storeTimer = new Timer();
 	private final ThreadPoolExecutor threadPoolExecutor;
 	private final Semaphore semaphore;
+	private ModelIO modelIO;
 
-	public AwsS3Store()
+	@Inject
+	public AwsS3Store(ModelIO modelIO)
 	{
+		this.modelIO = modelIO;
 		s3BucketName = props.get("s3BucketName", "gltech");
 		String accessKey = props.get("accessKey", "AKIAIMCO3L5X25HGADAQ");
 		String secretKey = props.get("secretKey", "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");
@@ -51,12 +56,12 @@ public class AwsS3Store implements Storage
 		semaphore = new Semaphore(activeUploads);
 	}
 
-	public void putBucket(ChannelMetaData channelMetaData)
+	public void put(ChannelMetaData channelMetaData)
 	{
 		String key = channelMetaData.getName();
 
-//byte[] jsonData = channelMetaData.toJson().toString().getBytes();
-byte[] jsonData = null;
+		byte[] jsonData = modelIO.toJsonBytes(channelMetaData);
+
 		ByteArrayInputStream bais = new ByteArrayInputStream(jsonData);
 
 		ObjectMetadata metadata = new ObjectMetadata();
@@ -65,7 +70,7 @@ byte[] jsonData = null;
 		s3Client.putObject(s3BucketName, key, bais, metadata);
 	}
 
-	public ChannelMetaData getBucket(String channelName)
+	public ChannelMetaData get(String channelName)
 	{
 		String key = channelName;
 		S3Object s3Object = null;
@@ -85,8 +90,7 @@ byte[] jsonData = null;
 		try
 		{
 			byte[] data = IOUtils.toByteArray(s3Object.getObjectContent());
-//			return new ChannelMetaData(new String(data));
-return null;
+			return modelIO.toChannelMetaData(new String(data));
 		}
 		catch (IOException e)
 		{
@@ -94,7 +98,7 @@ return null;
 		}
 	}
 
-	public void getPayload(String channelName, String id, OutputStream outputStream)
+	public void getMessages(String channelName, String id, OutputStream outputStream)
 	{
 		String key = keyNameWithUniquePrefix(channelName, id);
 		S3Object s3Object = null;
@@ -111,30 +115,17 @@ return null;
 			}
 		}
 
-		InputStream bis = null;
-
 		try
 		{
-			bis = new LZFInputStream(s3Object.getObjectContent());
-
-			byte[] buffer = new byte[1024];
-			int bytesRead;
-			while ((bytesRead = bis.read(buffer)) != -1)
-			{
-				outputStream.write(buffer, 0, bytesRead);
-			}
+			IOUtils.copy(new LZFInputStream(s3Object.getObjectContent()), outputStream);
 		}
 		catch (IOException e)
 		{
 			throw Throwables.propagate(e);
 		}
-		finally
-		{
-			IOUtils.closeQuietly(bis);
-		}
 	}
 
-	public void putPayload(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
+	public void putMessages(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
 	{
 		String key = keyNameWithUniquePrefix(channelName, id);
 

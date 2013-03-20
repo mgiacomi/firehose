@@ -3,7 +3,6 @@ package com.gltech.scale.core.storage;
 import com.gc.iotools.stream.is.InputStreamFromOutputStream;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.google.inject.Inject;
-import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,12 +23,12 @@ public class StorageClient
 
 	public ChannelMetaData getChannelMetaData(String channelName)
 	{
-		return storage.getBucket(channelName);
+		return storage.get(channelName);
 	}
 
-	public void putBucketMetaData(ChannelMetaData channelMetaData)
+	public void putChannelMetaData(ChannelMetaData channelMetaData)
 	{
-		storage.putBucket(channelMetaData);
+		storage.put(channelMetaData);
 	}
 
 	public InputStream getEventStream(final String channelName, final String id)
@@ -39,7 +38,7 @@ public class StorageClient
 			@Override
 			public Long produce(final OutputStream outputStream) throws Exception
 			{
-				storage.getPayload(channelName, id, outputStream);
+				storage.getMessages(channelName, id, outputStream);
 				return 0L;
 			}
 		};
@@ -48,13 +47,13 @@ public class StorageClient
 	public byte[] get(String channelName, String id)
 	{
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		storage.getPayload(channelName, id, byteArrayOutputStream);
+		storage.getMessages(channelName, id, byteArrayOutputStream);
 		return byteArrayOutputStream.toByteArray();
 	}
 
 	public void put(String channelName, String id, InputStream inputStream)
 	{
-		storage.putPayload(channelName, id, inputStream, new HashMap<String, List<String>>());
+		storage.putMessages(channelName, id, inputStream, new HashMap<String, List<String>>());
 	}
 
 	public void put(String channelName, String id, byte[] payload)

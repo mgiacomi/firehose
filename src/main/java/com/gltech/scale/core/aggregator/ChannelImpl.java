@@ -38,7 +38,7 @@ public class ChannelImpl implements Channel
 		if (batch == null)
 		{
 			// Register batch for collection
-			clusterService.addTimeBucket(channelMetaData, nearestPeriodCeiling);
+			clusterService.registerBatch(channelMetaData, nearestPeriodCeiling);
 
 			Batch newBatch = new Batch(channelMetaData, nearestPeriodCeiling);
 			batch = batches.putIfAbsent(nearestPeriodCeiling, newBatch);
@@ -62,7 +62,7 @@ public class ChannelImpl implements Channel
 			logger.info("Creating Backup Batch " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 
 			// Register batch for collection
-			clusterService.addTimeBucket(channelMetaData, nearestPeriodCeiling);
+			clusterService.registerBatch(channelMetaData, nearestPeriodCeiling);
 
 			Batch newBatch = new Batch(channelMetaData, nearestPeriodCeiling);
 			batch = backupBatches.putIfAbsent(nearestPeriodCeiling, newBatch);

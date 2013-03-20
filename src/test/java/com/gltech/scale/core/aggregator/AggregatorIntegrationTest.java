@@ -94,7 +94,7 @@ public class AggregatorIntegrationTest
 
 		for (String json : requests)
 		{
-			ecrc.postEvent(inboundService, "test1", json);
+			ecrc.postMessage(inboundService, "test1", json);
 		}
 		DateTime first = DateTime.now();
 
@@ -107,7 +107,7 @@ public class AggregatorIntegrationTest
 
 		for (String json : requests2)
 		{
-			ecrc.postEvent(inboundService, "test1", json);
+			ecrc.postMessage(inboundService, "test1", json);
 		}
 		DateTime second = DateTime.now();
 
@@ -189,23 +189,23 @@ public class AggregatorIntegrationTest
 	static class TestStore implements Storage
 	{
 		@Override
-		public ChannelMetaData getBucket(String channelName)
+		public ChannelMetaData get(String channelName)
 		{
 			return new ChannelMetaData("test", ChannelMetaData.TTL_DAY, true);
 		}
 
 		@Override
-		public void putBucket(ChannelMetaData channelMetaData)
+		public void put(ChannelMetaData channelMetaData)
 		{
 		}
 
 		@Override
-		public void putPayload(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
+		public void putMessages(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
 		{
 		}
 
 		@Override
-		public void getPayload(String cchannelName, String id, OutputStream outputStream)
+		public void getMessages(String channelName, String id, OutputStream outputStream)
 		{
 		}
 	}

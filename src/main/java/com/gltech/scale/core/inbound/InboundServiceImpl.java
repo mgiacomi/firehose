@@ -1,5 +1,8 @@
 package com.gltech.scale.core.inbound;
 
+import com.dyuproject.protostuff.ProtostuffIOUtil;
+import com.dyuproject.protostuff.Schema;
+import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -17,7 +20,6 @@ import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.ChannelCache;
-import com.gltech.scale.util.Http404Exception;
 import com.gltech.scale.util.Props;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -25,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -113,60 +116,52 @@ public class InboundServiceImpl implements InboundService
 	@Override
 	public int writeEventsToOutputStream(String channelName, DateTime dateTime, OutputStream outputStream, int recordsWritten)
 	{
+		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 		String id = timePeriodUtils.nearestPeriodCeiling(dateTime).toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
 
-		try
+		int origRecordsWritten = recordsWritten;
+
+		// Make sure the stream gets closed.
+		try (InputStream inputStream = storageClient.getEventStream(channelName, id))
 		{
-			int origRecordsWritten = recordsWritten;
-
-			// Make sure the stream gets closed.
-			try (InputStream inputStream = storageClient.getEventStream(channelName, id))
+			try
 			{
-				JsonFactory f = new MappingJsonFactory();
-				JsonParser jp = f.createJsonParser(inputStream);
-
-				if (jp.nextToken() != null)
+				while (true)
 				{
-					while (jp.nextToken() != JsonToken.END_ARRAY)
+					Message message = new Message();
+					ProtostuffIOUtil.mergeDelimitedFrom(inputStream, message, schema);
+
+					if (recordsWritten > 0)
 					{
-
-//						Message message = Message.jsonToEvent(jp);
-Message message = null;
-
-						if (recordsWritten > 0)
-						{
-							outputStream.write(",".getBytes());
-						}
-
-						if (message.isStored())
-						{
-							byte[] payload = storageClient.get(channelName, message.getUuid());
-							outputStream.write(payload);
-							logger.debug("Reading pre-stored event payload data from storage service: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
-						}
-						else
-						{
-							outputStream.write(message.getPayload());
-						}
-
-						recordsWritten++;
+						outputStream.write(",".getBytes());
 					}
+
+					if (message.isStored())
+					{
+						byte[] payload = storageClient.get(channelName, message.getUuid());
+						outputStream.write(payload);
+						logger.debug("Reading pre-stored event payload data from storage service: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
+					}
+					else
+					{
+						outputStream.write(message.getPayload());
+					}
+
+					recordsWritten++;
 				}
-
-				jp.close();
 			}
-			catch (IOException e)
+			catch (EOFException e)
 			{
-				logger.warn("unable to parse json", e);
-				throw new RuntimeException("unable to parse json", e);
+				// no prob just end of file.
 			}
-
-			logger.debug("Querying events for channelName={} id={} returned {} events.", channelName, id, (recordsWritten - origRecordsWritten));
 		}
-		catch (Http404Exception e)
+		catch (IOException e)
 		{
-			logger.debug("Query returned 404 channelName={} id={} returned {} events.", channelName, id);
+			logger.warn("unable to parse json", e);
+			throw new RuntimeException("unable to parse json", e);
 		}
+
+		logger.debug("Querying events for channelName={} id={} returned {} events.", channelName, id, (recordsWritten - origRecordsWritten));
 
 		return recordsWritten;
 	}

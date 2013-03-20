@@ -130,9 +130,9 @@ public class CoreManualRegression
 
 			InboundRestClient inboundRestClient = new InboundRestClient(new ModelIO());
 
-			System.out.println("1s: " + inboundRestClient.getEvents(inbound, "Matt_1s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
-			System.out.println("2s: " + inboundRestClient.getEvents(inbound, "Matt_2s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
-			System.out.println("3d: " + inboundRestClient.getEvents(inbound, "Matt_3d", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("1s: " + inboundRestClient.getMessages(inbound, "Matt_1s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("2s: " + inboundRestClient.getMessages(inbound, "Matt_2s", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("3d: " + inboundRestClient.getMessages(inbound, "Matt_3d", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
 		}
 	}
 }

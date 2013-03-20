@@ -80,19 +80,19 @@ public class BatchStreamsManagerTest
 		ByteArrayOutputStream bos3 = new ByteArrayOutputStream();
 		ByteArrayOutputStream bos4 = new ByteArrayOutputStream();
 
-		for(byte[] bytes : batch1.getMessages())
+		for (byte[] bytes : batch1.getMessages())
 		{
 			streamDelimiter.write(bos1, bytes);
 		}
-		for(byte[] bytes : batch2.getMessages())
+		for (byte[] bytes : batch2.getMessages())
 		{
 			streamDelimiter.write(bos2, bytes);
 		}
-		for(byte[] bytes : batch3.getMessages())
+		for (byte[] bytes : batch3.getMessages())
 		{
 			streamDelimiter.write(bos3, bytes);
 		}
-		for(byte[] bytes : batch4.getMessages())
+		for (byte[] bytes : batch4.getMessages())
 		{
 			streamDelimiter.write(bos4, bytes);
 		}

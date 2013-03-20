@@ -61,7 +61,7 @@ public class LoadClient
 
 		try
 		{
-//			new StorageServiceRestClient().putBucketMetaData(storageService,
+//			new StorageServiceRestClient().putChannelMetaData(storageService,
 //					new ChannelMetaData("LoadClient", 10, false));
 		}
 		catch (Exception e)
@@ -94,7 +94,7 @@ public class LoadClient
 			inboundService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
 			inboundService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
-			restClient.postEvent(inboundService, channelName, payload);
+			restClient.postMessage(inboundService, channelName, payload);
 
 			//todo - gfm - 11/6/12 - sleep where?
 

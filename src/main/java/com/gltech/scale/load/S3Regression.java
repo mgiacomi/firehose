@@ -4,7 +4,12 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.providers.AwsS3Store;
+import com.gltech.scale.util.ModelIO;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.List;
 
 public class S3Regression
 {
@@ -12,17 +17,13 @@ public class S3Regression
 	{
 		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.INFO);
-		AwsS3Store s3Store = new AwsS3Store();
-//		s3Storage.putPayload("matt", "test", "20130107233405", new FileInputStream(args[0]), new HashMap<String, List<String>>());
+		AwsS3Store s3Store = new AwsS3Store(new ModelIO());
+		s3Store.putMessages("matt_test", "20130107233405", new FileInputStream(args[0]), new HashMap<String, List<String>>());
 
-		String json = "{\"customer\":\"matt\", \"bucket\":\"testb\", \"bucketType\":\"EvEntSet\", \"redundancy\":\"singlewrite\", \"mediaType\":\"application/json\"}";
+		ChannelMetaData channelMetaData = new ChannelMetaData("matt_testb", ChannelMetaData.TTL_DAY, false);
 
-//		ChannelMetaData channelMetaData = new ChannelMetaData(json);
-ChannelMetaData channelMetaData = null;
-
-
-		s3Store.putBucket(channelMetaData);
-		ChannelMetaData channelMetaData1 = s3Store.getBucket("matt");
+		s3Store.put(channelMetaData);
+		ChannelMetaData channelMetaData1 = s3Store.get("matt");
 
 		if (channelMetaData.equals(channelMetaData1))
 		{

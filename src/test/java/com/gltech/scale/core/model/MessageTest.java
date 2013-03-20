@@ -13,7 +13,8 @@ import static junit.framework.Assert.*;
 public class MessageTest
 {
 	@Test
-	public void testToJsonAndBack() throws Exception{
+	public void testToJsonAndBack() throws Exception
+	{
 		ExplicitIdStrategy.Registry registry = new ExplicitIdStrategy.Registry();
 		registry.registerPojo(Message.class, 1);
 		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);

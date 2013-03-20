@@ -53,7 +53,7 @@ public class BatchCollectorImpl implements BatchCollector
 	{
 		if (channelMetaData == null || nearestPeriodCeiling == null)
 		{
-			String error = "TimeBucketCollector can not be started without configuring a BucketMetaData and nearestPeriodCeiling first.";
+			String error = "BatchCollector can not be started without configuring a ChannelMetaData and nearestPeriodCeiling first.";
 			logger.error(error);
 			throw new RuntimeException(error);
 		}
@@ -78,7 +78,7 @@ public class BatchCollectorImpl implements BatchCollector
 					aggregators.add(primaryBackupSet.getPrimary());
 
 					// If there is any discrepancy between the primary and backup rope for a double write bucket,
-					// then pull both and let TimeBucketStreamsManager figure it out. Otherwise only primary is used.
+					// then pull both and let BatchStreamsManager figure it out. Otherwise only primary is used.
 					if (primaryMetaData.getEventsAdded() != backupMetaData.getEventsAdded() || primaryMetaData.getBytes() != backupMetaData.getBytes())
 					{
 						aggregators.add(primaryBackupSet.getBackup());
@@ -118,7 +118,7 @@ public class BatchCollectorImpl implements BatchCollector
 			inputStream.close();
 
 			// Remove time bucket references from the coordination service.
-			clusterService.clearTimeBucketMetaData(channelMetaData, nearestPeriodCeiling);
+			clusterService.clearBatchMetaData(channelMetaData, nearestPeriodCeiling);
 
 			// Data has been written so remove it from all active aggregator.
 			for (ServiceMetaData aggregator : aggregators)
@@ -129,7 +129,7 @@ public class BatchCollectorImpl implements BatchCollector
 
 			long completedIn = System.nanoTime() - start;
 
-			logger.info("Completed collecting TimeBucket for " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + " in " + completedIn / 1000000 + "ms");
+			logger.info("Completed collecting Batch for " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + " in " + completedIn / 1000000 + "ms");
 
 			if (timer != null)
 			{
@@ -138,7 +138,7 @@ public class BatchCollectorImpl implements BatchCollector
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to collect TimeBucket. " + nearestPeriodCeiling + ", " + channelMetaData.toString(), e);
+			logger.error("Failed to collect Batch. " + nearestPeriodCeiling + ", " + channelMetaData.toString(), e);
 			clusterService.clearCollectorLock(channelMetaData, nearestPeriodCeiling);
 		}
 

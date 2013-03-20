@@ -2,16 +2,22 @@ package com.gltech.scale.core.inbound;
 
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.util.Http404Exception;
+import com.gltech.scale.core.storage.Storage;
+import com.gltech.scale.core.storage.providers.MemoryStore;
+import com.gltech.scale.util.ModelIO;
 import com.gltech.scale.util.Props;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import com.google.inject.Singleton;
 import com.netflix.curator.test.TestingServer;
+import com.sun.jersey.api.NotFoundException;
 import org.joda.time.DateTime;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -20,16 +26,13 @@ import static junit.framework.Assert.assertEquals;
 
 public class EventResourceRegression
 {
-/*
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
 	static private Props props;
 	private TestingServer testingServer;
 	private InboundRestClient inboundRestClient;
-	private StorageServiceRestClient storageServiceRestClient;
-	private ServiceMetaData eventService;
-	private ServiceMetaData storageService;
+	private ServiceMetaData inboundService;
 	private ChannelMetaData bmd1;
 	private TimePeriodUtils timePeriodUtils;
 
@@ -39,21 +42,22 @@ public class EventResourceRegression
 		testingServer = new TestingServer(21818);
 
 		// Pops and test classes have to be static to be used by embedded server.
-		eventService = new ServiceMetaData();
-		eventService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
-		eventService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
+		inboundService = new ServiceMetaData();
+		inboundService.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
+		inboundService.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
-		storageService = new ServiceMetaData();
-		storageService.setListenAddress(props.get("storage.rest_host", Defaults.REST_HOST));
-		storageService.setListenPort(props.get("storage.rest_port", Defaults.REST_PORT));
-
-		inboundRestClient = new InboundRestClient();
-		storageServiceRestClient = new StorageServiceRestClient();
+		inboundRestClient = new InboundRestClient(new ModelIO());
 		timePeriodUtils = new TimePeriodUtils();
 
-		bmd1 = createBucketMetaData("Matt", "Music");
+		bmd1 = createBucketMetaData("Matt_Music");
 
-		EmbeddedServer.start(9090);
+		EmbeddedServer.start(9090, new Module()
+		{
+			public void configure(Binder binder)
+			{
+				binder.bind(Storage.class).to(MemoryStore.class).in(Singleton.class);
+			}
+		});
 	}
 
 	@After
@@ -78,34 +82,34 @@ public class EventResourceRegression
 	@Test
 	public void createdAndGetBucketMetaData() throws Exception
 	{
-		storageServiceRestClient.putBucketMetaData(storageService, bmd1);
-		ChannelMetaData bmd2 = inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
+		inboundRestClient.putChannelMetaData(inboundService, bmd1);
+		ChannelMetaData bmd2 = inboundRestClient.getChannelMetaData(inboundService, "Matt_Music");
 		assertEquals(bmd1, bmd2);
 	}
 
 	@Test
 	public void createIfDoesNotExist() throws Exception
 	{
-		exception.expect(Http404Exception.class);
-		inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
+		exception.expect(NotFoundException.class);
+		inboundRestClient.getChannelMetaData(inboundService, "Matt_Music");
 	}
 
 	@Test
 	public void postEvenIfBucketDoesNotExist() throws Exception
 	{
-		inboundRestClient.postMessage(eventService, "test1", "test2", "{}");
+		inboundRestClient.postMessage(inboundService, "test1_test2", "{}");
+		Thread.sleep(2000);
+		ChannelMetaData cmd = inboundRestClient.getChannelMetaData(inboundService, "test1_test2");
+		assertEquals("test1_test2", cmd.getName());
 	}
-
 
 	@Test
 	public void postAndGetSomeEvents() throws Exception
 	{
-		storageServiceRestClient.putBucketMetaData(storageService, bmd1);
+		inboundRestClient.putChannelMetaData(inboundService, bmd1);
 
-		ChannelMetaData bmd2 = inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
-		assertEquals(bmd1, bmd2);
-
-		ChannelMetaData channelMetaData = inboundRestClient.getBucketMetaData(eventService, "Matt", "Music");
+		ChannelMetaData channelMetaData = inboundRestClient.getChannelMetaData(inboundService, "Matt_Music");
+		assertEquals(bmd1, channelMetaData);
 
 		List<String> requests = new ArrayList<>();
 		requests.add("{\"singer\":\"Metallica\",\"title\":\"Fade To Black\"}");
@@ -127,7 +131,7 @@ public class EventResourceRegression
 		StringBuilder expectedResults1 = new StringBuilder();
 		for (String json : requests)
 		{
-			inboundRestClient.postMessage(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), json);
+			inboundRestClient.postMessage(inboundService, channelMetaData.getName(), json);
 			if (expectedResults1.length() > 0)
 			{
 				expectedResults1.append(",");
@@ -141,7 +145,7 @@ public class EventResourceRegression
 		StringBuilder expectedResults2 = new StringBuilder();
 		for (String json : requests2)
 		{
-			inboundRestClient.postMessage(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), json);
+			inboundRestClient.postMessage(inboundService, channelMetaData.getName(), json);
 			if (expectedResults2.length() > 0)
 			{
 				expectedResults2.append(",");
@@ -152,27 +156,26 @@ public class EventResourceRegression
 
 		DateTime nowish = DateTime.now().withSecondOfMinute(0).withMillisOfSecond(0);
 
-		Thread.sleep(60000);
+		Thread.sleep(20000);
 
-		String firstEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(first), TimeUnit.SECONDS);
+		String firstEvents = inboundRestClient.getMessages(inboundService, channelMetaData.getName(), timePeriodUtils.nearestPeriodCeiling(first), TimeUnit.SECONDS);
 		assertEquals("[" + expectedResults1 + "]", firstEvents);
 
-		String secondEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), timePeriodUtils.nearestPeriodCeiling(second), TimeUnit.SECONDS);
+		String secondEvents = inboundRestClient.getMessages(inboundService, channelMetaData.getName(), timePeriodUtils.nearestPeriodCeiling(second), TimeUnit.SECONDS);
 		assertEquals("[" + expectedResults2 + "]", secondEvents);
 
-		String allEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.MINUTES);
+		String allEvents = inboundRestClient.getMessages(inboundService, channelMetaData.getName(), nowish, TimeUnit.MINUTES);
 		assertEquals("[" + expectedResults1 + "," + expectedResults2 + "]", allEvents);
 
-		allEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.HOURS);
+		allEvents = inboundRestClient.getMessages(inboundService, channelMetaData.getName(), nowish, TimeUnit.HOURS);
 		assertEquals("[" + expectedResults1 + "," + expectedResults2 + "]", allEvents);
 
-		allEvents = inboundRestClient.getMessages(eventService, channelMetaData.getCustomer(), channelMetaData.getBucket(), nowish, TimeUnit.DAYS);
+		allEvents = inboundRestClient.getMessages(inboundService, channelMetaData.getName(), nowish, TimeUnit.DAYS);
 		assertEquals("[" + expectedResults1 + "," + expectedResults2 + "]", allEvents);
 	}
 
-	private ChannelMetaData createBucketMetaData(String customer, String bucket)
+	private ChannelMetaData createBucketMetaData(String channelName)
 	{
-		return new ChannelMetaData(customer, bucket, ChannelMetaData.BucketType.eventset, 5, MediaType.APPLICATION_JSON_TYPE, ChannelMetaData.LifeTime.small, ChannelMetaData.Redundancy.singlewrite);
+		return new ChannelMetaData(channelName, ChannelMetaData.TTL_DAY, false);
 	}
-*/
 }

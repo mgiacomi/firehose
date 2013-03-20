@@ -59,37 +59,48 @@ public class Message
 
 	public String getMimeType()
 	{
-		if(mimeTypeId == 1) {
+		if (mimeTypeId == 1)
+		{
 			return MediaType.APPLICATION_XML;
 		}
-		if(mimeTypeId == 2) {
+		if (mimeTypeId == 2)
+		{
 			return MediaType.APPLICATION_ATOM_XML;
 		}
-		if(mimeTypeId == 3) {
+		if (mimeTypeId == 3)
+		{
 			return MediaType.APPLICATION_XHTML_XML;
 		}
-		if(mimeTypeId == 4) {
+		if (mimeTypeId == 4)
+		{
 			return MediaType.APPLICATION_SVG_XML;
 		}
-		if(mimeTypeId == 5) {
+		if (mimeTypeId == 5)
+		{
 			return MediaType.APPLICATION_JSON;
 		}
-		if(mimeTypeId == 6) {
+		if (mimeTypeId == 6)
+		{
 			return MediaType.APPLICATION_FORM_URLENCODED;
 		}
-		if(mimeTypeId == 7) {
+		if (mimeTypeId == 7)
+		{
 			return MediaType.MULTIPART_FORM_DATA;
 		}
-		if(mimeTypeId == 8) {
+		if (mimeTypeId == 8)
+		{
 			return MediaType.APPLICATION_OCTET_STREAM;
 		}
-		if(mimeTypeId == 9) {
+		if (mimeTypeId == 9)
+		{
 			return MediaType.TEXT_PLAIN;
 		}
-		if(mimeTypeId == 10) {
+		if (mimeTypeId == 10)
+		{
 			return MediaType.TEXT_XML;
 		}
-		if(mimeTypeId == 11) {
+		if (mimeTypeId == 11)
+		{
 			return MediaType.TEXT_HTML;
 		}
 
@@ -98,37 +109,48 @@ public class Message
 
 	public MediaType getMediaType()
 	{
-		if(mimeTypeId == 1) {
+		if (mimeTypeId == 1)
+		{
 			return MediaType.APPLICATION_XML_TYPE;
 		}
-		if(mimeTypeId == 2) {
+		if (mimeTypeId == 2)
+		{
 			return MediaType.APPLICATION_ATOM_XML_TYPE;
 		}
-		if(mimeTypeId == 3) {
+		if (mimeTypeId == 3)
+		{
 			return MediaType.APPLICATION_XHTML_XML_TYPE;
 		}
-		if(mimeTypeId == 4) {
+		if (mimeTypeId == 4)
+		{
 			return MediaType.APPLICATION_SVG_XML_TYPE;
 		}
-		if(mimeTypeId == 5) {
+		if (mimeTypeId == 5)
+		{
 			return MediaType.APPLICATION_JSON_TYPE;
 		}
-		if(mimeTypeId == 6) {
+		if (mimeTypeId == 6)
+		{
 			return MediaType.APPLICATION_FORM_URLENCODED_TYPE;
 		}
-		if(mimeTypeId == 7) {
+		if (mimeTypeId == 7)
+		{
 			return MediaType.MULTIPART_FORM_DATA_TYPE;
 		}
-		if(mimeTypeId == 8) {
+		if (mimeTypeId == 8)
+		{
 			return MediaType.APPLICATION_OCTET_STREAM_TYPE;
 		}
-		if(mimeTypeId == 9) {
+		if (mimeTypeId == 9)
+		{
 			return MediaType.TEXT_PLAIN_TYPE;
 		}
-		if(mimeTypeId == 10) {
+		if (mimeTypeId == 10)
+		{
 			return MediaType.TEXT_XML_TYPE;
 		}
-		if(mimeTypeId == 11) {
+		if (mimeTypeId == 11)
+		{
 			return MediaType.TEXT_HTML_TYPE;
 		}
 
@@ -181,41 +203,52 @@ public class Message
 
 	private int getIdForMediaType(MediaType mediaType)
 	{
-		if(mediaType.equals(MediaType.APPLICATION_XML_TYPE)) {
+		if (mediaType.equals(MediaType.APPLICATION_XML_TYPE))
+		{
 			return 1;
 		}
-		if(mediaType.equals(MediaType.APPLICATION_ATOM_XML_TYPE)) {
+		if (mediaType.equals(MediaType.APPLICATION_ATOM_XML_TYPE))
+		{
 			return 2;
 		}
-		if(mediaType.equals(MediaType.APPLICATION_XHTML_XML_TYPE)) {
+		if (mediaType.equals(MediaType.APPLICATION_XHTML_XML_TYPE))
+		{
 			return 3;
 		}
-		if(mediaType.equals(MediaType.APPLICATION_SVG_XML_TYPE)) {
+		if (mediaType.equals(MediaType.APPLICATION_SVG_XML_TYPE))
+		{
 			return 4;
 		}
-		if(mediaType.equals(MediaType.APPLICATION_JSON_TYPE)) {
+		if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE))
+		{
 			return 5;
 		}
-		if(mediaType.equals(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
+		if (mediaType.equals(MediaType.APPLICATION_FORM_URLENCODED_TYPE))
+		{
 			return 6;
 		}
-		if(mediaType.equals(MediaType.MULTIPART_FORM_DATA_TYPE)) {
+		if (mediaType.equals(MediaType.MULTIPART_FORM_DATA_TYPE))
+		{
 			return 7;
 		}
-		if(mediaType.equals(MediaType.APPLICATION_OCTET_STREAM_TYPE)) {
+		if (mediaType.equals(MediaType.APPLICATION_OCTET_STREAM_TYPE))
+		{
 			return 8;
 		}
-		if(mediaType.equals(MediaType.TEXT_PLAIN_TYPE)) {
+		if (mediaType.equals(MediaType.TEXT_PLAIN_TYPE))
+		{
 			return 9;
 		}
-		if(mediaType.equals(MediaType.TEXT_XML_TYPE)) {
+		if (mediaType.equals(MediaType.TEXT_XML_TYPE))
+		{
 			return 10;
 		}
-		if(mediaType.equals(MediaType.TEXT_HTML_TYPE)) {
+		if (mediaType.equals(MediaType.TEXT_HTML_TYPE))
+		{
 			return 11;
 		}
 
-		throw new IllegalStateException("No MediaType match found: "+ mediaType.toString());
+		throw new IllegalStateException("No MediaType match found: " + mediaType.toString());
 	}
 
 	public String toString()

@@ -7,15 +7,12 @@ import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.util.ModelIO;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +40,7 @@ public class BatchStreamsManager
 
 	public long writeMessages(OutputStream outputStream)
 	{
+//ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		logger.debug("Starting aggregator -> storage stream merge. " + customerBatchPeriod);
 
 		long recordsReceived = 0;
@@ -97,11 +95,15 @@ public class BatchStreamsManager
 				// If we have a candidate then write it to the stream.
 				if (candidateNextRecord != null)
 				{
-					bytesWritten =+ ProtostuffIOUtil.writeDelimitedTo(outputStream, candidateNextRecord.getCurrentMessage(), schema, linkedBuffer);
+					bytesWritten = +ProtostuffIOUtil.writeDelimitedTo(outputStream, candidateNextRecord.getCurrentMessage(), schema, linkedBuffer);
 					processedMessages.add(candidateNextRecord.getCurrentMessage().getUuid());
 					candidateNextRecord.nextRecord();
 					recordsReceived++;
 					linkedBuffer.clear();
+/*
+					ProtostuffIOUtil.writeDelimitedTo(baos, candidateNextRecord.getCurrentMessage(), schema, linkedBuffer);
+					linkedBuffer.clear();
+*/
 				}
 			}
 		}
@@ -126,7 +128,28 @@ public class BatchStreamsManager
 			}
 		}
 
-		logger.info("customerBatchPeriod={}, streams merged={}, processed messages={}, total messages={}, size={}mb", customerBatchPeriod, totalStreams, processedMessages.size(), recordsReceived, bytesWritten / Defaults.MEGABYTES);
+		logger.info("Completed stream merge: customerBatchPeriod={}, streams merged={}, processed messages={}, total messages={}, size={}mb", customerBatchPeriod, totalStreams, processedMessages.size(), recordsReceived, bytesWritten / Defaults.MEGABYTES);
+/*
+Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
+ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+try
+{
+	while (true)
+	{
+		Message message = new Message();
+		ProtostuffIOUtil.mergeDelimitedFrom(bais, message, schema);
+		System.out.println("MESSAGE: "+ message);
+	}
+}
+catch (EOFException e)
+{
+	// no prob just end of file.
+}
+catch (IOException e)
+{
+	e.printStackTrace();
+}
+*/
 
 		return processedMessages.size();
 	}

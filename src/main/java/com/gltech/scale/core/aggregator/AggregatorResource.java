@@ -4,7 +4,6 @@ import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.util.ModelIO;
 import com.google.inject.Inject;
-import com.gltech.scale.util.Http404Exception;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.*;
@@ -47,8 +46,8 @@ public class AggregatorResource
 
 	@DELETE
 	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/clear")
-	public Response clearTimeBucket(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
-									@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
+	public Response clearBatch(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
+							   @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
 		aggregator.clear(channelName, dateTime);
@@ -59,106 +58,78 @@ public class AggregatorResource
 	@GET
 	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/messages")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response timeBucketEvents(@PathParam("channelName") final String channelName, @PathParam("year") int year, @PathParam("month") int month,
-									 @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
+	public Response batchMessages(@PathParam("channelName") final String channelName, @PathParam("year") int year, @PathParam("month") int month,
+								  @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		final DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
 
-		try
+		StreamingOutput out = new StreamingOutput()
 		{
-			StreamingOutput out = new StreamingOutput()
+			public void write(OutputStream output) throws IOException, WebApplicationException
 			{
-				public void write(OutputStream output) throws IOException, WebApplicationException
+				try
 				{
-					try
-					{
-						aggregator.writeBatchMessages(output, channelName, dateTime);
-					}
-					catch (Exception e)
-					{
-						throw new WebApplicationException(e);
-					}
+					aggregator.writeBatchMessages(output, channelName, dateTime);
 				}
-			};
+				catch (Exception e)
+				{
+					throw new WebApplicationException(e);
+				}
+			}
+		};
 
-			return Response.ok(out, MediaType.APPLICATION_JSON_TYPE).build();
-		}
-		catch (Http404Exception e)
-		{
-			return Response.status(404).build();
-		}
+		return Response.ok(out, MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@GET
 	@Path("/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}/backup/messages")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response backupTimeBucketEvents(@PathParam("channelName") final String channelName, @PathParam("year") int year, @PathParam("month") int month,
-										   @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
+	public Response backupBatchMessages(@PathParam("channelName") final String channelName, @PathParam("year") int year, @PathParam("month") int month,
+										@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		final DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
 
-		try
+		StreamingOutput out = new StreamingOutput()
 		{
-			StreamingOutput out = new StreamingOutput()
+			public void write(OutputStream output) throws IOException, WebApplicationException
 			{
-				public void write(OutputStream output) throws IOException, WebApplicationException
+				try
 				{
-					try
-					{
-						aggregator.writeBackupBatchMessages(output, channelName, dateTime);
-					}
-					catch (Exception e)
-					{
-						throw new WebApplicationException(e);
-					}
+					aggregator.writeBackupBatchMessages(output, channelName, dateTime);
 				}
-			};
+				catch (Exception e)
+				{
+					throw new WebApplicationException(e);
+				}
+			}
+		};
 
-			return Response.ok(out, MediaType.APPLICATION_JSON_TYPE).build();
-		}
-		catch (Http404Exception e)
-		{
-			return Response.status(404).build();
-		}
+		return Response.ok(out, MediaType.APPLICATION_JSON_TYPE).build();
 	}
 
 	@GET
-	@Path("/{channelName}/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
+	@Path("/{channelName}/batch/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response timeBucketMetaData(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
-									   @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
+	public Response batchMetaData(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
+								  @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
 
-		try
-		{
-			BatchMetaData batchMetaData = aggregator.getBatchMetaData(channelName, dateTime);
+		BatchMetaData batchMetaData = aggregator.getBatchMetaData(channelName, dateTime);
 
-			return Response.ok(modelIO.toJson(batchMetaData), MediaType.APPLICATION_JSON).build();
-		}
-		catch (Http404Exception e)
-		{
-			return Response.status(404).build();
-		}
+		return Response.ok(modelIO.toJson(batchMetaData), MediaType.APPLICATION_JSON).build();
 	}
 
 	@GET
-	@Path("/{channelName}/backup/timebucket/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
+	@Path("/{channelName}/backup/batch/{year}/{month}/{day}/{hour}/{min}/{sec}/metadata")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response backupTimeBucketMetaData(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
-											 @PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
+	public Response backupBatchMetaData(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month,
+										@PathParam("day") int day, @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec)
 	{
 		DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
 
-		try
-		{
-			BatchMetaData batchMetaData = aggregator.getBatchBucketMetaData(channelName, dateTime);
+		BatchMetaData batchMetaData = aggregator.getBatchBucketMetaData(channelName, dateTime);
 
-			return Response.ok(modelIO.toJson(batchMetaData), MediaType.APPLICATION_JSON).build();
-		}
-		catch (Http404Exception e)
-		{
-			return Response.status(404).build();
-		}
+		return Response.ok(modelIO.toJson(batchMetaData), MediaType.APPLICATION_JSON).build();
 	}
 }

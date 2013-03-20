@@ -24,7 +24,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 	private Injector injector;
 	private ClusterService clusterService;
 	private ChannelCache channelCache;
-	private Timer collectTimeBucketTimer = new Timer();
+	private Timer collectBatchTimer = new Timer();
 	private TimerMap timerMap = new TimerMap();
 	private int periodSeconds;
 
@@ -35,9 +35,9 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 		this.channelCache = channelCache;
 		this.periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
 
-		String groupName = "Loki Collector";
-		MonitoringPublisher.getInstance().register(new PublishMetric("CollectTimeBucket.Count", groupName, "count", new TimerCountPublisher("", collectTimeBucketTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("CollectTimeBucket.AvgTime", groupName, "avg time in millis", new TimerAveragePublisher("", collectTimeBucketTimer)));
+		String groupName = "Collector";
+		MonitoringPublisher.getInstance().register(new PublishMetric("CollectBatch.Count", groupName, "count", new TimerCountPublisher("", collectBatchTimer)));
+		MonitoringPublisher.getInstance().register(new PublishMetric("CollectBatch.AvgTime", groupName, "avg time in millis", new TimerAveragePublisher("", collectBatchTimer)));
 		MonitoringPublisher.getInstance().register(new TimerMapPublishMetricGroup(groupName, timerMap));
 
 		// Register the event service with the coordination service
@@ -51,7 +51,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 		int activeCollectors = props.get("collector.manager.active_collectors", 100);
 
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
-		ThreadPoolExecutor threadPoolExecutor = new TimerThreadPoolExecutor(activeCollectors, activeCollectors, 1, TimeUnit.MINUTES, queue, new CollectorManagerThreadFactory(), collectTimeBucketTimer);
+		ThreadPoolExecutor threadPoolExecutor = new TimerThreadPoolExecutor(activeCollectors, activeCollectors, 1, TimeUnit.MINUTES, queue, new CollectorManagerThreadFactory(), collectBatchTimer);
 		logger.info("ThreadPoolExecutor started with " + activeCollectors + " active collectors.");
 
 		try
@@ -60,7 +60,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 			{
 				if (threadPoolExecutor.getActiveCount() < activeCollectors)
 				{
-					BatchPeriodMapper batchPeriodMapper = clusterService.getOldestCollectibleTimeBucket();
+					BatchPeriodMapper batchPeriodMapper = clusterService.getOldestCollectibleBatch();
 
 					if (batchPeriodMapper != null)
 					{
@@ -83,7 +83,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 							continue;
 						}
 
-						logger.debug("TimeBucketMataData submitted for collection: {}|{}", batchPeriodMapper.getChannelName(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+						logger.debug("BatchMataData submitted for collection: {}|{}", batchPeriodMapper.getChannelName(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 
 						continue;
 					}
@@ -154,7 +154,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 	{
 		public Thread newThread(Runnable r)
 		{
-			return new Thread(r, "TimeBucketCollector");
+			return new Thread(r, "BatchCollector");
 		}
 	}
 }

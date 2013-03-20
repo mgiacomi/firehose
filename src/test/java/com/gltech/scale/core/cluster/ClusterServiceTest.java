@@ -53,7 +53,7 @@ public class ClusterServiceTest
 	@Test
 	public void fullPathToNameOnly()
 	{
-		assertEquals("C|B|20121011150500", BatchPeriodMapper.nodeNameStripPath("/channel/timebuckets/C|B|20121011150500"));
+		assertEquals("C|B|20121011150500", BatchPeriodMapper.nodeNameStripPath("/channel/batches/C|B|20121011150500"));
 	}
 
 	@Test
