@@ -66,8 +66,8 @@ public class VoldemortStore implements Storage
 		try
 		{
 			byte[] bytes = IOUtils.toByteArray(inputStream);
-			messageClient.put(id, bytes);
-			logger.info("Wrote {} bytes for key {}", bytes.length, id);
+			messageClient.put(channelMetaData.getName() +"|"+id, bytes);
+			logger.info("Wrote {} bytes for key {}", bytes.length, channelMetaData.getName() +"|"+id);
 		}
 		catch (IOException e)
 		{
@@ -82,7 +82,7 @@ public class VoldemortStore implements Storage
 
 		try
 		{
-			Versioned<byte[]> versioned = messageClient.get(id);
+			Versioned<byte[]> versioned = messageClient.get(channelMetaData.getName() +"|"+id);
 
 			if (versioned != null && versioned.getValue().length > 0)
 			{
@@ -99,13 +99,13 @@ public class VoldemortStore implements Storage
 	public void putBytes(ChannelMetaData channelMetaData, String id, byte[] data)
 	{
 		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
-		messageClient.put(id, data);
+		messageClient.put(channelMetaData.getName() +"|"+id, data);
 	}
 
 	@Override
 	public byte[] getBytes(ChannelMetaData channelMetaData, String id)
 	{
 		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
-		return messageClient.get(id).getValue();
+		return messageClient.get(channelMetaData.getName() +"|"+id).getValue();
 	}
 }
