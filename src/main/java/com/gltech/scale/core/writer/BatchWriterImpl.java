@@ -30,6 +30,7 @@ public class BatchWriterImpl implements BatchWriter
 	private StorageClient storageClient;
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;
+	private String customerBatchPeriod;
 	private Timer timer;
 
 	@Inject
@@ -46,6 +47,7 @@ public class BatchWriterImpl implements BatchWriter
 	{
 		this.channelMetaData = channelMetaData;
 		this.nearestPeriodCeiling = nearestPeriodCeiling;
+		this.customerBatchPeriod = channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + "|" + channelMetaData.isRedundant();
 	}
 
 	@Override
@@ -82,6 +84,7 @@ public class BatchWriterImpl implements BatchWriter
 					if (primaryMetaData.getMessagesAdded() != backupMetaData.getMessagesAdded() || primaryMetaData.getBytes() != backupMetaData.getBytes())
 					{
 						aggregators.add(primaryBackupSet.getBackup());
+						logger.warn("A discrepancy between primary and backup aggregators has been detected for {}", customerBatchPeriod);
 					}
 				}
 				else
@@ -129,7 +132,7 @@ public class BatchWriterImpl implements BatchWriter
 
 			long completedIn = System.nanoTime() - start;
 
-			logger.info("Completed writing Batch for " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + " in " + completedIn / 1000000 + "ms");
+			logger.info("Completed writing Batch for " + customerBatchPeriod + " in " + completedIn / 1000000 + "ms");
 
 			if (timer != null)
 			{
@@ -138,7 +141,7 @@ public class BatchWriterImpl implements BatchWriter
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to write Batch. " + nearestPeriodCeiling + ", " + channelMetaData.toString(), e);
+			logger.error("Failed to write Batch. " + customerBatchPeriod, e);
 			clusterService.clearStorageWriterLock(channelMetaData, nearestPeriodCeiling);
 		}
 

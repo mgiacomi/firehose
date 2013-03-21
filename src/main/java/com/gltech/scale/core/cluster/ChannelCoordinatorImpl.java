@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChannelCoordinatorImpl implements ChannelCoordinator
@@ -36,6 +38,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	private final ObjectMapper mapper = new ObjectMapper();
 	private Props props = Props.getProps();
 	private List<Integer> registeredSetsHist = new CopyOnWriteArrayList<>();
+	private ConcurrentMap<DateTime, AggregatorsByPeriod> aggregatorPeriodMatricesCache = new ConcurrentHashMap<>();
 	private volatile boolean shutdown = false;
 
 	@Inject
@@ -129,11 +132,26 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	{
 		nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(nearestPeriodCeiling);
 
-		AggregatorsByPeriod aggregatorsByPeriod = readAggregatorsByPeriod(nearestPeriodCeiling);
+		AggregatorsByPeriod aggregatorsByPeriod = aggregatorPeriodMatricesCache.get(nearestPeriodCeiling);
 
+		// Was it in the cache
 		if (aggregatorsByPeriod == null)
 		{
-			aggregatorsByPeriod = writeAggregatorByPeriod(nearestPeriodCeiling);
+			AggregatorsByPeriod newAggregatorsByPeriod = readAggregatorsByPeriod(nearestPeriodCeiling);
+
+			// Was this period already registered with ZK
+			if (newAggregatorsByPeriod == null)
+			{
+				// It has not been registered yet, let's register the period now.
+				newAggregatorsByPeriod = writeAggregatorByPeriod(nearestPeriodCeiling);
+			}
+
+			// Update the cache
+			aggregatorsByPeriod = aggregatorPeriodMatricesCache.putIfAbsent(nearestPeriodCeiling, newAggregatorsByPeriod);
+			if (aggregatorsByPeriod == null)
+			{
+				aggregatorsByPeriod = newAggregatorsByPeriod;
+			}
 		}
 
 		return aggregatorsByPeriod;

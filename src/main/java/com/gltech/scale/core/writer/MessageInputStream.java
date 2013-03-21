@@ -54,7 +54,7 @@ public class MessageInputStream implements MessageStream
 			}
 			catch (IOException e)
 			{
-				throw new RuntimeException("unable to part messages from InputStream for " + customerBucketPeriod, e);
+				throw new RuntimeException("Unable to part messages from InputStream for " + customerBucketPeriod, e);
 			}
 		}
 		else

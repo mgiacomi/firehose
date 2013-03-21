@@ -9,6 +9,7 @@ import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.ChannelCache;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,15 +138,22 @@ public class AggregatorImpl implements Aggregator
 		if (channelMetaData != null)
 		{
 			Channel channel = channels.get(channelMetaData);
+			DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(dateTime);
 
 			if (channel != null)
 			{
-				Batch batch = channels.get(channelMetaData).getBatch(timePeriodUtils.nearestPeriodCeiling(dateTime));
+				Batch batch = channels.get(channelMetaData).getBatch(nearestPeriodCeiling);
 
 				if (batch != null)
 				{
-					return batchMessagesToStream(outputStream, batch);
+					long messagesWritten = batchMessagesToStream(outputStream, batch);
+					logger.warn("Collected {} primary messages from batch: {}", messagesWritten, channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+					return messagesWritten;
 				}
+			}
+			else
+			{
+				logger.warn("Trying to collect primary messages from a null batch: {}", channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 			}
 		}
 
@@ -160,6 +168,7 @@ public class AggregatorImpl implements Aggregator
 		if (channelMetaData != null)
 		{
 			Channel channel = channels.get(channelMetaData);
+			DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(dateTime);
 
 			if (channel != null)
 			{
@@ -167,8 +176,14 @@ public class AggregatorImpl implements Aggregator
 
 				if (batch != null)
 				{
-					return batchMessagesToStream(outputStream, batch);
+					long messagesWritten = batchMessagesToStream(outputStream, batch);
+					logger.warn("Collected {} backup messages from batch: {}", messagesWritten, channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+					return messagesWritten;
 				}
+			}
+			else
+			{
+				logger.warn("Trying to collect backup messages from a null batch: {}", channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 			}
 		}
 

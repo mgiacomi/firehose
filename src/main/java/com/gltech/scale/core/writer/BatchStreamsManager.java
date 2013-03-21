@@ -114,7 +114,7 @@ public class BatchStreamsManager
 			}
 			catch (IOException e)
 			{
-				// Ignore
+				logger.error("Error while closing stream "+ customerBatchPeriod, e);
 			}
 
 			for (MessageStream messageStream : batchStreams)
@@ -123,7 +123,7 @@ public class BatchStreamsManager
 			}
 		}
 
-		logger.info("Completed stream merge: customerBatchPeriod={}, streams merged={}, processed messages={}, total messages={}, size={}mb", customerBatchPeriod, totalStreams, processedMessages.size(), recordsReceived, bytesWritten / Defaults.MEGABYTES);
+		logger.info("Completed stream merge: {}, streams merged={}, processed messages={}, total messages={}, size={}mb", customerBatchPeriod, totalStreams, processedMessages.size(), recordsReceived, bytesWritten / Defaults.MEGABYTES);
 
 		return processedMessages.size();
 	}

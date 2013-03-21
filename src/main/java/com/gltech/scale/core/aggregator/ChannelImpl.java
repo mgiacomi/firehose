@@ -4,6 +4,8 @@ import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.core.model.Message;
+import com.gltech.scale.util.ModelIO;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ public class ChannelImpl implements Channel
 	private final ChannelMetaData channelMetaData;
 	private final ClusterService clusterService;
 	private final TimePeriodUtils timePeriodUtils;
+	private final ModelIO modelIO = new ModelIO();
 
 	public ChannelImpl(ChannelMetaData channelMetaData, ClusterService clusterService, TimePeriodUtils timePeriodUtils)
 	{
@@ -33,6 +36,14 @@ public class ChannelImpl implements Channel
 	public void addMessage(byte[] bytes)
 	{
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(new DateTime());
+
+		// Using Received date for redundant insurances that primary and backup messages are collected together.
+		if(channelMetaData.isRedundant())
+		{
+			Message message = modelIO.toMessage(bytes);
+			nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
+		}
+
 		Batch batch = batches.get(nearestPeriodCeiling);
 
 		if (batch == null)
@@ -55,6 +66,14 @@ public class ChannelImpl implements Channel
 	public void addBackupMessage(byte[] bytes)
 	{
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(new DateTime());
+
+		// Using Received date for redundant insurances that primary and backup messages are collected together.
+		if(channelMetaData.isRedundant())
+		{
+			Message message = modelIO.toMessage(bytes);
+			nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
+		}
+
 		Batch batch = backupBatches.get(nearestPeriodCeiling);
 
 		if (batch == null)

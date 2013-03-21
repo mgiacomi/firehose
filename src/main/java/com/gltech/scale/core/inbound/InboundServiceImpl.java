@@ -33,7 +33,6 @@ import java.util.concurrent.ConcurrentMap;
 public class InboundServiceImpl implements InboundService
 {
 	private static final Logger logger = LoggerFactory.getLogger(InboundServiceImpl.class);
-	private ConcurrentMap<DateTime, AggregatorsByPeriod> aggregatorPeriodMatrices = new ConcurrentHashMap<>();
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;
 	private StorageClient storageClient;
@@ -73,17 +72,8 @@ public class InboundServiceImpl implements InboundService
 			logger.debug("Pre-storing message payload data to data store: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
 		}
 
-		AggregatorsByPeriod aggregatorsByPeriod = aggregatorPeriodMatrices.get(nearestPeriodCeiling);
-
-		if (aggregatorsByPeriod == null)
-		{
-			AggregatorsByPeriod newAggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(nearestPeriodCeiling);
-			aggregatorsByPeriod = aggregatorPeriodMatrices.putIfAbsent(nearestPeriodCeiling, newAggregatorsByPeriod);
-			if (aggregatorsByPeriod == null)
-			{
-				aggregatorsByPeriod = newAggregatorsByPeriod;
-			}
-		}
+		// Backed by a cache, so OK to call for every request.
+		AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(nearestPeriodCeiling);
 
 		if (channelMetaData.isRedundant())
 		{
