@@ -2,17 +2,19 @@ package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Batch;
-import com.gltech.scale.util.StreamDelimiter;
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.ChannelCache;
+import com.google.protobuf.CodedOutputStream;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,15 +29,13 @@ public class AggregatorImpl implements Aggregator
 	private ChannelCache channelCache;
 	private ClusterService clusterService;
 	private TimePeriodUtils timePeriodUtils;
-	private StreamDelimiter streamDelimiter;
 
 	@Inject
-	public AggregatorImpl(ChannelCache channelCache, ClusterService clusterService, TimePeriodUtils timePeriodUtils, StreamDelimiter streamDelimiter)
+	public AggregatorImpl(ChannelCache channelCache, ClusterService clusterService, TimePeriodUtils timePeriodUtils)
 	{
 		this.channelCache = channelCache;
 		this.clusterService = clusterService;
 		this.timePeriodUtils = timePeriodUtils;
-		this.streamDelimiter = streamDelimiter;
 
 		// Register the aggregator with the coordination service, so that the storage writer can find us
 		clusterService.getRegistrationService().registerAsAggregator();
@@ -192,10 +192,23 @@ public class AggregatorImpl implements Aggregator
 
 	private long batchMessagesToStream(OutputStream outputStream, Batch batch)
 	{
-		for (byte[] bytes : batch.getMessages())
+		CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(outputStream);
+
+		try
 		{
-			streamDelimiter.write(outputStream, bytes);
+			for (byte[] bytes : batch.getMessages())
+			{
+				codedOutputStream.writeRawVarint32(bytes.length);
+				codedOutputStream.writeRawBytes(bytes);
+
+			}
+			codedOutputStream.flush();
 		}
+		catch (IOException e)
+		{
+			throw Throwables.propagate(e);
+		}
+
 		return batch.getMessages().size();
 	}
 

@@ -5,7 +5,7 @@ import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.util.ModelIO;
-import com.gltech.scale.util.StreamDelimiter;
+import com.google.protobuf.CodedOutputStream;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -21,7 +21,6 @@ public class MessageStreamTest
 	@Test
 	public void nextRecordTest() throws Exception
 	{
-		StreamDelimiter streamDelimiter = new StreamDelimiter();
 		ChannelMetaData channelMetaData = new ChannelMetaData("1", ChannelMetaData.TTL_DAY, true);
 		ModelIO modelIO = new ModelIO();
 
@@ -34,11 +33,14 @@ public class MessageStreamTest
 		assertEquals("testdata2", new String(modelIO.toMessage(batch.getMessages().get(1)).getPayload()));
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(bos);
 
 		for (byte[] bytes : batch.getMessages())
 		{
-			streamDelimiter.write(bos, bytes);
+			codedOutputStream.writeRawVarint32(bytes.length);
+			codedOutputStream.writeRawBytes(bytes);
 		}
+		codedOutputStream.flush();
 
 		MessageStream messageStream = new MessageInputStream("test", new ByteArrayInputStream(bos.toByteArray()));
 

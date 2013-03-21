@@ -2,7 +2,7 @@ package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.util.ModelIO;
-import com.gltech.scale.util.StreamDelimiter;
+import com.google.protobuf.CodedInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,18 +14,17 @@ public class MessageInputStream implements MessageStream
 {
 	private static final Logger logger = LoggerFactory.getLogger(MessageInputStream.class);
 	private Message currentMessage;
+	private final CodedInputStream codedInputStream;
 	private final InputStream inputStream;
-	private boolean endOfStream;
 	private int counter = 0;
 	private String customerBucketPeriod;
-	private StreamDelimiter streamDelimiter = new StreamDelimiter();
 	private ModelIO modelIO = new ModelIO();
 
 	public MessageInputStream(String customerBucketPeriod, InputStream inputStream)
 	{
 		this.customerBucketPeriod = customerBucketPeriod;
+		this.codedInputStream = CodedInputStream.newInstance(inputStream);
 		this.inputStream = inputStream;
-		this.endOfStream = false;
 	}
 
 	public Message getCurrentMessage()
@@ -40,26 +39,24 @@ public class MessageInputStream implements MessageStream
 
 	public void nextRecord()
 	{
-		if (!endOfStream)
+
+		try
 		{
-			try
+			if(!codedInputStream.isAtEnd())
 			{
-				currentMessage = modelIO.toMessage(streamDelimiter.readNext(inputStream));
+				byte[] bytes = codedInputStream.readRawBytes(codedInputStream.readRawVarint32());
+				currentMessage = modelIO.toMessage(bytes);
 				counter++;
 			}
-			catch (EOFException e)
+			else
 			{
-				endOfStream = true;
 				currentMessage = null;
 			}
-			catch (IOException e)
-			{
-				throw new RuntimeException("Unable to part messages from InputStream for " + customerBucketPeriod, e);
-			}
+
 		}
-		else
+		catch (IOException e)
 		{
-			currentMessage = null;
+			throw new RuntimeException("Unable to part messages from InputStream for " + customerBucketPeriod, e);
 		}
 	}
 

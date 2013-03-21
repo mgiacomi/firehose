@@ -8,7 +8,7 @@ import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.util.ModelIO;
-import com.gltech.scale.util.StreamDelimiter;
+import com.google.protobuf.CodedOutputStream;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -24,7 +24,6 @@ public class BatchStreamsManagerTest
 	public void nextMultiStreamTest() throws Exception
 	{
 		ModelIO modelIO = new ModelIO();
-		StreamDelimiter streamDelimiter = new StreamDelimiter();
 		ChannelMetaData channelMetaData = new ChannelMetaData("test", ChannelMetaData.TTL_DAY, false);
 		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 
@@ -80,22 +79,37 @@ public class BatchStreamsManagerTest
 		ByteArrayOutputStream bos3 = new ByteArrayOutputStream();
 		ByteArrayOutputStream bos4 = new ByteArrayOutputStream();
 
+		CodedOutputStream cos1 = CodedOutputStream.newInstance(bos1);
 		for (byte[] bytes : batch1.getMessages())
 		{
-			streamDelimiter.write(bos1, bytes);
+			cos1.writeRawVarint32(bytes.length);
+			cos1.writeRawBytes(bytes);
 		}
+		cos1.flush();
+
+		CodedOutputStream cos2 = CodedOutputStream.newInstance(bos2);
 		for (byte[] bytes : batch2.getMessages())
 		{
-			streamDelimiter.write(bos2, bytes);
+			cos2.writeRawVarint32(bytes.length);
+			cos2.writeRawBytes(bytes);
 		}
+		cos2.flush();
+
+		CodedOutputStream cos3 = CodedOutputStream.newInstance(bos3);
 		for (byte[] bytes : batch3.getMessages())
 		{
-			streamDelimiter.write(bos3, bytes);
+			cos3.writeRawVarint32(bytes.length);
+			cos3.writeRawBytes(bytes);
 		}
+		cos3.flush();
+
+		CodedOutputStream cos4 = CodedOutputStream.newInstance(bos4);
 		for (byte[] bytes : batch4.getMessages())
 		{
-			streamDelimiter.write(bos4, bytes);
+			cos4.writeRawVarint32(bytes.length);
+			cos4.writeRawBytes(bytes);
 		}
+		cos4.flush();
 
 		BatchStreamsManager batchStreamsManager = new BatchStreamsManager(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(period, 5));
 		batchStreamsManager.registerInputStream(new ByteArrayInputStream(bos1.toByteArray()));

@@ -1,19 +1,18 @@
 package com.gltech.scale.util;
 
+import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.CodedOutputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
 
 public class StreamDelimiterTest
 {
 	@Test
-	public void testStream() throws Exception
+	public void testCodedStreams() throws Exception
 	{
-		StreamDelimiter streamDelimiter = new StreamDelimiter();
-
 		String shortStr = "123";
 		String medStr = "asdfqwreasdfqweradfqewrasdfqweradfqweradsfqwerasdfqwerafdsqwre";
 		String longStr = "298347012357091735409813750917345908173450987132459087129430712904371920834" +
@@ -22,27 +21,27 @@ public class StreamDelimiterTest
 		String nullStr = "";
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		streamDelimiter.write(bos, shortStr.getBytes());
-		streamDelimiter.write(bos, null);
-		streamDelimiter.write(bos, medStr.getBytes());
-		streamDelimiter.write(bos, nullStr.getBytes());
-		streamDelimiter.write(bos, longStr.getBytes());
+		CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(bos);
+		codedOutputStream.writeRawVarint32(shortStr.length());
+		codedOutputStream.writeRawBytes(shortStr.getBytes());
+		codedOutputStream.writeRawVarint32(medStr.length());
+		codedOutputStream.writeRawBytes(medStr.getBytes());
+		codedOutputStream.writeRawVarint32(nullStr.length());
+		codedOutputStream.writeRawBytes(nullStr.getBytes());
+		codedOutputStream.writeRawVarint32(longStr.length());
+		codedOutputStream.writeRawBytes(longStr.getBytes());
+		codedOutputStream.flush();
 
 		ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-		Assert.assertEquals(shortStr, new String(streamDelimiter.readNext(bis)));
-		Assert.assertEquals(medStr, new String(streamDelimiter.readNext(bis)));
-		Assert.assertEquals(longStr, new String(streamDelimiter.readNext(bis)));
+		CodedInputStream codedInputStream = CodedInputStream.newInstance(bis);
 
-		boolean gotEOF = false;
-		try
-		{
-			streamDelimiter.readNext(bis);
-		}
-		catch (EOFException e)
-		{
-			gotEOF = true;
-		}
-
-		Assert.assertTrue(gotEOF);
+		Assert.assertEquals(shortStr, new String(codedInputStream.readRawBytes(codedInputStream.readRawVarint32())));
+		Assert.assertFalse(codedInputStream.isAtEnd());
+		Assert.assertEquals(medStr, new String(codedInputStream.readRawBytes(codedInputStream.readRawVarint32())));
+		Assert.assertFalse(codedInputStream.isAtEnd());
+		Assert.assertEquals(nullStr, new String(codedInputStream.readRawBytes(codedInputStream.readRawVarint32())));
+		Assert.assertFalse(codedInputStream.isAtEnd());
+		Assert.assertEquals(longStr, new String(codedInputStream.readRawBytes(codedInputStream.readRawVarint32())));
+		Assert.assertTrue(codedInputStream.isAtEnd());
 	}
 }

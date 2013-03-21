@@ -5,7 +5,6 @@ import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.Storage;
 import com.gltech.scale.util.ModelIO;
-import com.gltech.scale.util.StreamDelimiter;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
@@ -13,6 +12,7 @@ import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.util.Props;
+import com.google.protobuf.CodedInputStream;
 import com.netflix.curator.test.TestingServer;
 import org.joda.time.DateTime;
 import org.junit.*;
@@ -70,7 +70,6 @@ public class AggregatorIntegrationTest
 	public void testEventToAggregatorAndCollect() throws Exception
 	{
 		ModelIO modelIO = new ModelIO();
-		StreamDelimiter streamDelimiter = new StreamDelimiter();
 
 		ServiceMetaData aggregator = new ServiceMetaData();
 		aggregator.setListenAddress(props.get("aggregator.rest_host", Defaults.REST_HOST));
@@ -113,18 +112,13 @@ public class AggregatorIntegrationTest
 
 		// Get first set of messages
 		InputStream inputStream = aggregatorClient.getBatchMessagesStream(aggregator, "test1", first);
+		CodedInputStream codedInputStream = CodedInputStream.newInstance(inputStream);
 
 		List<Message> messages = new ArrayList<>();
-		while (true)
+		while (!codedInputStream.isAtEnd())
 		{
-			try
-			{
-				messages.add(modelIO.toMessage(streamDelimiter.readNext(inputStream)));
-			}
-			catch (EOFException e)
-			{
-				break;
-			}
+			byte[] bytes = codedInputStream.readRawBytes(codedInputStream.readRawVarint32());
+			messages.add(modelIO.toMessage(bytes));
 		}
 
 		inputStream.close();
@@ -139,18 +133,13 @@ public class AggregatorIntegrationTest
 
 		// Get Second set of messages
 		inputStream = aggregatorClient.getBatchMessagesStream(aggregator, "test1", second);
+		codedInputStream = CodedInputStream.newInstance(inputStream);
 
 		messages = new ArrayList<>();
-		while (true)
+		while (!codedInputStream.isAtEnd())
 		{
-			try
-			{
-				messages.add(modelIO.toMessage(streamDelimiter.readNext(inputStream)));
-			}
-			catch (EOFException e)
-			{
-				break;
-			}
+			byte[] bytes = codedInputStream.readRawBytes(codedInputStream.readRawVarint32());
+			messages.add(modelIO.toMessage(bytes));
 		}
 
 		inputStream.close();
@@ -165,18 +154,13 @@ public class AggregatorIntegrationTest
 
 		// Get backup messages
 		inputStream = aggregatorClient.getBackupBatchMessagesStream(aggregator, "test", first);
+		codedInputStream = CodedInputStream.newInstance(inputStream);
 
 		messages = new ArrayList<>();
-		while (true)
+		while (!codedInputStream.isAtEnd())
 		{
-			try
-			{
-				messages.add(modelIO.toMessage(streamDelimiter.readNext(inputStream)));
-			}
-			catch (EOFException e)
-			{
-				break;
-			}
+			byte[] bytes = codedInputStream.readRawBytes(codedInputStream.readRawVarint32());
+			messages.add(modelIO.toMessage(bytes));
 		}
 
 		inputStream.close();
