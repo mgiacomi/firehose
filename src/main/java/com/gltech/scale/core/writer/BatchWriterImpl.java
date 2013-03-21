@@ -114,7 +114,7 @@ public class BatchWriterImpl implements BatchWriter
 			};
 
 			// Write the stream to the storage service.
-			storageClient.put(channelName, nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), inputStream);
+			storageClient.putMessages(channelMetaData, nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), inputStream);
 			inputStream.close();
 
 			// Remove batch references from the coordination service.
@@ -129,7 +129,7 @@ public class BatchWriterImpl implements BatchWriter
 
 			long completedIn = System.nanoTime() - start;
 
-			logger.info("Completed collecting Batch for " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + " in " + completedIn / 1000000 + "ms");
+			logger.info("Completed writing Batch for " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")) + " in " + completedIn / 1000000 + "ms");
 
 			if (timer != null)
 			{
@@ -138,7 +138,7 @@ public class BatchWriterImpl implements BatchWriter
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to collect Batch. " + nearestPeriodCeiling + ", " + channelMetaData.toString(), e);
+			logger.error("Failed to write Batch. " + nearestPeriodCeiling + ", " + channelMetaData.toString(), e);
 			clusterService.clearStorageWriterLock(channelMetaData, nearestPeriodCeiling);
 		}
 

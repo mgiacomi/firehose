@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 
-public class StorageWriteManagerWithCoordination implements StorageWriteManager
+public class StorageWriteManagerImpl implements StorageWriteManager
 {
-	private static final Logger logger = LoggerFactory.getLogger(StorageWriteManagerWithCoordination.class);
+	private static final Logger logger = LoggerFactory.getLogger(StorageWriteManagerImpl.class);
 	private volatile boolean shutdown = false;
 	private volatile boolean confirmShutdown = false;
 	private Props props = Props.getProps();
@@ -29,7 +29,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 	private int periodSeconds;
 
 	@Inject
-	public StorageWriteManagerWithCoordination(ClusterService clusterService, ChannelCache channelCache)
+	public StorageWriteManagerImpl(ClusterService clusterService, ChannelCache channelCache)
 	{
 		this.clusterService = clusterService;
 		this.channelCache = channelCache;
@@ -79,7 +79,7 @@ public class StorageWriteManagerWithCoordination implements StorageWriteManager
 						}
 						catch (Exception e)
 						{
-							logger.error("Collection error: {}|{}", batchPeriodMapper.getChannelName(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), e);
+							logger.error("StorageWriter error: {}|{}", batchPeriodMapper.getChannelName(), batchPeriodMapper.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")), e);
 							continue;
 						}
 

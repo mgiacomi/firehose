@@ -65,7 +65,12 @@ public class RegistrationServiceImpl implements RegistrationService
 	public void registerAsInboundService()
 	{
 		String host = props.get("server_host", Defaults.REST_HOST);
-		int port = props.get("server_port", Defaults.REST_PORT);
+		int port = props.get("server_port", -1);
+
+		if(port == -1)
+		{
+			throw new IllegalStateException("RegistrationService could not determine the port for the InboundService on this host.");
+		}
 
 		try
 		{
@@ -92,7 +97,12 @@ public class RegistrationServiceImpl implements RegistrationService
 	public void registerAsStorageWriter()
 	{
 		String host = props.get("storage_writer.rest_host", Defaults.REST_HOST);
-		int port = props.get("storage_writer.rest_port", Defaults.REST_PORT);
+		int port = props.get("server_port", -1);
+
+		if(port == -1)
+		{
+			throw new IllegalStateException("RegistrationService could not determine the port for the StorageWriter on this host.");
+		}
 
 		try
 		{
@@ -114,7 +124,12 @@ public class RegistrationServiceImpl implements RegistrationService
 	public void registerAsAggregator()
 	{
 		String host = props.get("aggregator.rest_host", Defaults.REST_HOST);
-		int port = props.get("aggregator.rest_port", Defaults.REST_PORT);
+		int port = props.get("server_port", -1);
+
+		if(port == -1)
+		{
+			throw new IllegalStateException("RegistrationService could not determine the port for the Aggregator on this host.");
+		}
 
 		try
 		{

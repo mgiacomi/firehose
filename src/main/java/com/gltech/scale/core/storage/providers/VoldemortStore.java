@@ -1,106 +1,111 @@
 package com.gltech.scale.core.storage.providers;
 
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.storage.KeyAlreadyExistsException;
 import com.gltech.scale.core.storage.Storage;
-import com.gltech.scale.core.storage.StreamSplitter;
-import com.gltech.scale.ganglia.Timer;
-import com.gltech.scale.ganglia.TimerThreadPoolExecutor;
-import com.gltech.scale.util.Props;
+import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.util.VoldemortClient;
 import com.google.common.base.Throwables;
+import com.google.inject.Inject;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import voldemort.client.StoreClient;
+import voldemort.versioning.Versioned;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
 
 public class VoldemortStore implements Storage
 {
 	private static final Logger logger = LoggerFactory.getLogger(VoldemortStore.class);
-	private Props props = Props.getProps();
-	private Timer storeTimer = new Timer();
-	private final ThreadPoolExecutor threadPoolExecutor;
-	private final Semaphore semaphore;
+	private StoreClient<String, byte[]> channelClient;
+	private ModelIO modelIO;
 
-	public VoldemortStore()
+	@Inject
+	public VoldemortStore(ModelIO modelIO)
 	{
-		int activeUploads = props.get("storage.s3.concurrent_writes", Defaults.CONCURRENT_STORE_WRITES);
-
-		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
-		threadPoolExecutor = new TimerThreadPoolExecutor(activeUploads, activeUploads, 1, TimeUnit.MINUTES, queue, new S3UploadThreadFactory(), storeTimer);
-		semaphore = new Semaphore(activeUploads);
+		this.modelIO = modelIO;
+		this.channelClient = VoldemortClient.createFactory().getStoreClient("ChannelStore");
 	}
 
-	public void put(ChannelMetaData channelMetaData)
+	@Override
+	public void putChannelMetaData(final ChannelMetaData channelMetaData)
 	{
-		String key = channelMetaData.getName();
+		Versioned<byte[]> versioned = channelClient.get(channelMetaData.getName());
+
+		if (versioned != null)
+		{
+			throw new KeyAlreadyExistsException("Channel already exists " + channelMetaData.getName());
+		}
+
+		channelClient.put(channelMetaData.getName(), modelIO.toBytes(channelMetaData));
 	}
 
-	public ChannelMetaData get(String channelName)
+	@Override
+	public ChannelMetaData getChannelMetaData(String channelName)
 	{
-		return new ChannelMetaData(channelName, ChannelMetaData.TTL_DAY, false);
+		Versioned<byte[]> versioned = channelClient.get(channelName);
+
+		if (versioned != null)
+		{
+			return modelIO.toChannelMetaData(versioned.getValue());
+		}
+
+		return null;
 	}
 
-	public void getMessages(String channelName, String id, OutputStream outputStream)
+	@Override
+	public void putMessages(ChannelMetaData channelMetaData, String id, InputStream inputStream)
 	{
-	}
+		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
 
-	public void putMessages(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
-	{
-	}
-
-	private String keyNameWithUniquePrefix(String channelName, String id)
-	{
 		try
 		{
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			String key = channelName + "|" + id;
-			md.update(key.getBytes(), 0, key.length());
-			String md5 = new BigInteger(1, md.digest()).toString(16);
-			return md5.substring(0, 2) + "|" + channelName + "|" + id;
+			byte[] bytes = IOUtils.toByteArray(inputStream);
+			messageClient.put(id, bytes);
+			logger.info("Wrote {} bytes for key {}", bytes.length, id);
 		}
-		catch (NoSuchAlgorithmException e)
+		catch (IOException e)
 		{
 			throw Throwables.propagate(e);
 		}
 	}
 
-	private class PartUploader implements Callable<Long>
+	@Override
+	public void getMessages(ChannelMetaData channelMetaData, String id, OutputStream outputStream)
 	{
-		private StreamSplitter.StreamPart streamPart;
-		private String key;
-		private int part;
+		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
 
-		private PartUploader(StreamSplitter.StreamPart streamPart, String key, int part)
+		try
 		{
-			this.streamPart = streamPart;
-			this.key = key;
-			this.part = part;
+			Versioned<byte[]> versioned = messageClient.get(id);
+
+			if (versioned != null && versioned.getValue().length > 0)
+			{
+				outputStream.write(versioned.getValue());
+			}
 		}
-
-		public Long call() throws Exception
+		catch (IOException e)
 		{
-			logger.debug("Start Voldemort Part Upload key={}, part={}", key, part);
-
-
-			//LZFInputStream
-
-
-			return null;
+			throw Throwables.propagate(e);
 		}
 	}
 
-	private class S3UploadThreadFactory implements ThreadFactory
+	@Override
+	public void putBytes(ChannelMetaData channelMetaData, String id, byte[] data)
 	{
-		public Thread newThread(Runnable r)
-		{
-			return new Thread(r, "VoldemortUploader");
-		}
+		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
+		messageClient.put(id, data);
+	}
+
+	@Override
+	public byte[] getBytes(ChannelMetaData channelMetaData, String id)
+	{
+		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
+		return messageClient.get(id).getValue();
 	}
 }

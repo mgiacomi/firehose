@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MemoryStore implements Storage
@@ -25,9 +23,9 @@ public class MemoryStore implements Storage
 			new ConcurrentHashMap<>();
 
 	@Override
-	public void put(ChannelMetaData channelMetaData)
+	public void putChannelMetaData(ChannelMetaData channelMetaData)
 	{
-		logger.debug("Adding ChannelMetaData for {}", channelMetaData.getName());
+		logger.debug("Adding ChannelMetaData for {}", channelMetaData);
 		if (channelMap.containsKey(channelMetaData.getName()))
 		{
 			throw new DuplicateChannelException("Channel already exists " + channelMetaData.getName());
@@ -38,19 +36,28 @@ public class MemoryStore implements Storage
 	}
 
 	@Override
-	public ChannelMetaData get(String channelName)
+	public ChannelMetaData getChannelMetaData(String channelName)
 	{
 		return channelMap.get(channelName);
 	}
 
+
+	public void putBytes(ChannelMetaData channelMetaData, String id, byte[] data)
+	{
+	}
+
+	public byte[] getBytes(ChannelMetaData channelMetaData, String id)
+	{
+		return new byte[0];
+	}
+
 	@Override
-	public void putMessages(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
+	public void putMessages(ChannelMetaData channelMetaData, String id, InputStream inputStream)
 	{
 		try
 		{
 			byte[] bytes = IOUtils.toByteArray(inputStream);
-			logger.debug("putting payload channel={}, key={}, length={}", channelName, id, bytes.length);
-			ChannelMetaData channelMetaData = channelMap.get(channelName);
+			logger.debug("putting payload channel={}, key={}, length={}", channelMetaData.getName(), id, bytes.length);
 			payloadMap.get(channelMetaData).put(id, bytes);
 		}
 		catch (IOException e)
@@ -60,16 +67,15 @@ public class MemoryStore implements Storage
 	}
 
 	@Override
-	public void getMessages(String channelName, String id, OutputStream outputStream)
+	public void getMessages(ChannelMetaData channelMetaData, String id, OutputStream outputStream)
 	{
 		try
 		{
-			ChannelMetaData channelMetaData = channelMap.get(channelName);
 			byte[] bytes = payloadMap.get(channelMetaData).get(id);
 
 			if (bytes != null)
 			{
-				logger.info("Reading from memory store channelName={} id={} size={}", channelName, id, bytes.length);
+				logger.info("Reading from memory store channelName={} id={} size={}", channelMetaData.getName(), id, bytes.length);
 				outputStream.write(bytes);
 			}
 		}

@@ -18,14 +18,15 @@ public class S3Regression
 		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.INFO);
 		AwsS3Store s3Store = new AwsS3Store(new ModelIO());
-		s3Store.putMessages("matt_test", "20130107233405", new FileInputStream(args[0]), new HashMap<String, List<String>>());
 
-		ChannelMetaData channelMetaData = new ChannelMetaData("matt_testb", ChannelMetaData.TTL_DAY, false);
+		ChannelMetaData channelMetaData1 = new ChannelMetaData("matt_test", ChannelMetaData.TTL_DAY, false);
+		s3Store.putMessages(channelMetaData1, "20130107233405", new FileInputStream(args[0]));
 
-		s3Store.put(channelMetaData);
-		ChannelMetaData channelMetaData1 = s3Store.get("matt");
+		ChannelMetaData channelMetaData2 = new ChannelMetaData("matt_testb", ChannelMetaData.TTL_DAY, false);
+		s3Store.putChannelMetaData(channelMetaData2);
+		ChannelMetaData channelMetaData3 = s3Store.getChannelMetaData("matt");
 
-		if (channelMetaData.equals(channelMetaData1))
+		if (channelMetaData2.equals(channelMetaData3))
 		{
 			System.out.println("Yay they are equal!");
 		}

@@ -4,12 +4,8 @@ import com.gc.iotools.stream.is.InputStreamFromOutputStream;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.google.inject.Inject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
 
 public class StorageClient
 {
@@ -23,42 +19,39 @@ public class StorageClient
 
 	public ChannelMetaData getChannelMetaData(String channelName)
 	{
-		return storage.get(channelName);
+		return storage.getChannelMetaData(channelName);
 	}
 
 	public void putChannelMetaData(ChannelMetaData channelMetaData)
 	{
-		storage.put(channelMetaData);
+		storage.putChannelMetaData(channelMetaData);
 	}
 
-	public InputStream getMessageStream(final String channelName, final String id)
+	public InputStream getMessageStream(final ChannelMetaData channelMetaData, final String id)
 	{
 		return new InputStreamFromOutputStream<Long>()
 		{
 			@Override
 			public Long produce(final OutputStream outputStream) throws Exception
 			{
-				storage.getMessages(channelName, id, outputStream);
+				storage.getMessages(channelMetaData, id, outputStream);
 				return 0L;
 			}
 		};
 	}
 
-	public byte[] get(String channelName, String id)
+	public byte[] getMessage(ChannelMetaData channelMetaData, String id)
 	{
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		storage.getMessages(channelName, id, byteArrayOutputStream);
-		return byteArrayOutputStream.toByteArray();
+		return storage.getBytes(channelMetaData, id);
 	}
 
-	public void put(String channelName, String id, InputStream inputStream)
+	public void putMessages(ChannelMetaData channelMetaData, String id, InputStream inputStream)
 	{
-		storage.putMessages(channelName, id, inputStream, new HashMap<String, List<String>>());
+		storage.putMessages(channelMetaData, id, inputStream);
 	}
 
-	public void put(String channelName, String id, byte[] payload)
+	public void putMessage(ChannelMetaData channelMetaData, String id, byte[] data )
 	{
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(payload);
-		put(channelName, id, byteArrayInputStream);
+		storage.putBytes(channelMetaData, id, data);
 	}
 }

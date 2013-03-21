@@ -86,7 +86,6 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	{
 		long weight = WeightBreakdown.toWeight(active, primaries, backups, restedfor);
 		ServiceMetaData aggregator = registrationService.getLocalAggregatorMetaData();
-
 		if (aggregator != null)
 		{
 			try
@@ -214,7 +213,6 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 				{
 					return null;
 				}
-
 				// We only have one total, so just use it.
 				else if (totalAggregators == 1)
 				{
@@ -223,7 +221,6 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 					PrimaryBackupSet primaryBackupSet = new PrimaryBackupSet(primaryAggregator, null);
 					primaryBackupSets.add(primaryBackupSet);
 				}
-
 				else if (totalAggregators > 1)
 				{
 					List<String> sortedIds = new ArrayList<>(weightsToIds.values());

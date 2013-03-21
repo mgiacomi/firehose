@@ -62,13 +62,14 @@ public class InboundServiceImpl implements InboundService
 		int maxPayLoadSize = props.get("inbound.max_payload_size_kb", Defaults.MAX_PAYLOAD_SIZE_KB) * 1024;
 		Message message = new Message(mediaTypes, payload);
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 
 		// If the payload is too large then write it to the storage engine now
 		// and create and message object with no payload, which will flag it as stored.
 		if (payload.length > maxPayLoadSize)
 		{
 			message = new Message(MediaType.APPLICATION_JSON_TYPE);
-			storageClient.put(channelName, message.getUuid(), payload);
+			storageClient.putMessage(channelMetaData, message.getUuid(), payload);
 			logger.debug("Pre-storing message payload data to data store: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
 		}
 
@@ -83,8 +84,6 @@ public class InboundServiceImpl implements InboundService
 				aggregatorsByPeriod = newAggregatorsByPeriod;
 			}
 		}
-
-		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 
 		if (channelMetaData.isRedundant())
 		{
@@ -114,11 +113,12 @@ public class InboundServiceImpl implements InboundService
 	{
 		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 		String id = timePeriodUtils.nearestPeriodCeiling(dateTime).toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
+		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 
 		int origRecordsWritten = recordsWritten;
 
 		// Make sure the stream gets closed.
-		try (InputStream inputStream = storageClient.getMessageStream(channelName, id))
+		try (InputStream inputStream = storageClient.getMessageStream(channelMetaData, id))
 		{
 			try
 			{
@@ -134,7 +134,7 @@ public class InboundServiceImpl implements InboundService
 
 					if (message.isStored())
 					{
-						byte[] payload = storageClient.get(channelName, message.getUuid());
+						byte[] payload = storageClient.getMessage(channelMetaData, message.getUuid());
 						outputStream.write(payload);
 						logger.debug("Reading pre-stored message payload data from storage service: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
 					}

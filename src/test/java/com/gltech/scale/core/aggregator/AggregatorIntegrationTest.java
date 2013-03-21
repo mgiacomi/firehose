@@ -189,23 +189,30 @@ public class AggregatorIntegrationTest
 	static class TestStore implements Storage
 	{
 		@Override
-		public ChannelMetaData get(String channelName)
+		public ChannelMetaData getChannelMetaData(String channelName)
 		{
 			return new ChannelMetaData("test", ChannelMetaData.TTL_DAY, true);
 		}
 
 		@Override
-		public void put(ChannelMetaData channelMetaData)
+		public void putChannelMetaData(ChannelMetaData channelMetaData)
 		{
 		}
 
-		@Override
-		public void putMessages(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
+		public void putBytes(ChannelMetaData channelMetaData, String id, byte[] data)
 		{
 		}
 
-		@Override
-		public void getMessages(String channelName, String id, OutputStream outputStream)
+		public byte[] getBytes(ChannelMetaData channelMetaData, String id)
+		{
+			return new byte[0];
+		}
+
+		public void putMessages(ChannelMetaData channelMetaData, String id, InputStream inputStream)
+		{
+		}
+
+		public void getMessages(ChannelMetaData channelMetaData, String id, OutputStream outputStream)
 		{
 		}
 	}

@@ -8,6 +8,7 @@ public class ChannelMetaData
 	static public final String TTL_WEEK = "week";
 	static public final String TTL_MONTH = "month";
 	static public final String TTL_YEAR = "year";
+	static public final String TTL_FOREVER = "forever";
 
 	@Tag(1)
 	private final String name;
@@ -73,7 +74,7 @@ public class ChannelMetaData
 
 	private String validateTTL(String ttl)
 	{
-		if (TTL_DAY.equals(ttl) || TTL_MONTH.equals(ttl) || TTL_WEEK.equals(ttl) || TTL_YEAR.equals(ttl))
+		if (TTL_DAY.equals(ttl) || TTL_MONTH.equals(ttl) || TTL_WEEK.equals(ttl) || TTL_YEAR.equals(ttl) || TTL_FOREVER.equals(ttl))
 		{
 			return ttl;
 		}

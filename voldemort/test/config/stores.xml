@@ -1,6 +1,6 @@
 <stores>
     <store>
-        <name>BucketStorage</name>
+        <name>ChannelStore</name>
         <persistence>memory</persistence>
         <routing>client</routing>
         <replication-factor>1</replication-factor>
@@ -8,20 +8,14 @@
         <required-writes>1</required-writes>
         <hinted-handoff-strategy>consistent-handoff</hinted-handoff-strategy>
         <key-serializer>
-            <type>json</type>
-            <schema-info version="1">
-                {
-                "customer":"string",
-                "bucket":"string"
-                }
-            </schema-info>
-        </key-serializer>
-        <value-serializer>
             <type>string</type>
+        </key-serializer>
+        <value-serializer>
+            <type>identity</type>
         </value-serializer>
     </store>
     <store>
-        <name>ShortTermPayloadStorage</name>
+        <name>dayStore</name>
         <persistence>memory</persistence>
         <routing>client</routing>
         <replication-factor>1</replication-factor>
@@ -29,68 +23,11 @@
         <required-writes>1</required-writes>
         <hinted-handoff-strategy>consistent-handoff</hinted-handoff-strategy>
         <key-serializer>
-            <type>json</type>
-            <schema-info version="1">
-                {
-                "customer":"string",
-                "bucket":"string",
-                "id":"string"
-                }
-            </schema-info>
+            <type>string</type>
         </key-serializer>
         <value-serializer>
             <type>identity</type>
         </value-serializer>
-        <retention-days>14</retention-days>
+        <retention-days>1</retention-days>
     </store>
-
-    <store>
-        <name>MediumTermPayloadStorage</name>
-        <persistence>memory</persistence>
-        <routing>client</routing>
-        <replication-factor>1</replication-factor>
-        <required-reads>1</required-reads>
-        <required-writes>1</required-writes>
-        <hinted-handoff-strategy>consistent-handoff</hinted-handoff-strategy>
-        <key-serializer>
-            <type>json</type>
-            <schema-info version="1">
-                {
-                "customer":"string",
-                "bucket":"string",
-                "id":"string"
-                }
-            </schema-info>
-        </key-serializer>
-        <value-serializer>
-            <type>identity</type>
-        </value-serializer>
-        <retention-days>90</retention-days>
-    </store>
-
-    <store>
-        <name>LargeTermPayloadStorage</name>
-        <persistence>memory</persistence>
-        <routing>client</routing>
-        <replication-factor>1</replication-factor>
-        <required-reads>1</required-reads>
-        <required-writes>1</required-writes>
-        <hinted-handoff-strategy>consistent-handoff</hinted-handoff-strategy>
-        <key-serializer>
-            <type>json</type>
-            <schema-info version="1">
-                {
-                "customer":"string",
-                "bucket":"string",
-                "id":"string"
-                }
-            </schema-info>
-        </key-serializer>
-        <value-serializer>
-            <type>identity</type>
-        </value-serializer>
-        <retention-days>366</retention-days>
-    </store>
-
-
 </stores>

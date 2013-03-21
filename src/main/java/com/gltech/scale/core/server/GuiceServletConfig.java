@@ -84,7 +84,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 						bind(StorageWriterResource.class);
 
 						// These should not be singletons we want to get a new one with each injector call.
-						bind(StorageWriteManager.class).to(StorageWriteManagerWithCoordination.class);
+						bind(StorageWriteManager.class).to(StorageWriteManagerImpl.class);
 						bind(BatchWriter.class).to(BatchWriterImpl.class);
 					}
 

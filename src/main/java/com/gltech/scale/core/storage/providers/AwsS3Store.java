@@ -56,7 +56,8 @@ public class AwsS3Store implements Storage
 		semaphore = new Semaphore(activeUploads);
 	}
 
-	public void put(ChannelMetaData channelMetaData)
+	@Override
+	public void putChannelMetaData(ChannelMetaData channelMetaData)
 	{
 		String key = channelMetaData.getName();
 
@@ -70,7 +71,8 @@ public class AwsS3Store implements Storage
 		s3Client.putObject(s3BucketName, key, bais, metadata);
 	}
 
-	public ChannelMetaData get(String channelName)
+	@Override
+	public ChannelMetaData getChannelMetaData(String channelName)
 	{
 		String key = channelName;
 		S3Object s3Object = null;
@@ -98,9 +100,10 @@ public class AwsS3Store implements Storage
 		}
 	}
 
-	public void getMessages(String channelName, String id, OutputStream outputStream)
+	@Override
+	public void getMessages(ChannelMetaData channelMetaData, String id, OutputStream outputStream)
 	{
-		String key = keyNameWithUniquePrefix(channelName, id);
+		String key = keyNameWithUniquePrefix(channelMetaData.getName(), id);
 		S3Object s3Object = null;
 
 		try
@@ -125,9 +128,10 @@ public class AwsS3Store implements Storage
 		}
 	}
 
-	public void putMessages(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers)
+	@Override
+	public void putMessages(ChannelMetaData channelMetaData, String id, InputStream inputStream)
 	{
-		String key = keyNameWithUniquePrefix(channelName, id);
+		String key = keyNameWithUniquePrefix(channelMetaData.getName(), id);
 
 		// Set part size to 5 MB.
 		int partSize = 5 * Defaults.MEGABYTES;
@@ -187,6 +191,17 @@ public class AwsS3Store implements Storage
 			logger.error("Failed to upload key to S3.  key=" + key, e);
 			throw Throwables.propagate(e);
 		}
+	}
+
+	@Override
+	public byte[] getBytes(ChannelMetaData channelMetaData, String id)
+	{
+		return new byte[0];
+	}
+
+	@Override
+	public void putBytes(ChannelMetaData channelMetaData, String id, byte[] data)
+	{
 	}
 
 	private String keyNameWithUniquePrefix(String channelName, String id)

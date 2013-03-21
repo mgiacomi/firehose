@@ -9,11 +9,15 @@ import java.util.Map;
 
 public interface Storage
 {
-	void put(ChannelMetaData channelMetaData);
+	void putChannelMetaData(ChannelMetaData channelMetaData);
 
-	ChannelMetaData get(String channelName);
+	ChannelMetaData getChannelMetaData(String channelName);
 
-	void putMessages(String channelName, String id, InputStream inputStream, Map<String, List<String>> headers);
+	void putBytes(ChannelMetaData channelMetaData, String id, byte[] data);
 
-	void getMessages(String channelName, String id, OutputStream outputStream);
+	byte[] getBytes(ChannelMetaData channelMetaData, String id);
+
+	void putMessages(ChannelMetaData channelMetaData, String id, InputStream inputStream);
+
+	void getMessages(ChannelMetaData channelMetaData, String id, OutputStream outputStream);
 }
