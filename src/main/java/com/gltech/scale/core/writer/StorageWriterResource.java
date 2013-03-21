@@ -6,7 +6,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-@Path("/collector")
+@Path("/storagewriter")
 public class StorageWriterResource
 {
 	@Context

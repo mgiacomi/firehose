@@ -23,6 +23,7 @@ import com.gltech.scale.util.Props;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -65,12 +66,18 @@ public class EmbeddedServer
 		// Create the server.
 		server = new Server(port);
 
-		// Create a servlet context and add the jersey servlet.
-		ServletContextHandler sch = new ServletContextHandler(server, "/");
+		// static files handler
+		ResourceHandler resourceHandler = new ResourceHandler();
+		resourceHandler.setDirectoriesListed(true);
+		resourceHandler.setResourceBase("public_html");
+		resourceHandler.setWelcomeFiles(new String[]{"index.html"});
 
-		// Add our Guice listener that includes our bindings
+		// servlet handler
+		ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+		servletContextHandler.setContextPath("/");
+
 		GuiceServletConfig guiceServletConfig = new GuiceServletConfig(moduleOverride);
-		sch.addEventListener(guiceServletConfig);
+		servletContextHandler.addEventListener(guiceServletConfig);
 		injector = guiceServletConfig.getInjector();
 
 		TimerMap timerMap = new TimerMap();
@@ -78,29 +85,27 @@ public class EmbeddedServer
 		StatisticsFilter.add(timerMap);
 		StatisticsFilter.add("/inbound/", "Events");
 		StatisticsFilter.add("/aggregator/", "Aggregator");
-		sch.addFilter(StatisticsFilter.class, "/*", null);
+		servletContextHandler.addFilter(StatisticsFilter.class, "/*", null);
 
 		// Then add GuiceFilter and configure the server to
 		// reroute all requests through this filter.
-		sch.addFilter(GuiceFilter.class, "/*", null);
+		servletContextHandler.addFilter(GuiceFilter.class, "/*", null);
 
 		// Must add DefaultServlet for embedded Jetty.
 		// Failing to do this will cause 404 errors.
 		// This is not needed if web.xml is used instead.
-		sch.addServlet(DefaultServlet.class, "/");
+		servletContextHandler.addServlet(DefaultServlet.class, "/aggregator/*");
+		servletContextHandler.addServlet(DefaultServlet.class, "/inbound/*");
+		servletContextHandler.addServlet(DefaultServlet.class, "/storagewriter/*");
 
-		/*
-		// Setup Handler for html files
-		ResourceHandler resource_handler = new ResourceHandler();
-		resource_handler.setDirectoriesListed(true);
-		resource_handler.setWelcomeFiles(new String[]{"index.html"});
+		// websocket handler
+//		myWebSocketHandler myWebSocketHandler = new myWebSocketHandler();
 
-		resource_handler.setResourceBase("public_html");
-
-		HandlerList handlers = new HandlerList();
-		handlers.setHandlers(new Handler[]{resource_handler, new DefaultHandler()});
-		server.setHandler(handlers);
-		*/
+		// Bind all resources
+		HandlerCollection handlerList = new HandlerCollection();
+//		handlerList.setHandlers(new Handler[]{webSocketHandler,servletContextHandler,resourceHandler});
+		handlerList.setHandlers(new Handler[]{servletContextHandler,resourceHandler});
+		server.setHandler(handlerList);
 
 		// Handle all non jersey services here
 		startServices();
