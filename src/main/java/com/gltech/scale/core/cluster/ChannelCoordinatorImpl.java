@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class ChannelCoordinatorImpl implements ChannelCoordinator
 {
@@ -69,7 +70,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 					logger.error("Failed to get AggregatorPeriodMatrix for period: " + now, e);
 				}
 
-				Thread.sleep(1000);
+				TimeUnit.SECONDS.sleep(1);
 			}
 		}
 		catch (InterruptedException e)

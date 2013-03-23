@@ -13,4 +13,6 @@ public class Defaults
 	static public final int STORAGE_WRITER_WAIT_FOR_SHUTDOWN_MINS = 5;
 	static public final boolean STORAGE_WRITER_CLEAN_SHUTDOWN = true;
 	static public final String STORAGE_STORE = "voldemort";
+	static public final int WEIGHT_MANGER_SLEEP_MILLIS = 500;
+	static public final int STATS_MANAGER_CLEANUP_SLEEP_MINS = 5;
 }

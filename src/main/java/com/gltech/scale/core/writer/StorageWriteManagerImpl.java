@@ -47,7 +47,7 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 	@Override
 	public void run()
 	{
-		int checkForWorkInterval = props.get("storage_writer.check_for_work_interval_secs", Defaults.STORAGE_WRITER_CHECK_FOR_WORK_INTERVAL_SECS) * 1000;
+		int checkForWorkInterval = props.get("storage_writer.check_for_work_interval_secs", Defaults.STORAGE_WRITER_CHECK_FOR_WORK_INTERVAL_SECS);
 		int activeStorageWriters = props.get("storage_writer.active_collectors", Defaults.STORAGE_WRITER_ACTIVE_WRITERS);
 
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
@@ -93,7 +93,7 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 					logger.debug("Could not take on new work.  All threads busy. ActiveWriters={}", threadPoolExecutor.getActiveCount());
 				}
 
-				Thread.sleep(checkForWorkInterval);
+				TimeUnit.SECONDS.sleep(checkForWorkInterval);
 			}
 
 			int waitForShutdown = props.get("storage_writer.wait_for_shutdown_mins", Defaults.STORAGE_WRITER_WAIT_FOR_SHUTDOWN_MINS);
@@ -132,7 +132,7 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 				try
 				{
 					logger.info("Waiting to shutdown...");
-					Thread.sleep(1000);
+					TimeUnit.MINUTES.sleep(1);
 				}
 				catch (InterruptedException e)
 				{

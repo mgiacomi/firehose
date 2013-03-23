@@ -46,7 +46,7 @@ public class InboundResource
 	@POST
 	@Path("/{channelName}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response post(@PathParam("channelName") String channelName, byte[] payload)
+	public Response postMessage(@PathParam("channelName") String channelName, byte[] payload)
 	{
 		inboundService.addMessage(channelName, httpHeaders.getMediaType(), payload);
 		return Response.status(Response.Status.ACCEPTED).build();
@@ -55,7 +55,7 @@ public class InboundResource
 	@PUT
 	@Path("/channel/new")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response put(byte[] payload)
+	public Response putChannel(byte[] payload)
 	{
 		ChannelMetaData channelMetaData = modelIO.toChannelMetaData(new String(payload));
 
@@ -71,7 +71,7 @@ public class InboundResource
 	@GET
 	@Path("/channel/{channelName}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response post(@PathParam("channelName") String channelName)
+	public Response getChannel(@PathParam("channelName") String channelName)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
 

@@ -1,6 +1,8 @@
 package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.cluster.ChannelCoordinator;
+import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.util.Props;
 import com.google.inject.Inject;
 import com.gltech.scale.lifecycle.LifeCycle;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ public class WeightManager implements Runnable, LifeCycle
 	private final Aggregator aggregator;
 	private final ChannelCoordinator channelCoordinator;
 	private volatile boolean shutdown = false;
+	Props props = Props.getProps();
 
 	@Inject
 	public WeightManager(Aggregator aggregator, ChannelCoordinator channelCoordinator)
@@ -20,6 +23,7 @@ public class WeightManager implements Runnable, LifeCycle
 		this.channelCoordinator = channelCoordinator;
 	}
 
+	@Override
 	public void run()
 	{
 		try
@@ -48,7 +52,7 @@ public class WeightManager implements Runnable, LifeCycle
 					logger.error("Failed to update weight for Aggregator.", e);
 				}
 
-				Thread.sleep(500);
+				Thread.sleep(props.get("aggregator.weight_manager_sleep_millis", Defaults.WEIGHT_MANGER_SLEEP_MILLIS));
 			}
 		}
 		catch (InterruptedException e)

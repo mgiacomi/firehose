@@ -5,6 +5,7 @@ import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.monitoring.StatsManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
@@ -30,6 +31,8 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 public class EmbeddedServer
 {
@@ -130,9 +133,14 @@ public class EmbeddedServer
 		final ClusterService clusterService = injector.getInstance(ClusterService.class);
 		LifeCycleManager.getInstance().add(clusterService, LifeCycle.Priority.FINAL);
 
+		// Registered StatsManager for shutdown
+		final StatsManager statsManager = injector.getInstance(StatsManager.class);
+		new Thread(statsManager, "StatsManager").start();
+		LifeCycleManager.getInstance().add(statsManager, LifeCycle.Priority.FINAL);
+
 		if (props.get("enable.inbound_service", true))
 		{
-			// Registered EventService for shutdown
+			// Registered InboundService for shutdown
 			InboundService inboundService = injector.getInstance(InboundService.class);
 			LifeCycleManager.getInstance().add(inboundService, LifeCycle.Priority.INITIAL);
 		}
@@ -175,7 +183,7 @@ public class EmbeddedServer
 		while (!server.isStopped() && retryCount > 0)
 		{
 			retryCount++;
-			Thread.sleep(1000);
+			TimeUnit.MINUTES.sleep(1);
 		}
 
 		server = null;
