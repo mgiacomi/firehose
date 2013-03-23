@@ -39,22 +39,22 @@ public class AvgStatOverTime implements StatOverTime
 		counterStatOverTime.increment(dateTime);
 	}
 
-	public AvgCountStat getAvgOverSeconds(int seconds)
+	public AvgStatResult getAvgOverSeconds(int seconds)
 	{
 		return getAverage(seconds / 5 + 1);
 	}
 
-	public AvgCountStat getAvgOverMinutes(int minutes)
+	public AvgStatResult getAvgOverMinutes(int minutes)
 	{
 		return getAverage(minutes * 12);
 	}
 
-	public AvgCountStat getAvgOverHours(int hour)
+	public AvgStatResult getAvgOverHours(int hour)
 	{
 		return getAverage(60 * 12 * hour);
 	}
 
-	private AvgCountStat getAverage(int loops)
+	private AvgStatResult getAverage(int loops)
 	{
 		if(loops > 1440) {
 			throw new IllegalArgumentException("You can only query 2 hours back in time.");
@@ -76,7 +76,7 @@ public class AvgStatOverTime implements StatOverTime
 		}
 
 		long counter = counterStatOverTime.getTotalCount(loops);
-		return new AvgCountStat(total, counter);
+		return new AvgStatResult(total, counter);
 	}
 
 	@Override
