@@ -2,6 +2,7 @@ package com.gltech.scale.core.server;
 
 import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.inbound.InboundServiceImpl;
+import com.gltech.scale.core.inbound.InboundServiceStats;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.storage.providers.AwsS3Store;
 import com.gltech.scale.core.storage.providers.VoldemortStore;
@@ -67,7 +68,8 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					if (props.get("enable.inbound_service", true))
 					{
 						bind(InboundResource.class);
-						bind(InboundService.class).to(InboundServiceImpl.class).in(Singleton.class);
+						bind(InboundService.class).to(InboundServiceStats.class).in(Singleton.class);
+						bind(InboundService.class).annotatedWith(Names.named(InboundServiceStats.BASE)).to(InboundServiceImpl.class).in(Singleton.class);
 					}
 
 					if (props.get("enable.aggregator", true))

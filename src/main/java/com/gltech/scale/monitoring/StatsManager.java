@@ -78,6 +78,8 @@ public class StatsManager implements Runnable, LifeCycle
 	@Override
 	public void run()
 	{
+		logger.info("StatsManager starting.");
+
 		try
 		{
 			while (!shutdown)
@@ -96,10 +98,10 @@ public class StatsManager implements Runnable, LifeCycle
 		}
 		catch (InterruptedException e)
 		{
-			logger.error("WeightManager was inturrupted.", e);
+			logger.error("StatsManager was inturrupted.", e);
 		}
 
-		logger.info("WeightManager has been shutdown.");
+		logger.info("StatsManager has been shutdown.");
 	}
 
 	@Override
