@@ -88,8 +88,16 @@ public class InboundResource
 
 	@GET
 	@Path("/stats")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response getProtoStats()
+	{
+		return Response.ok(statsManager.toBytes(), MediaType.APPLICATION_OCTET_STREAM).build();
+	}
+
+	@GET
+	@Path("/stats")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStats()
+	public Response getJsonStats()
 	{
 		return Response.ok(statsManager.toJson(), MediaType.APPLICATION_JSON).build();
 	}

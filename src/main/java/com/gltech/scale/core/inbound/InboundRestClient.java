@@ -1,25 +1,34 @@
 package com.gltech.scale.core.inbound;
 
+import com.dyuproject.protostuff.ProtostuffIOUtil;
+import com.dyuproject.protostuff.Schema;
+import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataException;
 import com.gltech.scale.core.storage.DuplicateChannelException;
+import com.gltech.scale.monitoring.results.GroupStats;
 import com.gltech.scale.util.ClientCreator;
 import com.gltech.scale.util.ModelIO;
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class InboundRestClient
 {
 	private final Client client = ClientCreator.createCached();
 	private ModelIO modelIO;
+	private Schema<GroupStats> groupStatsSchema = RuntimeSchema.getSchema(GroupStats.class);
 
 	@Inject
 	public InboundRestClient(ModelIO modelIO)
@@ -72,6 +81,27 @@ public class InboundRestClient
 		if (response.getStatus() != 202)
 		{
 			throw new RuntimeException("Failed : HTTP error code: " + response);
+		}
+	}
+
+	public List<GroupStats> getGroupStats(ServiceMetaData inboundService)
+	{
+		String url = "http://" + inboundService.getListenAddress() + ":" + inboundService.getListenPort() + "/inbound/stats";
+		WebResource webResource = client.resource(url);
+		ClientResponse response = webResource.accept(MediaType.APPLICATION_OCTET_STREAM_TYPE).get(ClientResponse.class);
+
+		if (response.getStatus() != 200)
+		{
+			throw new RuntimeException("Failed : HTTP error code: " + response);
+		}
+
+		try
+		{
+			return ProtostuffIOUtil.parseListFrom(response.getEntityInputStream(), groupStatsSchema);
+		}
+		catch (IOException e)
+		{
+			throw Throwables.propagate(e);
 		}
 	}
 

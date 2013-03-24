@@ -1,8 +1,12 @@
 package com.gltech.scale.monitoring.results;
 
+import com.dyuproject.protostuff.Tag;
+
 public class AvgStat
 {
+	@Tag(1)
 	private long total;
+	@Tag(2)
 	private long count;
 
 	public AvgStat(long total, long count)

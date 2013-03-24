@@ -1,17 +1,22 @@
 package com.gltech.scale.monitoring;
 
-import com.dyuproject.protostuff.JsonIOUtil;
+import com.dyuproject.protostuff.LinkedBuffer;
+import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.lifecycle.LifeCycle;
 import com.gltech.scale.monitoring.results.AvgStat;
 import com.gltech.scale.monitoring.results.GroupStats;
 import com.gltech.scale.monitoring.results.OverTime;
 import com.gltech.scale.util.Props;
+import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -20,9 +25,10 @@ import java.util.concurrent.TimeUnit;
 public class StatsManager implements Runnable, LifeCycle
 {
 	private static final Logger logger = LoggerFactory.getLogger(StatsManager.class);
+	LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+	private Schema<GroupStats> groupStatsSchema = RuntimeSchema.getSchema(GroupStats.class);
 	private volatile boolean shutdown = false;
 	Props props = Props.getProps();
-	private Schema<ArrayList> listSchema = RuntimeSchema.getSchema(ArrayList.class);
 
 	// Multi-level Map used to hold group and name level stat data.
 	private static ConcurrentMap<String, ConcurrentMap<String, StatOverTime>> stats = new ConcurrentHashMap<>();
@@ -80,19 +86,44 @@ public class StatsManager implements Runnable, LifeCycle
 			return existingStatOverTime;
 		}
 
-System.out.println("STAT COUNT: "+ stats.size() +" : "+ this);
-
 		return statOverTime;
+	}
+
+	public byte[] toBytes()
+	{
+		try
+		{
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			ProtostuffIOUtil.writeListTo(out, getGroupStats(), groupStatsSchema, linkedBuffer);
+			linkedBuffer.clear();
+			return out.toByteArray();
+		}
+		catch (IOException e)
+		{
+			throw Throwables.propagate(e);
+		}
 	}
 
 	public String toJson()
 	{
-System.out.println("STAT COUNT: "+ stats.size() +" : "+ this);
+		try
+		{
+			ObjectMapper mapper = new ObjectMapper();
+			return mapper.writeValueAsString(getGroupStats());
+		}
+		catch (IOException e)
+		{
+			throw Throwables.propagate(e);
+		}
+	}
+
+	public ArrayList<GroupStats> getGroupStats()
+	{
 		ArrayList<GroupStats> groupStatsList = new ArrayList<>();
 
 		for (String groupName : stats.keySet())
 		{
-			GroupStats groupStats = new GroupStats();
+			GroupStats groupStats = new GroupStats(groupName);
 
 			for (String statName : stats.get(groupName).keySet())
 			{
@@ -131,7 +162,7 @@ System.out.println("STAT COUNT: "+ stats.size() +" : "+ this);
 			groupStatsList.add(groupStats);
 		}
 
-		return new String(JsonIOUtil.toByteArray(groupStatsList, listSchema, false));
+		return groupStatsList;
 	}
 
 	@Override

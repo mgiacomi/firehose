@@ -1,11 +1,18 @@
 package com.gltech.scale.monitoring.results;
 
+import com.dyuproject.protostuff.Tag;
+
 public class OverTime<T>
 {
+	@Tag(1)
 	private String statName;
+	@Tag(2)
 	private T min1;
+	@Tag(3)
 	private T min5;
+	@Tag(4)
 	private T min30;
+	@Tag(5)
 	private T hour2;
 
 	public OverTime(String statName, T min1, T min5, T min30, T hour2)
@@ -17,7 +24,7 @@ public class OverTime<T>
 		this.hour2 = hour2;
 	}
 
-	public String getStatName()
+	public String getName()
 	{
 		return statName;
 	}

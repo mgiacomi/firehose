@@ -6,6 +6,9 @@ import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.monitoring.StatsManager;
+import com.gltech.scale.monitoring.results.AvgStat;
+import com.gltech.scale.monitoring.results.GroupStats;
+import com.gltech.scale.monitoring.results.OverTime;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
@@ -124,7 +127,9 @@ public class EmbeddedServer
 		registry.registerPojo(Message.class, 1);
 		registry.registerPojo(Batch.class, 2);
 		registry.registerPojo(ChannelMetaData.class, 3);
-
+		registry.registerPojo(GroupStats.class, 4);
+		registry.registerPojo(AvgStat.class, 5);
+		registry.registerPojo(OverTime.class, 6);
 	}
 
 	private static void startServices()
