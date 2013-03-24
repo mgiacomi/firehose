@@ -10,7 +10,7 @@ import javax.ws.rs.core.UriInfo;
 public class StorageWriterResource
 {
 	@Context
-	UriInfo uriInfo;
+	private UriInfo uriInfo;
 
 	@Path("/test")
 	@GET

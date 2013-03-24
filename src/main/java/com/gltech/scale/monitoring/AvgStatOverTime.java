@@ -1,6 +1,7 @@
 package com.gltech.scale.monitoring;
 
 import com.gltech.scale.core.cluster.TimePeriodUtils;
+import com.gltech.scale.monitoring.results.AvgStat;
 import org.joda.time.DateTime;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,22 +40,22 @@ public class AvgStatOverTime implements StatOverTime
 		counterStatOverTime.increment(dateTime);
 	}
 
-	public AvgStatResult getAvgOverSeconds(int seconds)
+	public AvgStat getAvgOverSeconds(int seconds)
 	{
 		return getAverage(seconds / 5 + 1);
 	}
 
-	public AvgStatResult getAvgOverMinutes(int minutes)
+	public AvgStat getAvgOverMinutes(int minutes)
 	{
 		return getAverage(minutes * 12);
 	}
 
-	public AvgStatResult getAvgOverHours(int hour)
+	public AvgStat getAvgOverHours(int hour)
 	{
 		return getAverage(60 * 12 * hour);
 	}
 
-	private AvgStatResult getAverage(int loops)
+	private AvgStat getAverage(int loops)
 	{
 		if(loops > 1440) {
 			throw new IllegalArgumentException("You can only query 2 hours back in time.");
@@ -76,7 +77,7 @@ public class AvgStatOverTime implements StatOverTime
 		}
 
 		long counter = counterStatOverTime.getTotalCount(loops);
-		return new AvgStatResult(total, counter);
+		return new AvgStat(total, counter);
 	}
 
 	@Override

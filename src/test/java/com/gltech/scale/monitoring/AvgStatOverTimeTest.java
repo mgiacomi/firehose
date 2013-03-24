@@ -2,7 +2,6 @@ package com.gltech.scale.monitoring;
 
 import static junit.framework.Assert.*;
 
-import com.gltech.scale.monitoring.AvgStatOverTime;
 import org.joda.time.DateTime;
 import org.junit.Test;
 

@@ -1,11 +1,11 @@
-package com.gltech.scale.monitoring;
+package com.gltech.scale.monitoring.results;
 
-public class AvgStatResult
+public class AvgStat
 {
-	private final long total;
-	private final long count;
+	private long total;
+	private long count;
 
-	public AvgStatResult(long total, long count)
+	public AvgStat(long total, long count)
 	{
 		this.total = total;
 		this.count = count;

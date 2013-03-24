@@ -1,11 +1,20 @@
 package com.gltech.scale.monitoring;
 
+import com.dyuproject.protostuff.JsonIOUtil;
+import com.dyuproject.protostuff.Schema;
+import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.model.Message;
 import com.gltech.scale.lifecycle.LifeCycle;
+import com.gltech.scale.monitoring.results.AvgStat;
+import com.gltech.scale.monitoring.results.GroupStats;
+import com.gltech.scale.monitoring.results.OverTime;
 import com.gltech.scale.util.Props;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +24,7 @@ public class StatsManager implements Runnable, LifeCycle
 	private static final Logger logger = LoggerFactory.getLogger(StatsManager.class);
 	private volatile boolean shutdown = false;
 	Props props = Props.getProps();
+	private Schema<ArrayList> listSchema = RuntimeSchema.getSchema(ArrayList.class);
 
 	// Multi-level Map used to hold group and name level stat data.
 	private ConcurrentMap<String, ConcurrentMap<String, StatOverTime>> stats = new ConcurrentHashMap<>();
@@ -73,6 +83,54 @@ public class StatsManager implements Runnable, LifeCycle
 		}
 
 		return statOverTime;
+	}
+
+	public String toJson()
+	{
+		ArrayList<GroupStats> groupStatsList = new ArrayList<>();
+
+		for (String groupName : stats.keySet())
+		{
+			GroupStats groupStats = new GroupStats();
+
+			for (String statName : stats.get(groupName).keySet())
+			{
+				StatOverTime statOverTime = stats.get(groupName).get(statName);
+
+				if (statOverTime instanceof AvgStatOverTime)
+				{
+					AvgStatOverTime avgStatOverTime = (AvgStatOverTime) statOverTime;
+
+					OverTime<AvgStat> overTime = new OverTime<>(
+							statName,
+							avgStatOverTime.getAvgOverMinutes(1),
+							avgStatOverTime.getAvgOverMinutes(5),
+							avgStatOverTime.getAvgOverMinutes(30),
+							avgStatOverTime.getAvgOverHours(2)
+					);
+
+					groupStats.getAvgStats().add(overTime);
+				}
+				if (statOverTime instanceof CounterStatOverTime)
+				{
+					CounterStatOverTime counterStatOverTime = (CounterStatOverTime) statOverTime;
+
+					OverTime<Long> overTime = new OverTime<>(
+							statName,
+							counterStatOverTime.getCountOverMinutes(1),
+							counterStatOverTime.getCountOverMinutes(5),
+							counterStatOverTime.getCountOverMinutes(30),
+							counterStatOverTime.getCountOverHours(2)
+					);
+
+					groupStats.getCountStats().add(overTime);
+				}
+			}
+
+			groupStatsList.add(groupStats);
+		}
+
+		return new String(JsonIOUtil.toByteArray(groupStatsList, listSchema, false));
 	}
 
 	@Override

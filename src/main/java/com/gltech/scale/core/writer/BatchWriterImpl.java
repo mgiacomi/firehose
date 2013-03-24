@@ -75,16 +75,20 @@ public class BatchWriterImpl implements BatchWriter
 				if (channelMetaData.isRedundant())
 				{
 					BatchMetaData primaryMetaData = aggregatorRestClient.getBatchMetaData(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
-					BatchMetaData backupMetaData = aggregatorRestClient.getBackupBatchMetaData(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
 
 					aggregators.add(primaryBackupSet.getPrimary());
 
-					// If there is any discrepancy between the primary and backup rope for a double write bucket,
-					// then pull both and let BatchStreamsManager figure it out. Otherwise only primary is used.
-					if (primaryMetaData.getMessagesAdded() != backupMetaData.getMessagesAdded() || primaryMetaData.getBytes() != backupMetaData.getBytes())
+					if (primaryBackupSet.getBackup() != null)
 					{
-						aggregators.add(primaryBackupSet.getBackup());
-						logger.warn("A discrepancy between primary and backup aggregators has been detected for {}", customerBatchPeriod);
+						BatchMetaData backupMetaData = aggregatorRestClient.getBackupBatchMetaData(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
+
+						// If there is any discrepancy between the primary and backup rope for a double write bucket,
+						// then pull both and let BatchStreamsManager figure it out. Otherwise only primary is used.
+						if (primaryMetaData.getMessagesAdded() != backupMetaData.getMessagesAdded() || primaryMetaData.getBytes() != backupMetaData.getBytes())
+						{
+							aggregators.add(primaryBackupSet.getBackup());
+							logger.warn("A discrepancy between primary and backup aggregators has been detected for {}", customerBatchPeriod);
+						}
 					}
 				}
 				else

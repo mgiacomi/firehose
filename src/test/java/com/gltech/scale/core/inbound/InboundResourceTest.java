@@ -6,6 +6,7 @@ import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.ChannelCache;
 import com.gltech.scale.core.storage.StorageClient;
+import com.gltech.scale.monitoring.StatsManager;
 import com.gltech.scale.util.ModelIO;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -76,10 +77,12 @@ public class InboundResourceTest
 	@Test
 	public void testPeriodSecondBySecond() throws Exception
 	{
+		StatsManager statsManager = mock(StatsManager.class);
+
 		ChannelCache channelCache = mock(ChannelCache.class);
 		when(channelCache.getChannelMetaData(anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(channelCache, inboundService, new ModelIO(), storageClient);
+		InboundResource inboundResource = new InboundResource(channelCache, inboundService, statsManager, new ModelIO(), storageClient);
 		Response response = inboundResource.getMessagesOrRedirect("c1", 2012, 10, 12, 10, 40, 15);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
@@ -89,10 +92,12 @@ public class InboundResourceTest
 	@Test
 	public void testPeriodSecondBySecond2() throws Exception
 	{
+		StatsManager statsManager = mock(StatsManager.class);
+
 		ChannelCache channelCache = mock(ChannelCache.class);
 		when(channelCache.getChannelMetaData(anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(channelCache, inboundService, new ModelIO(), storageClient);
+		InboundResource inboundResource = new InboundResource(channelCache, inboundService, statsManager, new ModelIO(), storageClient);
 		Response response = inboundResource.getMessagesOrRedirect("c1", 2012, 10, 12, 10, 40, 13);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
@@ -102,10 +107,12 @@ public class InboundResourceTest
 	@Test
 	public void testPeriodByMinute() throws Exception
 	{
+		StatsManager statsManager = mock(StatsManager.class);
+
 		ChannelCache channelCache = mock(ChannelCache.class);
 		when(channelCache.getChannelMetaData(anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(channelCache, inboundService, new ModelIO(), storageClient);
+		InboundResource inboundResource = new InboundResource(channelCache, inboundService, statsManager, new ModelIO(), storageClient);
 		Response response = inboundResource.getMessagesOrRedirect("c1", 2012, 10, 12, 10, 40, -1);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 
@@ -128,10 +135,12 @@ public class InboundResourceTest
 	@Test
 	public void testPeriodByHour() throws Exception
 	{
+		StatsManager statsManager = mock(StatsManager.class);
+
 		ChannelCache channelCache = mock(ChannelCache.class);
 		when(channelCache.getChannelMetaData(anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(channelCache, inboundService, new ModelIO(), storageClient);
+		InboundResource inboundResource = new InboundResource(channelCache, inboundService, statsManager, new ModelIO(), storageClient);
 		Response response = inboundResource.getMessagesOrRedirect("c1", 2012, 10, 12, 10, -1, -1);
 		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
 

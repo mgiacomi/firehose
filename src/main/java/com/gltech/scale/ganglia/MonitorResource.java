@@ -12,7 +12,7 @@ import javax.ws.rs.core.UriInfo;
 public class MonitorResource
 {
 	@Context
-	UriInfo uriInfo;
+	private UriInfo uriInfo;
 
 	@Path("/test")
 	@GET
