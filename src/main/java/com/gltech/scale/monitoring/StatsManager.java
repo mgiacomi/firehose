@@ -4,7 +4,6 @@ import com.dyuproject.protostuff.JsonIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.gltech.scale.core.model.Defaults;
-import com.gltech.scale.core.model.Message;
 import com.gltech.scale.lifecycle.LifeCycle;
 import com.gltech.scale.monitoring.results.AvgStat;
 import com.gltech.scale.monitoring.results.GroupStats;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +25,7 @@ public class StatsManager implements Runnable, LifeCycle
 	private Schema<ArrayList> listSchema = RuntimeSchema.getSchema(ArrayList.class);
 
 	// Multi-level Map used to hold group and name level stat data.
-	private ConcurrentMap<String, ConcurrentMap<String, StatOverTime>> stats = new ConcurrentHashMap<>();
+	private static ConcurrentMap<String, ConcurrentMap<String, StatOverTime>> stats = new ConcurrentHashMap<>();
 
 	// Factory method to make sure that new stats are registered
 	public AvgStatOverTime createAvgStat(String groupName, String statName)
@@ -82,11 +80,14 @@ public class StatsManager implements Runnable, LifeCycle
 			return existingStatOverTime;
 		}
 
+System.out.println("STAT COUNT: "+ stats.size() +" : "+ this);
+
 		return statOverTime;
 	}
 
 	public String toJson()
 	{
+System.out.println("STAT COUNT: "+ stats.size() +" : "+ this);
 		ArrayList<GroupStats> groupStatsList = new ArrayList<>();
 
 		for (String groupName : stats.keySet())
