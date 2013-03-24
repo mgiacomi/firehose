@@ -14,7 +14,6 @@ public class AggregatorsByPeriod
 	private final List<PrimaryBackupSet> primaryBackupSets;
 	private final List<ServiceMetaData> aggregators = new ArrayList<>();
 	private final AtomicInteger setIndex = new AtomicInteger(0);
-//	private final AtomicInteger singleIndex = new AtomicInteger(0);
 
 	@JsonCreator
 	public AggregatorsByPeriod(@JsonProperty("period") DateTime period, @JsonProperty("primaryBackupSets") List<PrimaryBackupSet> primaryBackupSets)

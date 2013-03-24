@@ -15,14 +15,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class ZookeeperClusterService implements ClusterService
+public class ClusterServiceImpl implements ClusterService
 {
-	private static final Logger logger = LoggerFactory.getLogger(ZookeeperClusterService.class);
+	private static final Logger logger = LoggerFactory.getLogger(ClusterServiceImpl.class);
 	private CuratorFramework client = ZkClientCreator.createCached();
 	private RegistrationService registrationService;
 
 	@Inject
-	public ZookeeperClusterService(RegistrationService registrationService)
+	public ClusterServiceImpl(RegistrationService registrationService)
 	{
 		this.registrationService = registrationService;
 	}

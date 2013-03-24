@@ -59,7 +59,7 @@ public class ClusterServiceTest
 	@Test
 	public void testRegisterAndQueryAggregators() throws Exception
 	{
-		ClusterService clusterService = new ZookeeperClusterService(new RegistrationServiceImpl());
+		ClusterService clusterService = new ClusterServiceImpl(new RegistrationServiceImpl());
 
 		props.set("aggregator.rest_host", "aggregator1");
 		props.set("aggregator.rest_port", 8080);

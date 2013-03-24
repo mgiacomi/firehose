@@ -56,7 +56,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 				protected void configureServlets()
 				{
 					// Global injector settings
-					bind(ClusterService.class).to(ZookeeperClusterService.class).in(Singleton.class);
+					bind(ClusterService.class).to(ClusterServiceImpl.class).in(Singleton.class);
 					bind(RegistrationService.class).to(RegistrationServiceImpl.class).in(Singleton.class);
 					bind(ChannelCoordinator.class).to(ChannelCoordinatorImpl.class).in(Singleton.class);
 					bind(StatsManager.class).to(StatsManagerImpl.class).in(Singleton.class);
@@ -66,7 +66,6 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					if (props.get("enable.monitoring_service", true))
 					{
 						bind(MonitorResource.class);
-						//bind(EventService.class).to(EventServiceImpl.class).in(Singleton.class);
 					}
 
 					if (props.get("enable.inbound_service", true))
