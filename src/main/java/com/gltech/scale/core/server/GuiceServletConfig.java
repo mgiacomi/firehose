@@ -7,6 +7,8 @@ import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.storage.providers.AwsS3Store;
 import com.gltech.scale.core.storage.providers.VoldemortStore;
 import com.gltech.scale.ganglia.MonitorResource;
+import com.gltech.scale.monitoring.StatsManager;
+import com.gltech.scale.monitoring.StatsManagerImpl;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -57,6 +59,8 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					bind(ClusterService.class).to(ZookeeperClusterService.class).in(Singleton.class);
 					bind(RegistrationService.class).to(RegistrationServiceImpl.class).in(Singleton.class);
 					bind(ChannelCoordinator.class).to(ChannelCoordinatorImpl.class).in(Singleton.class);
+					bind(StatsManager.class).to(StatsManagerImpl.class).in(Singleton.class);
+					bind(ChannelCache.class).to(ChannelCacheImpl.class).in(Singleton.class);
 
 					// Service specific injector settings
 					if (props.get("enable.monitoring_service", true))

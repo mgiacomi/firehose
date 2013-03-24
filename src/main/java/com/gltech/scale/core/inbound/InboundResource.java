@@ -44,6 +44,8 @@ public class InboundResource
 		this.modelIO = modelIO;
 		this.storageClient = storageClient;
 		this.periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
+
+		System.out.println(statsManager +" : "+ inboundService +" : "+ channelCache);
 	}
 
 	@POST

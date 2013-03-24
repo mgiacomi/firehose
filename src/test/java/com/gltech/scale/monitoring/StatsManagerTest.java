@@ -19,7 +19,7 @@ public class StatsManagerTest
 	{
 		Schema<GroupStats> groupStatsSchema = RuntimeSchema.getSchema(GroupStats.class);
 
-		StatsManager statsManager = new StatsManager();
+		StatsManager statsManager = new StatsManagerImpl();
 		AvgStatOverTime addMessageStat = statsManager.createAvgStat("Inbound Service", "Message.Size");
 		addMessageStat.add(40);
 		addMessageStat.add(160);
