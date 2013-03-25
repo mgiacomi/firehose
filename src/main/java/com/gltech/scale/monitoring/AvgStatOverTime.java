@@ -11,10 +11,33 @@ import java.util.concurrent.atomic.AtomicLong;
 public class AvgStatOverTime implements StatOverTime
 {
 	private ConcurrentMap<DateTime, AtomicLong> totalsBy5SecPeriods = new ConcurrentHashMap<>();
-	private CounterStatOverTime counterStatOverTime = new CounterStatOverTime();
+	private final ThreadLocal<Long> startTime = new ThreadLocal<>();
+	private CounterStatOverTime counterStatOverTime;
+	private String statName;
 
 	// Only allow classes in this package to create a stat.
-	protected AvgStatOverTime() {}
+	protected AvgStatOverTime(String statName)
+	{
+		this.statName = statName;
+		counterStatOverTime = new CounterStatOverTime(null);
+	}
+
+	// Only allow classes in this package to create a stat.
+	protected AvgStatOverTime(String statName, String countStatName)
+	{
+		this.statName = statName;
+		counterStatOverTime = new CounterStatOverTime(countStatName);
+	}
+
+	public void startTimer()
+	{
+		startTime.set(System.nanoTime()  / 1000 / 1000);
+	}
+
+	public void stopTimer()
+	{
+		add((System.nanoTime() / 1000 / 1000) - startTime.get());
+	}
 
 	public void add(long total)
 	{
@@ -40,6 +63,17 @@ public class AvgStatOverTime implements StatOverTime
 		counterStatOverTime.increment(dateTime);
 	}
 
+	@Override
+	public String getStatName()
+	{
+		return statName;
+	}
+
+	public CounterStatOverTime getCounterStatOverTime()
+	{
+		return counterStatOverTime;
+	}
+
 	public AvgStat getAvgOverSeconds(int seconds)
 	{
 		return getAverage(seconds / 5 + 1);
@@ -57,7 +91,8 @@ public class AvgStatOverTime implements StatOverTime
 
 	private AvgStat getAverage(int loops)
 	{
-		if(loops > 1440) {
+		if (loops > 1440)
+		{
 			throw new IllegalArgumentException("You can only query 2 hours back in time.");
 		}
 
@@ -83,15 +118,32 @@ public class AvgStatOverTime implements StatOverTime
 	@Override
 	public void cleanOldThanTwoHours()
 	{
-		for(DateTime period : totalsBy5SecPeriods.keySet())
+		for (DateTime period : totalsBy5SecPeriods.keySet())
 		{
 			DateTime twoHoursAgo = DateTime.now().minusHours(2);
-			if(period.isAfter(twoHoursAgo))
+			if (period.isAfter(twoHoursAgo))
 			{
 				totalsBy5SecPeriods.remove(twoHoursAgo);
 			}
 		}
 
 		counterStatOverTime.cleanOldThanTwoHours();
+	}
+
+	public boolean equals(Object o)
+	{
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		AvgStatOverTime that = (AvgStatOverTime) o;
+
+		if (statName != null ? !statName.equals(that.statName) : that.statName != null) return false;
+
+		return true;
+	}
+
+	public int hashCode()
+	{
+		return statName != null ? statName.hashCode() : 0;
 	}
 }

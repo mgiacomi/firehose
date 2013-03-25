@@ -10,9 +10,12 @@ import java.util.concurrent.atomic.AtomicLong;
 public class CounterStatOverTime implements StatOverTime
 {
 	private ConcurrentMap<DateTime, AtomicLong> countsBy5SecPeriods = new ConcurrentHashMap<>();
+	private String statName;
 
 	// Only allow classes in this package to create a stat.
-	protected CounterStatOverTime() {}
+	protected CounterStatOverTime(String statName) {
+		this.statName = statName;
+	}
 
 	public void increment()
 	{
@@ -45,6 +48,11 @@ public class CounterStatOverTime implements StatOverTime
 		}
 
 		atomicTotal.addAndGet(count);
+	}
+
+	public String getStatName()
+	{
+		return statName;
 	}
 
 	public long getCountOverSeconds(int seconds)
@@ -97,5 +105,22 @@ public class CounterStatOverTime implements StatOverTime
 				countsBy5SecPeriods.remove(twoHoursAgo);
 			}
 		}
+	}
+
+	public boolean equals(Object o)
+	{
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		CounterStatOverTime that = (CounterStatOverTime) o;
+
+		if (statName != null ? !statName.equals(that.statName) : that.statName != null) return false;
+
+		return true;
+	}
+
+	public int hashCode()
+	{
+		return statName != null ? statName.hashCode() : 0;
 	}
 }

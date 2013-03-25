@@ -9,6 +9,8 @@ public interface StatsManager extends Runnable, LifeCycle
 {
 	AvgStatOverTime createAvgStat(String groupName, String statName);
 
+	AvgStatOverTime createAvgAndCountStat(String groupName, String avgStatName, String countStatName);
+
 	CounterStatOverTime createCounterStat(String groupName, String statName);
 
 	byte[] toBytes();

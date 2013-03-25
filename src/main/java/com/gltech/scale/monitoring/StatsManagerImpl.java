@@ -6,7 +6,6 @@ import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gltech.scale.core.model.Defaults;
-import com.gltech.scale.lifecycle.LifeCycle;
 import com.gltech.scale.monitoring.results.AvgStat;
 import com.gltech.scale.monitoring.results.GroupStats;
 import com.gltech.scale.monitoring.results.OverTime;
@@ -36,8 +35,14 @@ public class StatsManagerImpl implements StatsManager
 	// Factory method to make sure that new stats are registered
 	public AvgStatOverTime createAvgStat(String groupName, String statName)
 	{
-		AvgStatOverTime avgStatOverTime = new AvgStatOverTime();
-		StatOverTime statOverTime = registerStat(groupName, statName, avgStatOverTime);
+		return createAvgAndCountStat(groupName, statName, null);
+	}
+
+	// Factory method to make sure that new stats are registered
+	public AvgStatOverTime createAvgAndCountStat(String groupName, String avgStatName, String countStatName)
+	{
+		AvgStatOverTime avgStatOverTime = new AvgStatOverTime(avgStatName, countStatName);
+		StatOverTime statOverTime = registerStat(groupName, avgStatName, avgStatOverTime);
 
 		try
 		{
@@ -45,14 +50,14 @@ public class StatsManagerImpl implements StatsManager
 		}
 		catch (ClassCastException e)
 		{
-			throw new IllegalStateException("A stat has already been created with the same name, but of a different type. {name=" + statName + ", type=" + statOverTime.getClass().getSimpleName() + "}");
+			throw new IllegalStateException("A stat has already been created with the same name, but of a different type. {name=" + avgStatName + ", type=" + statOverTime.getClass().getSimpleName() + "}");
 		}
 	}
 
 	// Factory method to make sure that new stats are registered
 	public CounterStatOverTime createCounterStat(String groupName, String statName)
 	{
-		CounterStatOverTime counterStatOverTime = new CounterStatOverTime();
+		CounterStatOverTime counterStatOverTime = new CounterStatOverTime(statName);
 		StatOverTime statOverTime = registerStat(groupName, statName, counterStatOverTime);
 
 		try
@@ -133,29 +138,41 @@ public class StatsManagerImpl implements StatsManager
 				{
 					AvgStatOverTime avgStatOverTime = (AvgStatOverTime) statOverTime;
 
-					OverTime<AvgStat> overTime = new OverTime<>(
-							statName,
+					OverTime<AvgStat> avgOverTime = new OverTime<>(
+							avgStatOverTime.getStatName(),
 							avgStatOverTime.getAvgOverMinutes(1),
 							avgStatOverTime.getAvgOverMinutes(5),
 							avgStatOverTime.getAvgOverMinutes(30),
 							avgStatOverTime.getAvgOverHours(2)
 					);
 
-					groupStats.getAvgStats().add(overTime);
+					groupStats.getAvgStats().add(avgOverTime);
+
+					if(avgStatOverTime.getCounterStatOverTime().getStatName() != null) {
+						OverTime<Long> countOverTime = new OverTime<>(
+								avgStatOverTime.getCounterStatOverTime().getStatName(),
+								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(1),
+								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(5),
+								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(30),
+								avgStatOverTime.getCounterStatOverTime().getCountOverHours(2)
+						);
+
+						groupStats.getCountStats().add(countOverTime);
+					}
 				}
 				if (statOverTime instanceof CounterStatOverTime)
 				{
 					CounterStatOverTime counterStatOverTime = (CounterStatOverTime) statOverTime;
 
-					OverTime<Long> overTime = new OverTime<>(
-							statName,
+					OverTime<Long> countOverTime = new OverTime<>(
+							counterStatOverTime.getStatName(),
 							counterStatOverTime.getCountOverMinutes(1),
 							counterStatOverTime.getCountOverMinutes(5),
 							counterStatOverTime.getCountOverMinutes(30),
 							counterStatOverTime.getCountOverHours(2)
 					);
 
-					groupStats.getCountStats().add(overTime);
+					groupStats.getCountStats().add(countOverTime);
 				}
 			}
 

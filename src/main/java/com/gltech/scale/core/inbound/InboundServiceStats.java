@@ -13,19 +13,26 @@ public class InboundServiceStats implements InboundService
 {
 	public static final String BASE = "InboundServiceStats";
 	private final InboundService inboundService;
-	private AvgStatOverTime addMessageStat;
+	private AvgStatOverTime addMessageSizeStat;
+	private AvgStatOverTime addMessageTimeStat;
 
 	@Inject
 	public InboundServiceStats(@Named(BASE) final InboundService inboundService, StatsManager statsManager)
 	{
 		this.inboundService = inboundService;
-		this.addMessageStat = statsManager.createAvgStat("Inbound Service", "Message.Size");
+
+		String groupName = "Inbound Service";
+		this.addMessageSizeStat = statsManager.createAvgAndCountStat(groupName, "AddMessage.Size", "AddMessage.Count");
+		this.addMessageTimeStat = statsManager.createAvgStat(groupName, "AddMessage.Time");
 	}
 
 	public void addMessage(String channelName, MediaType mediaTypes, byte[] payload)
 	{
-		addMessageStat.add(payload.length);
+		addMessageTimeStat.startTimer();
 		inboundService.addMessage(channelName, mediaTypes, payload);
+		addMessageTimeStat.stopTimer();
+
+		addMessageSizeStat.add(payload.length);
 	}
 
 	public int writeMessagesToOutputStream(String channelName, DateTime dateTime, OutputStream outputStream, int recordsWritten)

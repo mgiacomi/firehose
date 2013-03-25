@@ -3,6 +3,7 @@ package com.gltech.scale.core.aggregator;
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.ganglia.*;
+import com.gltech.scale.monitoring.StatsManager;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.joda.time.DateTime;
@@ -22,11 +23,13 @@ public class AggregatorStats implements Aggregator
 	private Timer writtenBackupMessagesTimer = new Timer();
 
 	@Inject
-	public AggregatorStats(@Named(BASE) final Aggregator aggregator)
+	public AggregatorStats(@Named(BASE) final Aggregator aggregator, StatsManager statsManager)
 	{
 		this.aggregator = aggregator;
 
 		String groupName = "Aggregator";
+//		this.addMessageStat = statsManager.createAvgStat(groupName, "Message", "Size");
+
 		MonitoringPublisher.getInstance().register(new PublishMetric("AddMessage.Count", groupName, "count", new TimerCountPublisher("", addMessageTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("AddMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addMessageTimer)));
 		MonitoringPublisher.getInstance().register(new PublishMetric("AddBackupMessage.Count", groupName, "count", new TimerCountPublisher("", addBackupMessageTimer)));
