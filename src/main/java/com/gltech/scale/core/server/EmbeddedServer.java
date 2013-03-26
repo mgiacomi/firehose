@@ -5,10 +5,10 @@ import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Message;
-import com.gltech.scale.monitoring.StatsManager;
-import com.gltech.scale.monitoring.results.AvgStat;
-import com.gltech.scale.monitoring.results.GroupStats;
-import com.gltech.scale.monitoring.results.OverTime;
+import com.gltech.scale.core.stats.StatsManager;
+import com.gltech.scale.core.stats.results.AvgStat;
+import com.gltech.scale.core.stats.results.GroupStats;
+import com.gltech.scale.core.stats.results.OverTime;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
@@ -26,9 +26,7 @@ import com.gltech.scale.core.aggregator.WeightManager;
 import com.gltech.scale.util.Props;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -103,6 +101,7 @@ public class EmbeddedServer
 		servletContextHandler.addServlet(DefaultServlet.class, "/aggregator/*");
 		servletContextHandler.addServlet(DefaultServlet.class, "/inbound/*");
 		servletContextHandler.addServlet(DefaultServlet.class, "/storagewriter/*");
+		servletContextHandler.addServlet(DefaultServlet.class, "/stats/*");
 
 		// websocket handler
 //		myWebSocketHandler myWebSocketHandler = new myWebSocketHandler();

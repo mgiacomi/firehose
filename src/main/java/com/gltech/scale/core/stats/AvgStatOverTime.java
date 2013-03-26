@@ -1,7 +1,7 @@
-package com.gltech.scale.monitoring;
+package com.gltech.scale.core.stats;
 
 import com.gltech.scale.core.cluster.TimePeriodUtils;
-import com.gltech.scale.monitoring.results.AvgStat;
+import com.gltech.scale.core.stats.results.AvgStat;
 import org.joda.time.DateTime;
 
 import java.util.concurrent.ConcurrentHashMap;

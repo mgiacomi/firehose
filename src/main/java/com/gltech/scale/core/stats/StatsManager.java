@@ -1,7 +1,7 @@
-package com.gltech.scale.monitoring;
+package com.gltech.scale.core.stats;
 
+import com.gltech.scale.core.stats.results.GroupStats;
 import com.gltech.scale.lifecycle.LifeCycle;
-import com.gltech.scale.monitoring.results.GroupStats;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,7 @@
 package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
-import com.gltech.scale.core.model.Message;
-import com.gltech.scale.monitoring.StatsManager;
+import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.util.ModelIO;
 import com.google.inject.Inject;
 import org.joda.time.DateTime;
@@ -135,21 +134,4 @@ public class AggregatorResource
 
 		return Response.ok(modelIO.toJson(batchMetaData), MediaType.APPLICATION_JSON).build();
 	}
-
-	@GET
-	@Path("/stats")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response getProtoStats()
-	{
-		return Response.ok(statsManager.toBytes(), MediaType.APPLICATION_OCTET_STREAM).build();
-	}
-
-	@GET
-	@Path("/stats")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getJsonStats()
-	{
-		return Response.ok(statsManager.toJson(), MediaType.APPLICATION_JSON).build();
-	}
-
 }

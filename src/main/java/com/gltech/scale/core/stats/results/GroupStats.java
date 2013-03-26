@@ -1,4 +1,4 @@
-package com.gltech.scale.monitoring.results;
+package com.gltech.scale.core.stats.results;
 
 import com.dyuproject.protostuff.Tag;
 

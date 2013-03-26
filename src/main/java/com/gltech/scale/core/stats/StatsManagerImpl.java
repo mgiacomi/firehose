@@ -1,4 +1,4 @@
-package com.gltech.scale.monitoring;
+package com.gltech.scale.core.stats;
 
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
@@ -6,9 +6,9 @@ import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gltech.scale.core.model.Defaults;
-import com.gltech.scale.monitoring.results.AvgStat;
-import com.gltech.scale.monitoring.results.GroupStats;
-import com.gltech.scale.monitoring.results.OverTime;
+import com.gltech.scale.core.stats.results.GroupStats;
+import com.gltech.scale.core.stats.results.OverTime;
+import com.gltech.scale.core.stats.results.AvgStat;
 import com.gltech.scale.util.Props;
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;
@@ -29,10 +29,10 @@ public class StatsManagerImpl implements StatsManager
 	Props props = Props.getProps();
 
 	// Multi-level Map used to hold group and name level stat data.
-	private static ConcurrentMap<String, ConcurrentMap<String, StatOverTime>> stats = new ConcurrentHashMap<>();
+	private static final ConcurrentMap<String, ConcurrentMap<String, StatOverTime>> stats = new ConcurrentHashMap<>();
 
 	// List of callbacks that need to be returned into their associated stat
-	private static ConcurrentMap<StatOverTime, StatCallBack> callbacks = new ConcurrentHashMap<>();
+	private static final ConcurrentMap<StatOverTime, StatCallBack> callbacks = new ConcurrentHashMap<>();
 
 	@Override
 	public synchronized void start()
@@ -171,6 +171,10 @@ public class StatsManagerImpl implements StatsManager
 				groupMap = newGroupMap;
 			}
 
+		}
+
+		if (statCallBack != null)
+		{
 			callbacks.put(statOverTime, statCallBack);
 		}
 

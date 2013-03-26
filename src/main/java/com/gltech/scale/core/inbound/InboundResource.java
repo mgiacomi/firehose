@@ -2,7 +2,6 @@ package com.gltech.scale.core.inbound;
 
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.storage.StorageClient;
-import com.gltech.scale.monitoring.StatsManager;
 import com.gltech.scale.util.ModelIO;
 import com.google.inject.Inject;
 import com.gltech.scale.core.model.ChannelMetaData;
@@ -23,7 +22,6 @@ public class InboundResource
 	private static final Logger logger = LoggerFactory.getLogger(InboundResource.class);
 	private ChannelCache channelCache;
 	private InboundService inboundService;
-	private StatsManager statsManager;
 	private ModelIO modelIO;
 	private StorageClient storageClient;
 	private static Props props = Props.getProps();
@@ -36,11 +34,10 @@ public class InboundResource
 	private UriInfo uriInfo;
 
 	@Inject
-	public InboundResource(ChannelCache channelCache, InboundService inboundService, StatsManager statsManager, ModelIO modelIO, StorageClient storageClient)
+	public InboundResource(ChannelCache channelCache, InboundService inboundService, ModelIO modelIO, StorageClient storageClient)
 	{
 		this.channelCache = channelCache;
 		this.inboundService = inboundService;
-		this.statsManager = statsManager;
 		this.modelIO = modelIO;
 		this.storageClient = storageClient;
 		this.periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
@@ -84,22 +81,6 @@ public class InboundResource
 		}
 
 		return Response.ok(modelIO.toJson(channelMetaData), MediaType.APPLICATION_JSON).build();
-	}
-
-	@GET
-	@Path("/stats")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response getProtoStats()
-	{
-		return Response.ok(statsManager.toBytes(), MediaType.APPLICATION_OCTET_STREAM).build();
-	}
-
-	@GET
-	@Path("/stats")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getJsonStats()
-	{
-		return Response.ok(statsManager.toJson(), MediaType.APPLICATION_JSON).build();
 	}
 
 	@GET

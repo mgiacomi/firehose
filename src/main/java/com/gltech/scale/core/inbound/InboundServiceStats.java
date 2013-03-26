@@ -1,7 +1,7 @@
 package com.gltech.scale.core.inbound;
 
-import com.gltech.scale.monitoring.AvgStatOverTime;
-import com.gltech.scale.monitoring.StatsManager;
+import com.gltech.scale.core.stats.AvgStatOverTime;
+import com.gltech.scale.core.stats.StatsManager;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.joda.time.DateTime;

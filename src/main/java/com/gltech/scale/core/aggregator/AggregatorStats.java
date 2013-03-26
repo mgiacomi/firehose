@@ -2,11 +2,10 @@ package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Batch;
-import com.gltech.scale.ganglia.*;
-import com.gltech.scale.monitoring.AvgStatOverTime;
-import com.gltech.scale.monitoring.CounterStatOverTime;
-import com.gltech.scale.monitoring.StatCallBack;
-import com.gltech.scale.monitoring.StatsManager;
+import com.gltech.scale.core.stats.AvgStatOverTime;
+import com.gltech.scale.core.stats.CounterStatOverTime;
+import com.gltech.scale.core.stats.StatCallBack;
+import com.gltech.scale.core.stats.StatsManager;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.joda.time.DateTime;

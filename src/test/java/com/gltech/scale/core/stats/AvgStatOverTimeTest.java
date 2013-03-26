@@ -1,4 +1,4 @@
-package com.gltech.scale.monitoring;
+package com.gltech.scale.core.stats;
 
 import static junit.framework.Assert.*;
 

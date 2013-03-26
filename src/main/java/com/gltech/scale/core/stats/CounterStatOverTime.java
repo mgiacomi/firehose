@@ -1,4 +1,4 @@
-package com.gltech.scale.monitoring;
+package com.gltech.scale.core.stats;
 
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import org.joda.time.DateTime;

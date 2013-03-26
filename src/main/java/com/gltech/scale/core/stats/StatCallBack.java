@@ -1,4 +1,4 @@
-package com.gltech.scale.monitoring;
+package com.gltech.scale.core.stats;
 
 public interface StatCallBack
 {

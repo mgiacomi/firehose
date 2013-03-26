@@ -1,11 +1,11 @@
-package com.gltech.scale.monitoring;
+package com.gltech.scale.core.stats;
 
 import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
-import com.gltech.scale.monitoring.results.AvgStat;
-import com.gltech.scale.monitoring.results.GroupStats;
-import com.gltech.scale.monitoring.results.OverTime;
+import com.gltech.scale.core.stats.results.AvgStat;
+import com.gltech.scale.core.stats.results.GroupStats;
+import com.gltech.scale.core.stats.results.OverTime;
 import junit.framework.Assert;
 import org.junit.Test;
 
