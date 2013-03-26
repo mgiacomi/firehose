@@ -3,6 +3,9 @@ package com.gltech.scale.core.aggregator;
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.ganglia.*;
+import com.gltech.scale.monitoring.AvgStatOverTime;
+import com.gltech.scale.monitoring.CounterStatOverTime;
+import com.gltech.scale.monitoring.StatCallBack;
 import com.gltech.scale.monitoring.StatsManager;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -16,11 +19,15 @@ public class AggregatorStats implements Aggregator
 	public static final String BASE = "AggregatorStats";
 
 	private final Aggregator aggregator;
-	private Timer addMessageTimer = new Timer();
-	private Timer addBackupMessageTimer = new Timer();
-	private Timer clearTimer = new Timer();
-	private Timer writtenMessagesTimer = new Timer();
-	private Timer writtenBackupMessagesTimer = new Timer();
+	private AvgStatOverTime addMessageSizeStat;
+	private AvgStatOverTime addMessageTimeStat;
+	private AvgStatOverTime addBackupMessageSizeStat;
+	private AvgStatOverTime addBackupMessageTimeStat;
+	private CounterStatOverTime clearCountStat;
+	private AvgStatOverTime messagesWrittenTimeStat;
+	private CounterStatOverTime messagesWrittenCountStat;
+	private AvgStatOverTime backupMessagesWrittenTimeStat;
+	private CounterStatOverTime backupMessagesWrittenCountStat;
 
 	@Inject
 	public AggregatorStats(@Named(BASE) final Aggregator aggregator, StatsManager statsManager)
@@ -28,45 +35,46 @@ public class AggregatorStats implements Aggregator
 		this.aggregator = aggregator;
 
 		String groupName = "Aggregator";
-//		this.addMessageStat = statsManager.createAvgStat(groupName, "Message", "Size");
-
-		MonitoringPublisher.getInstance().register(new PublishMetric("AddMessage.Count", groupName, "count", new TimerCountPublisher("", addMessageTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("AddMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addMessageTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("AddBackupMessage.Count", groupName, "count", new TimerCountPublisher("", addBackupMessageTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("AddBackupMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupMessageTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("Clear.Count", groupName, "count", new TimerCountPublisher("", clearTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("Clear.Time", groupName, "millis per call", new TimerAveragePublisher("", clearTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("MessagesWritten.Count", groupName, "count", new TimerCountPublisher("", writtenMessagesTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("MessagesWritten.Time", groupName, "millis per call", new TimerAveragePublisher("", writtenMessagesTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("BackupMessagesWritten.Count", groupName, "count", new TimerCountPublisher("", writtenBackupMessagesTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("BackupMessagesWritten.Time", groupName, "millis per call", new TimerAveragePublisher("", writtenBackupMessagesTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("ActiveBatches.Count", groupName, "count", new PublishCallback()
+		this.addMessageSizeStat = statsManager.createAvgAndCountStat(groupName, "AddMessage.Size", "AddMessage.Count");
+		this.addMessageTimeStat = statsManager.createAvgStat(groupName, "AddMessage.Time");
+		this.addBackupMessageSizeStat = statsManager.createAvgAndCountStat(groupName, "AddBackupMessage.Size", "AddBackupMessage.Count");
+		this.addBackupMessageTimeStat = statsManager.createAvgStat(groupName, "AddBackupMessage.Time");
+		this.messagesWrittenTimeStat = statsManager.createAvgStat(groupName, "MessagesWritten.Time");
+		this.messagesWrittenCountStat = statsManager.createCounterStat(groupName, "MessagesWritten.Count");
+		this.backupMessagesWrittenTimeStat = statsManager.createAvgStat(groupName, "BackupMessagesWritten.Time");
+		this.backupMessagesWrittenCountStat = statsManager.createCounterStat(groupName, "BackupMessagesWritten.Count");
+		this.clearCountStat = statsManager.createCounterStat(groupName, "Clear.Count");
+		statsManager.createCounterStat(groupName, "ActiveBatches.Count", new StatCallBack()
 		{
-			public String getValue()
+			public long getValue()
 			{
-				return Integer.toString(aggregator.getActiveBatches().size());
+				return aggregator.getActiveBatches().size();
 			}
-		}));
-
+		});
 	}
 
 	public void addMessage(String channelName, byte[] bytes)
 	{
+		addMessageTimeStat.startTimer();
 		aggregator.addMessage(channelName, bytes);
-		addMessageTimer.add(bytes.length);
+		addMessageTimeStat.stopTimer();
+
+		addMessageSizeStat.add(bytes.length);
 	}
 
 	public void addBackupMessage(String channelName, byte[] bytes)
 	{
+		addBackupMessageTimeStat.startTimer();
 		aggregator.addBackupMessage(channelName, bytes);
-		addBackupMessageTimer.add(bytes.length);
+		addBackupMessageTimeStat.stopTimer();
+
+		addBackupMessageSizeStat.add(bytes.length);
 	}
 
 	public void clear(String channelName, DateTime dateTime)
 	{
-		clearTimer.start();
 		aggregator.clear(channelName, dateTime);
-		clearTimer.stop();
+		clearCountStat.increment();
 	}
 
 	public List<Batch> getActiveBatches()
@@ -81,17 +89,19 @@ public class AggregatorStats implements Aggregator
 
 	public long writeBatchMessages(OutputStream outputStream, String channelName, DateTime dateTime)
 	{
-		long start = System.nanoTime();
+		messagesWrittenTimeStat.startTimer();
 		long processed = aggregator.writeBatchMessages(outputStream, channelName, dateTime);
-		writtenMessagesTimer.add(System.nanoTime() - start, processed);
+		messagesWrittenTimeStat.stopTimer();
+		messagesWrittenCountStat.add(processed);
 		return processed;
 	}
 
 	public long writeBackupBatchMessages(OutputStream outputStream, String channelName, DateTime dateTime)
 	{
-		long start = System.nanoTime();
+		backupMessagesWrittenTimeStat.startTimer();
 		long processed = aggregator.writeBackupBatchMessages(outputStream, channelName, dateTime);
-		writtenBackupMessagesTimer.add(System.nanoTime() - start, processed);
+		backupMessagesWrittenTimeStat.stopTimer();
+		backupMessagesWrittenCountStat.add(processed);
 		return processed;
 	}
 

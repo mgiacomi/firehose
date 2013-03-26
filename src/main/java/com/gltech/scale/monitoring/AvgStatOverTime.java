@@ -60,7 +60,7 @@ public class AvgStatOverTime implements StatOverTime
 		}
 
 		atomicTotal.addAndGet(total);
-		counterStatOverTime.increment(dateTime);
+		counterStatOverTime.add(dateTime);
 	}
 
 	@Override

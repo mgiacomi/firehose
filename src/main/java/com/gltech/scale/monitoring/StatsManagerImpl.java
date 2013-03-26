@@ -17,32 +17,114 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class StatsManagerImpl implements StatsManager
 {
 	private static final Logger logger = LoggerFactory.getLogger(StatsManagerImpl.class);
 	LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 	private Schema<GroupStats> groupStatsSchema = RuntimeSchema.getSchema(GroupStats.class);
-	private volatile boolean shutdown = false;
+	private static ScheduledExecutorService scheduledCleanUpService;
+	private static ScheduledExecutorService scheduledCallBackService;
 	Props props = Props.getProps();
 
 	// Multi-level Map used to hold group and name level stat data.
 	private static ConcurrentMap<String, ConcurrentMap<String, StatOverTime>> stats = new ConcurrentHashMap<>();
 
-	// Factory method to make sure that new stats are registered
-	public AvgStatOverTime createAvgStat(String groupName, String statName)
+	// List of callbacks that need to be returned into their associated stat
+	private static ConcurrentMap<StatOverTime, StatCallBack> callbacks = new ConcurrentHashMap<>();
+
+	@Override
+	public synchronized void start()
 	{
-		return createAvgAndCountStat(groupName, statName, null);
+		if (scheduledCleanUpService == null || scheduledCleanUpService.isShutdown())
+		{
+			scheduledCleanUpService = Executors.newScheduledThreadPool(1, new ThreadFactory()
+			{
+				public Thread newThread(Runnable runnable)
+				{
+					return new Thread(runnable, "StatsManagerCleanUp");
+				}
+			});
+
+			int runEveryXMinutes = props.get("monitoring.stats_manager_cleanup_run_every_x_minutes", Defaults.STATS_MANAGER_CLEANUP_RUN_EVERY_X_MINS);
+
+			scheduledCleanUpService.scheduleAtFixedRate(new Runnable()
+			{
+				public void run()
+				{
+					for (ConcurrentMap<String, StatOverTime> groupStats : stats.values())
+					{
+						for (StatOverTime statName : groupStats.values())
+						{
+							statName.cleanOldThanTwoHours();
+						}
+					}
+				}
+			}, 0, runEveryXMinutes, TimeUnit.MINUTES);
+
+			logger.info("StatsManager clean up service has been started.");
+		}
+
+		if (scheduledCallBackService == null || scheduledCallBackService.isShutdown())
+		{
+			scheduledCallBackService = Executors.newScheduledThreadPool(1, new ThreadFactory()
+			{
+				public Thread newThread(Runnable runnable)
+				{
+					return new Thread(runnable, "StatsManagerCallBack");
+				}
+			});
+
+			int runEveryXSeconds = props.get("monitoring.stats_manager_callback_run_every_x_seconds", Defaults.STATS_MANAGER_CALLBACK_RUN_EVERY_X_SECONDS);
+
+			scheduledCallBackService.scheduleAtFixedRate(new Runnable()
+			{
+				public void run()
+				{
+					// Loop through each callback and update the stats
+					for (StatOverTime statOverTime : callbacks.keySet())
+					{
+						statOverTime.add(callbacks.get(statOverTime).getValue());
+					}
+				}
+			}, runEveryXSeconds, runEveryXSeconds, TimeUnit.SECONDS);
+
+			logger.info("StatsManager call back service has been started.");
+		}
 	}
 
-	// Factory method to make sure that new stats are registered
+	@Override
+	public void shutdown()
+	{
+		scheduledCleanUpService.shutdown();
+		scheduledCallBackService.shutdown();
+		logger.info("StatsManager has been shutdown.");
+	}
+
+	@Override
+	public AvgStatOverTime createAvgStat(String groupName, String statName)
+	{
+		return createAvgAndCountStat(groupName, statName, null, null);
+	}
+
+	@Override
+	public AvgStatOverTime createAvgStat(String groupName, String statName, StatCallBack statCallBack)
+	{
+		return createAvgAndCountStat(groupName, statName, null, statCallBack);
+	}
+
+	@Override
 	public AvgStatOverTime createAvgAndCountStat(String groupName, String avgStatName, String countStatName)
 	{
+		return createAvgAndCountStat(groupName, avgStatName, countStatName, null);
+	}
+
+	@Override
+	public AvgStatOverTime createAvgAndCountStat(String groupName, String avgStatName, String countStatName, StatCallBack statCallBack)
+	{
 		AvgStatOverTime avgStatOverTime = new AvgStatOverTime(avgStatName, countStatName);
-		StatOverTime statOverTime = registerStat(groupName, avgStatName, avgStatOverTime);
+		StatOverTime statOverTime = registerStat(groupName, avgStatName, avgStatOverTime, statCallBack);
 
 		try
 		{
@@ -54,11 +136,17 @@ public class StatsManagerImpl implements StatsManager
 		}
 	}
 
-	// Factory method to make sure that new stats are registered
+	@Override
 	public CounterStatOverTime createCounterStat(String groupName, String statName)
 	{
+		return createCounterStat(groupName, statName, null);
+	}
+
+	@Override
+	public CounterStatOverTime createCounterStat(String groupName, String statName, StatCallBack statCallBack)
+	{
 		CounterStatOverTime counterStatOverTime = new CounterStatOverTime(statName);
-		StatOverTime statOverTime = registerStat(groupName, statName, counterStatOverTime);
+		StatOverTime statOverTime = registerStat(groupName, statName, counterStatOverTime, statCallBack);
 
 		try
 		{
@@ -70,7 +158,7 @@ public class StatsManagerImpl implements StatsManager
 		}
 	}
 
-	private StatOverTime registerStat(String groupName, String statName, StatOverTime statOverTime)
+	private StatOverTime registerStat(String groupName, String statName, StatOverTime statOverTime, StatCallBack statCallBack)
 	{
 		ConcurrentMap<String, StatOverTime> groupMap = stats.get(groupName);
 
@@ -82,6 +170,8 @@ public class StatsManagerImpl implements StatsManager
 			{
 				groupMap = newGroupMap;
 			}
+
+			callbacks.put(statOverTime, statCallBack);
 		}
 
 		StatOverTime existingStatOverTime = groupMap.putIfAbsent(statName, statOverTime);
@@ -148,7 +238,8 @@ public class StatsManagerImpl implements StatsManager
 
 					groupStats.getAvgStats().add(avgOverTime);
 
-					if(avgStatOverTime.getCounterStatOverTime().getStatName() != null) {
+					if (avgStatOverTime.getCounterStatOverTime().getStatName() != null)
+					{
 						OverTime<Long> countOverTime = new OverTime<>(
 								avgStatOverTime.getCounterStatOverTime().getStatName(),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(1),
@@ -180,40 +271,5 @@ public class StatsManagerImpl implements StatsManager
 		}
 
 		return groupStatsList;
-	}
-
-	@Override
-	public void run()
-	{
-		logger.info("StatsManager starting.");
-
-		try
-		{
-			while (!shutdown)
-			{
-				for (ConcurrentMap<String, StatOverTime> groupStats : stats.values())
-				{
-					for (StatOverTime statName : groupStats.values())
-					{
-						statName.cleanOldThanTwoHours();
-					}
-				}
-			}
-
-			int sleepInMinutes = props.get("monitoring.stats_manager_cleanup_sleep_minutes", Defaults.STATS_MANAGER_CLEANUP_SLEEP_MINS);
-			TimeUnit.MINUTES.sleep(sleepInMinutes);
-		}
-		catch (InterruptedException e)
-		{
-			logger.error("StatsManager was inturrupted.", e);
-		}
-
-		logger.info("StatsManager has been shutdown.");
-	}
-
-	@Override
-	public void shutdown()
-	{
-		shutdown = true;
 	}
 }

@@ -140,7 +140,7 @@ public class EmbeddedServer
 
 		// Registered StatsManager for shutdown
 		final StatsManager statsManager = injector.getInstance(StatsManager.class);
-		new Thread(statsManager, "StatsManager").start();
+		statsManager.start();
 		LifeCycleManager.getInstance().add(statsManager, LifeCycle.Priority.FINAL);
 
 		if (props.get("enable.inbound_service", true))

@@ -19,20 +19,20 @@ public class CounterStatOverTime implements StatOverTime
 
 	public void increment()
 	{
-		increment(1, DateTime.now());
+		add(1, DateTime.now());
 	}
 
-	public void increment(long count)
+	public void add(long count)
 	{
-		increment(count, DateTime.now());
+		add(count, DateTime.now());
 	}
 
-	void increment(DateTime dateTime)
+	void add(DateTime dateTime)
 	{
-		increment(1, dateTime);
+		add(1, dateTime);
 	}
 
-	void increment(long count, DateTime dateTime)
+	void add(long count, DateTime dateTime)
 	{
 		DateTime period = TimePeriodUtils.nearestPeriodCeiling(dateTime, 5);
 		AtomicLong atomicTotal = countsBy5SecPeriods.get(period);
