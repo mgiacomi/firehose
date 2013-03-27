@@ -1,7 +1,9 @@
 package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.model.Defaults;
-import com.gltech.scale.ganglia.*;
+import com.gltech.scale.core.stats.AvgStatOverTime;
+import com.gltech.scale.core.stats.StatsManager;
+import com.gltech.scale.core.stats.StatsThreadPoolExecutor;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -25,28 +27,25 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 	private Injector injector;
 	private ClusterService clusterService;
 	private ChannelCache channelCache;
-	private Timer collectBatchTimer = new Timer();
-	private TimerMap timerMap = new TimerMap();
-	private int periodSeconds;
+	private StatsManager statsManager;
+	private AvgStatOverTime collectBatchAvgTime;
 	private int activeStorageWriters;
+	private String groupName = "Storage Writer";
 
 	@Inject
-	public StorageWriteManagerImpl(ClusterService clusterService, ChannelCache channelCache)
+	public StorageWriteManagerImpl(ClusterService clusterService, ChannelCache channelCache, StatsManager statsManager)
 	{
 		this.clusterService = clusterService;
 		this.channelCache = channelCache;
-		this.periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
+		this.statsManager = statsManager;
+
+		this.collectBatchAvgTime = statsManager.createAvgAndCountStat(groupName, "CollectBatch.AvgTime", "CollectBatch.Count");
 
 		activeStorageWriters = props.get("storage_writer.active_collectors", Defaults.STORAGE_WRITER_ACTIVE_WRITERS);
 
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
-		threadPoolExecutor = new TimerThreadPoolExecutor(activeStorageWriters, activeStorageWriters, 1, TimeUnit.MINUTES, queue, new StorageWriterThreadFactory(), collectBatchTimer);
+		threadPoolExecutor = new StatsThreadPoolExecutor(activeStorageWriters, activeStorageWriters, 1, TimeUnit.MINUTES, queue, new StorageWriterThreadFactory(), collectBatchAvgTime);
 		logger.info("ThreadPoolExecutor started with " + activeStorageWriters + " active collectors.");
-
-		String groupName = "Storage Writer";
-		MonitoringPublisher.getInstance().register(new PublishMetric("CollectBatch.Count", groupName, "count", new TimerCountPublisher("", collectBatchTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric("CollectBatch.AvgTime", groupName, "avg time in millis", new TimerAveragePublisher("", collectBatchTimer)));
-		MonitoringPublisher.getInstance().register(new TimerMapPublishMetricGroup(groupName, timerMap));
 
 		// Register the event service with the coordination service
 		clusterService.getRegistrationService().registerAsStorageWriter();
@@ -84,9 +83,9 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 								BatchWriter batchWriter = injector.getInstance(BatchWriter.class);
 								batchWriter.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());
 
-								// Get a Timer from the timermap based on the bucket being collected.
-								String timerName = batchPeriodMapper.getChannelName() + "/" + Integer.toString(periodSeconds);
-								batchWriter.setTimer(timerMap.get(timerName));
+								// Get a stat based on channel name.
+								AvgStatOverTime channelStat = statsManager.createAvgAndCountStat(groupName, batchPeriodMapper.getChannelName() + ".AvgTime", batchPeriodMapper.getChannelName() + ".Count");
+								batchWriter.setChannelStat(channelStat);
 
 								threadPoolExecutor.submit(batchWriter);
 							}

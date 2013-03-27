@@ -43,7 +43,7 @@ public class AggregatorStats implements Aggregator
 		this.backupMessagesWrittenTimeStat = statsManager.createAvgStat(groupName, "BackupMessagesWritten.Time");
 		this.backupMessagesWrittenCountStat = statsManager.createCounterStat(groupName, "BackupMessagesWritten.Count");
 		this.clearCountStat = statsManager.createCounterStat(groupName, "Clear.Count");
-		statsManager.createCounterStat(groupName, "ActiveBatches.Count", new StatCallBack()
+		statsManager.createAvgStat(groupName, "ActiveBatches.Avg", new StatCallBack()
 		{
 			public long getValue()
 			{

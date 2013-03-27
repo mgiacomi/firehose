@@ -4,11 +4,11 @@ import com.gc.iotools.stream.is.InputStreamFromOutputStream;
 import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.BatchMetaData;
+import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.storage.StorageClient;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.ganglia.Timer;
 import com.gltech.scale.core.aggregator.PrimaryBackupSet;
 import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
@@ -31,7 +31,7 @@ public class BatchWriterImpl implements BatchWriter
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;
 	private String customerBatchPeriod;
-	private Timer timer;
+	private AvgStatOverTime channelStat;
 
 	@Inject
 	public BatchWriterImpl(AggregatorRestClient aggregatorRestClient, StorageClient storageClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
@@ -63,6 +63,7 @@ public class BatchWriterImpl implements BatchWriter
 		try
 		{
 			long start = System.nanoTime();
+			channelStat.startTimer();
 
 			String channelName = channelMetaData.getName();
 
@@ -135,13 +136,9 @@ public class BatchWriterImpl implements BatchWriter
 			}
 
 			long completedIn = System.nanoTime() - start;
+			channelStat.stopTimer();
 
 			logger.info("Completed writing Batch for " + customerBatchPeriod + " in " + completedIn / 1000000 + "ms");
-
-			if (timer != null)
-			{
-				timer.add(completedIn, inputStream.getResult());
-			}
 		}
 		catch (Exception e)
 		{
@@ -152,8 +149,9 @@ public class BatchWriterImpl implements BatchWriter
 		return null;
 	}
 
-	public void setTimer(Timer timer)
+	@Override
+	public void setChannelStat(AvgStatOverTime channelStat)
 	{
-		this.timer = timer;
+		this.channelStat = channelStat;
 	}
 }
