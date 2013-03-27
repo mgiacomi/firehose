@@ -157,7 +157,7 @@ public class EmbeddedServer
 
 			// Start WeightManager and registered it for shutdown
 			WeightManager weightManager = injector.getInstance(WeightManager.class);
-			new Thread(weightManager, "WeightManager").start();
+			weightManager.start();
 			LifeCycleManager.getInstance().add(weightManager, LifeCycle.Priority.INITIAL);
 		}
 
@@ -166,12 +166,12 @@ public class EmbeddedServer
 			// Start the CollectorManager and register it for shutdown
 			StorageWriteManager storageWriteManager = injector.getInstance(StorageWriteManager.class);
 			storageWriteManager.setInjector(injector);
-			new Thread(storageWriteManager, "StorageWriter").start();
+			storageWriteManager.start();
 			LifeCycleManager.getInstance().add(storageWriteManager, LifeCycle.Priority.INITIAL);
 
 			// Start the ChannelCoordinator and register it for shutdown
 			ChannelCoordinator channelCoordinator = injector.getInstance(ChannelCoordinator.class);
-			new Thread(channelCoordinator, "ChannelCoordinator").start();
+			channelCoordinator.start();
 			LifeCycleManager.getInstance().add(channelCoordinator, LifeCycle.Priority.INITIAL);
 		}
 	}

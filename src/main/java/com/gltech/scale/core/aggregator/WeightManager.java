@@ -8,12 +8,14 @@ import com.gltech.scale.lifecycle.LifeCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WeightManager implements Runnable, LifeCycle
+import java.util.concurrent.*;
+
+public class WeightManager implements LifeCycle
 {
 	private static final Logger logger = LoggerFactory.getLogger(WeightManager.class);
 	private final Aggregator aggregator;
 	private final ChannelCoordinator channelCoordinator;
-	private volatile boolean shutdown = false;
+	private static ScheduledExecutorService scheduledUpdateWeightsService;
 	Props props = Props.getProps();
 
 	@Inject
@@ -23,14 +25,23 @@ public class WeightManager implements Runnable, LifeCycle
 		this.channelCoordinator = channelCoordinator;
 	}
 
-	@Override
-	public void run()
+	public synchronized void start()
 	{
-		try
+		if (scheduledUpdateWeightsService == null || scheduledUpdateWeightsService.isShutdown())
 		{
-			while (!shutdown)
+			scheduledUpdateWeightsService = Executors.newScheduledThreadPool(1, new ThreadFactory()
 			{
-				try
+				public Thread newThread(Runnable runnable)
+				{
+					return new Thread(runnable, "WeightManager");
+				}
+			});
+
+			int runEveryXMillis = props.get("aggregator.weight_manager_register_every_x_millis", Defaults.WEIGHT_MANGER_REGISTER_EVERY_X_MILLIS);
+
+			scheduledUpdateWeightsService.scheduleAtFixedRate(new Runnable()
+			{
+				public void run()
 				{
 					boolean active = true;
 					int primaries = aggregator.getActiveBatches().size();
@@ -46,25 +57,16 @@ public class WeightManager implements Runnable, LifeCycle
 					channelCoordinator.registerWeight(active, primaries, backups, rested);
 					logger.trace("Registering weight with ChannelCoordinator. active={}, primaries={}, backups={}, rested={}", active, primaries, backups, rested);
 				}
-				catch (Exception e)
-				{
-					// May fail due to network/zookeeper issues.  If so, just try again next time.
-					logger.error("Failed to update weight for Aggregator.", e);
-				}
+			}, 0, runEveryXMillis, TimeUnit.MILLISECONDS);
 
-				Thread.sleep(props.get("aggregator.weight_manager_sleep_millis", Defaults.WEIGHT_MANGER_SLEEP_MILLIS));
-			}
+			logger.info("WeightManager has been started.");
 		}
-		catch (InterruptedException e)
-		{
-			logger.error("WeightManager was inturrupted.", e);
-		}
-
-		logger.info("WeightManager has been shutdown.");
 	}
 
+	@Override
 	public void shutdown()
 	{
-		shutdown = true;
+		scheduledUpdateWeightsService.shutdown();
+		logger.info("WeightManager has been shutdown.");
 	}
 }

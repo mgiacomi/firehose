@@ -96,6 +96,10 @@ public class StorageWriteManagerTest
 			}
 		}
 
+		public void start()
+		{
+		}
+
 		public void setInjector(Injector injector)
 		{
 			gotInjector = true;

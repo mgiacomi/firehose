@@ -25,10 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class ChannelCoordinatorImpl implements ChannelCoordinator
 {
@@ -40,7 +37,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	private Props props = Props.getProps();
 	private List<Integer> registeredSetsHist = new CopyOnWriteArrayList<>();
 	private ConcurrentMap<DateTime, AggregatorsByPeriod> aggregatorPeriodMatricesCache = new ConcurrentHashMap<>();
-	private volatile boolean shutdown = false;
+	private static ScheduledExecutorService scheduledChannelCoordinatorService;
 
 	@Inject
 	public ChannelCoordinatorImpl(RegistrationService registrationService, TimePeriodUtils timePeriodUtils)
@@ -52,38 +49,46 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		registeredSetsHist.add(1);
 	}
 
-	public void run()
+	@Override
+	public synchronized void start()
 	{
-		try
+		if (scheduledChannelCoordinatorService == null || scheduledChannelCoordinatorService.isShutdown())
 		{
-			while (!shutdown)
+			scheduledChannelCoordinatorService = Executors.newScheduledThreadPool(1, new ThreadFactory()
 			{
-				DateTime now = DateTime.now().plusSeconds(3);
-
-				try
+				public Thread newThread(Runnable runnable)
 				{
-					getAggregatorPeriodMatrix(now);
+					return new Thread(runnable, "ChannelCoordinator");
 				}
-				catch (Exception e)
+			});
+
+			scheduledChannelCoordinatorService.scheduleAtFixedRate(new Runnable()
+			{
+				public void run()
 				{
-					// May fail due to network/zookeeper issues.  If so, just try again next time.
-					logger.error("Failed to get AggregatorPeriodMatrix for period: " + now, e);
+					DateTime now = DateTime.now().plusSeconds(3);
+
+					try
+					{
+						getAggregatorPeriodMatrix(now);
+					}
+					catch (Exception e)
+					{
+						// May fail due to network/zookeeper issues.  If so, just try again next time.
+						logger.error("Failed to get AggregatorPeriodMatrix for period: " + now, e);
+					}
 				}
+			}, 0, 1, TimeUnit.SECONDS);
 
-				TimeUnit.SECONDS.sleep(1);
-			}
+			logger.info("ChannelCoordinator has been started.");
 		}
-		catch (InterruptedException e)
-		{
-			logger.error("ChannelCoordinatorImpl was inturrupted.", e);
-		}
-
-		logger.info("ChannelCoordinatorImpl has been shutdown.");
 	}
 
+	@Override
 	public void shutdown()
 	{
-		shutdown = true;
+		scheduledChannelCoordinatorService.shutdown();
+		logger.info("ChannelCoordinator has been shutdown.");
 	}
 
 	public void registerWeight(boolean active, int primaries, int backups, int restedfor)
