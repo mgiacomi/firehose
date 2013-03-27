@@ -1,9 +1,10 @@
 package com.gltech.scale.core.aggregator;
 
-import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.ganglia.*;
+import com.gltech.scale.core.stats.AvgStatOverTime;
+import com.gltech.scale.core.stats.StatCallBack;
+import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.util.Props;
 import org.joda.time.DateTime;
 
@@ -14,20 +15,19 @@ public class ChannelStats implements Channel
 	private static final long KBytes = 1024L;
 	private Props props = Props.getProps();
 	private final Channel channel;
-	private Timer addMessageTimer = new Timer();
-	private Timer addBackupMessageTimer = new Timer();
+	private AvgStatOverTime addMessageSizeStat;
+	private AvgStatOverTime addBackupMessageSizeStat;
 
-	public ChannelStats(final Channel channel)
+	public ChannelStats(final Channel channel, StatsManager statsManager)
 	{
 		this.channel = channel;
 
-		String channelName = channel.getChannelMetaData().getName() + "/" + props.get("period_seconds", Defaults.PERIOD_SECONDS);
-		String groupName = "Channel (" + channelName + ")";
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddMessage.Count", groupName, "count", new TimerCountPublisher("", addMessageTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addMessageTimer)));
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " OldestMessage.Time", groupName, "oldest message seconds", new PublishCallback()
+		String groupName = "Channel (" + channel.getChannelMetaData().getName() + ")";
+		this.addMessageSizeStat = statsManager.createAvgAndCountStat(groupName, "AddMessage.Size", "AddMessage.Count");
+
+		statsManager.createAvgStat(groupName, "OldestMessage.Time", new StatCallBack()
 		{
-			public String getValue()
+			public long getValue()
 			{
 				DateTime firstMessageTime = null;
 
@@ -47,22 +47,24 @@ public class ChannelStats implements Channel
 
 				if (firstMessageTime == null)
 				{
-					return "0";
+					return 0;
 				}
 
-				return Long.toString(System.currentTimeMillis() - firstMessageTime.getMillis() / 1000);
+				return System.currentTimeMillis() - firstMessageTime.getMillis() / 1000;
 			}
-		}));
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " Batches.Count", groupName, "count", new PublishCallback()
+		});
+
+		statsManager.createCounterStat(groupName, "Batches.Count", new StatCallBack()
 		{
-			public String getValue()
+			public long getValue()
 			{
-				return Integer.toString(channel.getBatches().size());
+				return channel.getBatches().size();
 			}
-		}));
-		MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " Batches.Size", groupName, "size in kb", new PublishCallback()
+		});
+
+		statsManager.createCounterStat(groupName, "Batches.Size", new StatCallBack()
 		{
-			public String getValue()
+			public long getValue()
 			{
 				long channelPayloadSize = 0;
 
@@ -71,24 +73,25 @@ public class ChannelStats implements Channel
 					channelPayloadSize += batch.getBytes();
 				}
 
-				return Long.toString(channelPayloadSize / KBytes);
+				return channelPayloadSize / KBytes;
 			}
-		}));
+		});
 
 		if (channel.getChannelMetaData().isRedundant())
 		{
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupMessage.Count", groupName, "count", new TimerCountPublisher("", addBackupMessageTimer)));
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " AddBackupMessage.AvgSize", groupName, "avg payload size bytes", new TimerAveragePublisher("", addBackupMessageTimer)));
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupBatches.Count", groupName, "count", new PublishCallback()
+			this.addBackupMessageSizeStat = statsManager.createAvgAndCountStat(groupName, "AddBackupMessage.Size", "AddBackupMessage.Count");
+
+			statsManager.createCounterStat(groupName, "BackupBatches.Count", new StatCallBack()
 			{
-				public String getValue()
+				public long getValue()
 				{
-					return Integer.toString(channel.getBackupBatches().size());
+					return channel.getBackupBatches().size();
 				}
-			}));
-			MonitoringPublisher.getInstance().register(new PublishMetric(channelName + " BackupBatches.Size", groupName, "size in kb", new PublishCallback()
+			});
+
+			statsManager.createCounterStat(groupName, "BackupBatches.Size", new StatCallBack()
 			{
-				public String getValue()
+				public long getValue()
 				{
 					long channelPayloadSize = 0;
 
@@ -97,9 +100,9 @@ public class ChannelStats implements Channel
 						channelPayloadSize += batch.getBytes();
 					}
 
-					return Long.toString(channelPayloadSize / KBytes);
+					return channelPayloadSize / KBytes;
 				}
-			}));
+			});
 		}
 	}
 
@@ -111,13 +114,13 @@ public class ChannelStats implements Channel
 	public void addMessage(byte[] bytes)
 	{
 		channel.addMessage(bytes);
-		addMessageTimer.add(bytes.length);
+		addMessageSizeStat.add(bytes.length);
 	}
 
 	public void addBackupMessage(byte[] bytes)
 	{
 		channel.addBackupMessage(bytes);
-		addBackupMessageTimer.add(bytes.length);
+		addBackupMessageSizeStat.add(bytes.length);
 	}
 
 	public Collection<Batch> getBatches()

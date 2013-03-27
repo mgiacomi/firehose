@@ -10,11 +10,24 @@ import java.util.concurrent.atomic.AtomicLong;
 public class CounterStatOverTime implements StatOverTime
 {
 	private ConcurrentMap<DateTime, AtomicLong> countsBy5SecPeriods = new ConcurrentHashMap<>();
+	private final ThreadLocal<Long> startTime = new ThreadLocal<>();
 	private String statName;
 
 	// Only allow classes in this package to create a stat.
 	protected CounterStatOverTime(String statName) {
 		this.statName = statName;
+	}
+
+	@Override
+	public void startTimer()
+	{
+		startTime.set(System.nanoTime()  / 1000 / 1000);
+	}
+
+	@Override
+	public void stopTimer()
+	{
+		add((System.nanoTime() / 1000 / 1000) - startTime.get());
 	}
 
 	public void increment()

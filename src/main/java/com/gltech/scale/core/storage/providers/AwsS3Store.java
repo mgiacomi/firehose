@@ -6,11 +6,12 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.stats.AvgStatOverTime;
+import com.gltech.scale.core.stats.StatsManager;
+import com.gltech.scale.core.stats.StatsThreadPoolExecutor;
 import com.gltech.scale.core.storage.StreamSplitter;
 import com.gltech.scale.util.ModelIO;
 import com.google.common.base.Throwables;
-import com.gltech.scale.ganglia.Timer;
-import com.gltech.scale.ganglia.TimerThreadPoolExecutor;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.Storage;
 import com.gltech.scale.util.Props;
@@ -26,7 +27,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.*;
 
 public class AwsS3Store implements Storage
@@ -35,13 +35,16 @@ public class AwsS3Store implements Storage
 	private Props props = Props.getProps();
 	private AmazonS3 s3Client;
 	private String s3BucketName;
-	private Timer storeTimer = new Timer();
+	private AvgStatOverTime keyReadTimeStat;
+	private AvgStatOverTime keyReadSizeStat;
+	private AvgStatOverTime keyWrittenTimeStat;
+	private AvgStatOverTime keyWrittenSizeStat;
 	private final ThreadPoolExecutor threadPoolExecutor;
 	private final Semaphore semaphore;
 	private ModelIO modelIO;
 
 	@Inject
-	public AwsS3Store(ModelIO modelIO)
+	public AwsS3Store(ModelIO modelIO, StatsManager statsManager)
 	{
 		this.modelIO = modelIO;
 		s3BucketName = props.get("s3BucketName", "gltech");
@@ -51,8 +54,14 @@ public class AwsS3Store implements Storage
 
 		int activeUploads = props.get("storage.s3.concurrent_writes", Defaults.CONCURRENT_STORE_WRITES);
 
+		String groupName = "Storage";
+		keyWrittenTimeStat = statsManager.createAvgAndCountStat(groupName, "KeysWritten.AvgTime", "KeysWritten.Count");
+		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten.Size");
+		keyReadTimeStat = statsManager.createAvgAndCountStat(groupName, "KeysRead.AvgTime", "KeysRead.Count");
+		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead.Size");
+
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
-		threadPoolExecutor = new TimerThreadPoolExecutor(activeUploads, activeUploads, 1, TimeUnit.MINUTES, queue, new S3UploadThreadFactory(), storeTimer);
+		threadPoolExecutor = new StatsThreadPoolExecutor(activeUploads, activeUploads, 1, TimeUnit.MINUTES, queue, new S3UploadThreadFactory(), keyWrittenTimeStat);
 		semaphore = new Semaphore(activeUploads);
 	}
 
@@ -106,6 +115,7 @@ public class AwsS3Store implements Storage
 		String key = keyNameWithUniquePrefix(channelMetaData.getName(), id);
 		S3Object s3Object = null;
 
+		keyReadTimeStat.startTimer();
 		try
 		{
 			s3Object = s3Client.getObject(s3BucketName, key);
@@ -120,7 +130,9 @@ public class AwsS3Store implements Storage
 
 		try
 		{
-			IOUtils.copy(new LZFInputStream(s3Object.getObjectContent()), outputStream);
+			int bytesWritten = IOUtils.copy(new LZFInputStream(s3Object.getObjectContent()), outputStream);
+			keyReadTimeStat.stopTimer();
+			keyReadSizeStat.add(bytesWritten);
 		}
 		catch (IOException e)
 		{
@@ -154,6 +166,8 @@ public class AwsS3Store implements Storage
 			while (streamSplitter.hasNext())
 			{
 				StreamSplitter.StreamPart streamPart = streamSplitter.next();
+
+				keyWrittenSizeStat.add(streamPart.getSize());
 
 				semaphore.acquire();
 
@@ -196,12 +210,18 @@ public class AwsS3Store implements Storage
 	@Override
 	public byte[] getBytes(ChannelMetaData channelMetaData, String id)
 	{
+		keyReadTimeStat.startTimer();
+		keyReadTimeStat.stopTimer();
+		keyReadSizeStat.add(0);
 		return new byte[0];
 	}
 
 	@Override
 	public void putBytes(ChannelMetaData channelMetaData, String id, byte[] data)
 	{
+		keyWrittenTimeStat.startTimer();
+		keyWrittenTimeStat.stopTimer();
+		keyWrittenSizeStat.add(data.length);
 	}
 
 	private String keyNameWithUniquePrefix(String channelName, String id)

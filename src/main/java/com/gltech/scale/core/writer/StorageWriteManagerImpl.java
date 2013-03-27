@@ -28,7 +28,6 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 	private ClusterService clusterService;
 	private ChannelCache channelCache;
 	private StatsManager statsManager;
-	private AvgStatOverTime collectBatchAvgTime;
 	private int activeStorageWriters;
 	private String groupName = "Storage Writer";
 
@@ -39,7 +38,7 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 		this.channelCache = channelCache;
 		this.statsManager = statsManager;
 
-		this.collectBatchAvgTime = statsManager.createAvgAndCountStat(groupName, "CollectBatch.AvgTime", "CollectBatch.Count");
+		AvgStatOverTime collectBatchAvgTime = statsManager.createAvgAndCountStat(groupName, "CollectBatch.AvgTime", "CollectBatch.Count");
 
 		activeStorageWriters = props.get("storage_writer.active_collectors", Defaults.STORAGE_WRITER_ACTIVE_WRITERS);
 

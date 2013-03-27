@@ -29,11 +29,13 @@ public class AvgStatOverTime implements StatOverTime
 		counterStatOverTime = new CounterStatOverTime(countStatName);
 	}
 
+	@Override
 	public void startTimer()
 	{
 		startTime.set(System.nanoTime()  / 1000 / 1000);
 	}
 
+	@Override
 	public void stopTimer()
 	{
 		add((System.nanoTime() / 1000 / 1000) - startTime.get());

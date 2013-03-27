@@ -8,13 +8,13 @@ import java.util.concurrent.TimeUnit;
 public class StatsThreadPoolExecutor extends ThreadPoolExecutor
 {
 	private final ThreadLocal<Long> startTime = new ThreadLocal<>();
-	private final AvgStatOverTime avgStatOverTime;
+	private final StatOverTime statOverTime;
 
 	public StatsThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
-								   BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, AvgStatOverTime avgStatOverTime)
+								   BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, StatOverTime statOverTime)
 	{
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
-		this.avgStatOverTime = avgStatOverTime;
+		this.statOverTime = statOverTime;
 	}
 
 	protected void beforeExecute(Thread t, Runnable r)
@@ -27,7 +27,7 @@ public class StatsThreadPoolExecutor extends ThreadPoolExecutor
 	{
 		try
 		{
-			avgStatOverTime.add((System.nanoTime()  / 1000 / 1000) - startTime.get());
+			statOverTime.add((System.nanoTime()  / 1000 / 1000) - startTime.get());
 		}
 		finally
 		{
