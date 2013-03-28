@@ -84,13 +84,6 @@ public class EmbeddedServer
 		servletContextHandler.addEventListener(guiceServletConfig);
 		injector = guiceServletConfig.getInjector();
 
-		TimerMap timerMap = new TimerMap();
-		MonitoringPublisher.getInstance().register(new TimerMapPublishMetricGroup("REST", timerMap));
-		StatisticsFilter.add(timerMap);
-		StatisticsFilter.add("/inbound/", "Events");
-		StatisticsFilter.add("/aggregator/", "Aggregator");
-		servletContextHandler.addFilter(StatisticsFilter.class, "/*", null);
-
 		// Then add GuiceFilter and configure the server to
 		// reroute all requests through this filter.
 		servletContextHandler.addFilter(GuiceFilter.class, "/*", null);
