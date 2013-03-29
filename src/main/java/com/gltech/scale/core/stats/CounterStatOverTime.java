@@ -12,10 +12,12 @@ public class CounterStatOverTime implements StatOverTime
 	private ConcurrentMap<DateTime, AtomicLong> countsBy5SecPeriods = new ConcurrentHashMap<>();
 	private final ThreadLocal<Long> startTime = new ThreadLocal<>();
 	private String statName;
+	private String unitOfMeasure;
 
 	// Only allow classes in this package to create a stat.
-	protected CounterStatOverTime(String statName) {
+	protected CounterStatOverTime(String statName, String unitOfMeasure) {
 		this.statName = statName;
+		this.unitOfMeasure = unitOfMeasure;
 	}
 
 	@Override
@@ -63,9 +65,26 @@ public class CounterStatOverTime implements StatOverTime
 		atomicTotal.addAndGet(count);
 	}
 
-	public String getStatName()
+	@Override
+	public String getName()
 	{
 		return statName;
+	}
+
+	protected void setStatName(String statName)
+	{
+		this.statName = statName;
+	}
+
+	@Override
+	public String getUnitOfMeasure()
+	{
+		return unitOfMeasure;
+	}
+
+	protected void setUnitOfMeasure(String unitOfMeasure)
+	{
+		this.unitOfMeasure = unitOfMeasure;
 	}
 
 	public long getCountOverSeconds(int seconds)

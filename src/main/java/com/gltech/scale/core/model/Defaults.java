@@ -2,6 +2,7 @@ package com.gltech.scale.core.model;
 
 public class Defaults
 {
+	static public final long KBytes = 1024L;
 	static public final String REST_HOST = "localhost";
 	static public final int MEGABYTES = 1024 * 1024;
 	static public final int PERIOD_SECONDS = 5;

@@ -3,6 +3,7 @@ package com.gltech.scale.load;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.core.stats.StatsManagerImpl;
 import com.gltech.scale.core.storage.providers.AwsS3Store;
 import com.gltech.scale.util.ModelIO;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ public class S3Regression
 	{
 		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.INFO);
-		AwsS3Store s3Store = new AwsS3Store(new ModelIO());
+		AwsS3Store s3Store = new AwsS3Store(new ModelIO(), new StatsManagerImpl());
 
 		ChannelMetaData channelMetaData1 = new ChannelMetaData("matt_test", ChannelMetaData.TTL_DAY, false);
 		s3Store.putMessages(channelMetaData1, "20130107233405", new FileInputStream(args[0]));

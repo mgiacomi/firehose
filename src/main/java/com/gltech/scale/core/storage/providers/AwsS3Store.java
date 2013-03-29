@@ -55,10 +55,12 @@ public class AwsS3Store implements Storage
 		int activeUploads = props.get("storage.s3.concurrent_writes", Defaults.CONCURRENT_STORE_WRITES);
 
 		String groupName = "Storage";
-		keyWrittenTimeStat = statsManager.createAvgAndCountStat(groupName, "KeysWritten.AvgTime", "KeysWritten.Count");
-		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten.Size");
-		keyReadTimeStat = statsManager.createAvgAndCountStat(groupName, "KeysRead.AvgTime", "KeysRead.Count");
-		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead.Size");
+		keyWrittenTimeStat = statsManager.createAvgStat(groupName, "KeysWritten.AvgTime", "milliseconds");
+		keyWrittenTimeStat.activateCountStat("KeysWritten.Count", "keys");
+		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten.Size", "kb");
+		keyReadTimeStat = statsManager.createAvgStat(groupName, "KeysRead.AvgTime", "milliseconds");
+		keyReadTimeStat.activateCountStat("KeysRead.Count", "keys");
+		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead.Size", "kb");
 
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
 		threadPoolExecutor = new StatsThreadPoolExecutor(activeUploads, activeUploads, 1, TimeUnit.MINUTES, queue, new S3UploadThreadFactory(), keyWrittenTimeStat);
@@ -132,7 +134,7 @@ public class AwsS3Store implements Storage
 		{
 			int bytesWritten = IOUtils.copy(new LZFInputStream(s3Object.getObjectContent()), outputStream);
 			keyReadTimeStat.stopTimer();
-			keyReadSizeStat.add(bytesWritten);
+			keyReadSizeStat.add(bytesWritten / Defaults.KBytes);
 		}
 		catch (IOException e)
 		{
@@ -167,7 +169,7 @@ public class AwsS3Store implements Storage
 			{
 				StreamSplitter.StreamPart streamPart = streamSplitter.next();
 
-				keyWrittenSizeStat.add(streamPart.getSize());
+				keyWrittenSizeStat.add(streamPart.getSize() / Defaults.KBytes);
 
 				semaphore.acquire();
 
@@ -221,7 +223,7 @@ public class AwsS3Store implements Storage
 	{
 		keyWrittenTimeStat.startTimer();
 		keyWrittenTimeStat.stopTimer();
-		keyWrittenSizeStat.add(data.length);
+		keyWrittenSizeStat.add(data.length / Defaults.KBytes);
 	}
 
 	private String keyNameWithUniquePrefix(String channelName, String id)

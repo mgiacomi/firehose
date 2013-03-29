@@ -10,7 +10,7 @@ public class AvgStatOverTimeTest
 	@Test
 	public void testAverager() throws Exception
 	{
-		AvgStatOverTime stat = new AvgStatOverTime("SIZE");
+		AvgStatOverTime stat = new AvgStatOverTime("SIZE", "");
 		DateTime dateTime = DateTime.now();
 
 		stat.add(10, dateTime);

@@ -9,8 +9,13 @@ import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.results.GroupStats;
 import com.gltech.scale.core.stats.results.OverTime;
 import com.gltech.scale.core.stats.results.AvgStat;
+import com.gltech.scale.lifecycle.LifeCycle;
+import com.gltech.scale.lifecycle.LifeCycleManager;
 import com.gltech.scale.util.Props;
 import com.google.common.base.Throwables;
+import ganglia.gmetric.GMetric;
+import ganglia.gmetric.GMetricSlope;
+import ganglia.gmetric.GMetricType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +31,7 @@ public class StatsManagerImpl implements StatsManager
 	private Schema<GroupStats> groupStatsSchema = RuntimeSchema.getSchema(GroupStats.class);
 	private static ScheduledExecutorService scheduledCleanUpService;
 	private static ScheduledExecutorService scheduledCallBackService;
+	private static ScheduledExecutorService scheduledPublishService;
 	Props props = Props.getProps();
 
 	// Multi-level Map used to hold group and name level stat data.
@@ -92,6 +98,54 @@ public class StatsManagerImpl implements StatsManager
 
 			logger.info("StatsManager call back service has been started.");
 		}
+
+		scheduledPublishService = Executors.newScheduledThreadPool(1, new ThreadFactory()
+		{
+			public Thread newThread(Runnable runnable)
+			{
+				return new Thread(runnable, "MonitoringPublisher");
+			}
+		});
+		scheduledPublishService.scheduleAtFixedRate(new Runnable()
+		{
+			public void run()
+			{
+				Props props = Props.getProps();
+				String ipAddress = props.get("gangliaIpaddress", "localhost");
+				int port = props.get("gangliaPort", 8649);
+				GMetric gMetric = new GMetric(ipAddress, port, GMetric.UDPAddressingMode.UNICAST, true);
+
+				for (GroupStats groupStats : getGroupStats())
+				{
+					for(OverTime<AvgStat> avgStat : groupStats.getAvgStats())
+					{
+						try
+						{
+							logger.debug("publishing " + avgStat.getName() + " " + avgStat.getMin1().getAverage());
+							gMetric.announce(avgStat.getName(), String.valueOf(avgStat.getMin1().getAverage()), GMetricType.DOUBLE, avgStat.getUnitOfMeasure(), GMetricSlope.BOTH, 60, 1440 * 60, groupStats.getName());
+						}
+						catch (Exception e)
+						{
+							logger.warn("unable to publish GMetric: " + avgStat.getName(), e);
+						}
+					}
+					for(OverTime<Long> countStat : groupStats.getCountStats())
+					{
+						try
+						{
+							logger.debug("publishing " + countStat.getName() + " " + countStat.getMin1());
+							gMetric.announce(countStat.getName(), String.valueOf(countStat.getMin1()), GMetricType.DOUBLE, countStat.getUnitOfMeasure(), GMetricSlope.BOTH, 60, 1440 * 60, groupStats.getName());
+						}
+						catch (Exception e)
+						{
+							logger.warn("unable to publish GMetric: " + countStat.getName(), e);
+						}
+					}
+				}
+			}
+		}, 60, 60, TimeUnit.SECONDS);
+		LifeCycleManager.getInstance().add(this, LifeCycle.Priority.INITIAL);
+
 	}
 
 	@Override
@@ -99,31 +153,20 @@ public class StatsManagerImpl implements StatsManager
 	{
 		scheduledCleanUpService.shutdown();
 		scheduledCallBackService.shutdown();
+		scheduledPublishService.shutdown();
 		logger.info("StatsManager has been shutdown.");
 	}
 
 	@Override
-	public AvgStatOverTime createAvgStat(String groupName, String statName)
+	public AvgStatOverTime createAvgStat(String groupName, String avgStatName, String unitOfMeasure)
 	{
-		return createAvgAndCountStat(groupName, statName, null, null);
+		return createAvgStat(groupName, avgStatName, unitOfMeasure, null);
 	}
 
 	@Override
-	public AvgStatOverTime createAvgStat(String groupName, String statName, StatCallBack statCallBack)
+	public AvgStatOverTime createAvgStat(String groupName, String avgStatName, String unitOfMeasure, StatCallBack statCallBack)
 	{
-		return createAvgAndCountStat(groupName, statName, null, statCallBack);
-	}
-
-	@Override
-	public AvgStatOverTime createAvgAndCountStat(String groupName, String avgStatName, String countStatName)
-	{
-		return createAvgAndCountStat(groupName, avgStatName, countStatName, null);
-	}
-
-	@Override
-	public AvgStatOverTime createAvgAndCountStat(String groupName, String avgStatName, String countStatName, StatCallBack statCallBack)
-	{
-		AvgStatOverTime avgStatOverTime = new AvgStatOverTime(avgStatName, countStatName);
+		AvgStatOverTime avgStatOverTime = new AvgStatOverTime(avgStatName, unitOfMeasure);
 		StatOverTime statOverTime = registerStat(groupName, avgStatName, avgStatOverTime, statCallBack);
 
 		try
@@ -137,15 +180,15 @@ public class StatsManagerImpl implements StatsManager
 	}
 
 	@Override
-	public CounterStatOverTime createCounterStat(String groupName, String statName)
+	public CounterStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure)
 	{
-		return createCounterStat(groupName, statName, null);
+		return createCounterStat(groupName, statName, unitOfMeasure, null);
 	}
 
 	@Override
-	public CounterStatOverTime createCounterStat(String groupName, String statName, StatCallBack statCallBack)
+	public CounterStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure, StatCallBack statCallBack)
 	{
-		CounterStatOverTime counterStatOverTime = new CounterStatOverTime(statName);
+		CounterStatOverTime counterStatOverTime = new CounterStatOverTime(statName, unitOfMeasure);
 		StatOverTime statOverTime = registerStat(groupName, statName, counterStatOverTime, statCallBack);
 
 		try
@@ -233,7 +276,7 @@ public class StatsManagerImpl implements StatsManager
 					AvgStatOverTime avgStatOverTime = (AvgStatOverTime) statOverTime;
 
 					OverTime<AvgStat> avgOverTime = new OverTime<>(
-							avgStatOverTime.getStatName(),
+							avgStatOverTime.getName(),
 							avgStatOverTime.getAvgOverMinutes(1),
 							avgStatOverTime.getAvgOverMinutes(5),
 							avgStatOverTime.getAvgOverMinutes(30),
@@ -242,10 +285,10 @@ public class StatsManagerImpl implements StatsManager
 
 					groupStats.getAvgStats().add(avgOverTime);
 
-					if (avgStatOverTime.getCounterStatOverTime().getStatName() != null)
+					if (avgStatOverTime.getCounterStatOverTime().getName() != null)
 					{
 						OverTime<Long> countOverTime = new OverTime<>(
-								avgStatOverTime.getCounterStatOverTime().getStatName(),
+								avgStatOverTime.getCounterStatOverTime().getName(),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(1),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(5),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(30),
@@ -260,7 +303,7 @@ public class StatsManagerImpl implements StatsManager
 					CounterStatOverTime counterStatOverTime = (CounterStatOverTime) statOverTime;
 
 					OverTime<Long> countOverTime = new OverTime<>(
-							counterStatOverTime.getStatName(),
+							counterStatOverTime.getName(),
 							counterStatOverTime.getCountOverMinutes(1),
 							counterStatOverTime.getCountOverMinutes(5),
 							counterStatOverTime.getCountOverMinutes(30),

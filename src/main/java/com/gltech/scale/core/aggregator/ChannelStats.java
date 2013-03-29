@@ -2,6 +2,7 @@ package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.stats.StatCallBack;
 import com.gltech.scale.core.stats.StatsManager;
@@ -12,7 +13,6 @@ import java.util.Collection;
 
 public class ChannelStats implements Channel
 {
-	private static final long KBytes = 1024L;
 	private Props props = Props.getProps();
 	private final Channel channel;
 	private AvgStatOverTime addMessageSizeStat;
@@ -23,9 +23,10 @@ public class ChannelStats implements Channel
 		this.channel = channel;
 
 		String groupName = "Channel (" + channel.getChannelMetaData().getName() + ")";
-		this.addMessageSizeStat = statsManager.createAvgAndCountStat(groupName, "AddMessage.Size", "AddMessage.Count");
+		this.addMessageSizeStat = statsManager.createAvgStat(groupName, "AddMessage.Size", "bytes");
+		this.addMessageSizeStat.activateCountStat("AddMessage.Count", "messages");
 
-		statsManager.createAvgStat(groupName, "OldestMessage.Time", new StatCallBack()
+		statsManager.createAvgStat(groupName, "OldestMessage.Time", "seconds", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -54,7 +55,7 @@ public class ChannelStats implements Channel
 			}
 		});
 
-		statsManager.createCounterStat(groupName, "Batches.Count", new StatCallBack()
+		statsManager.createCounterStat(groupName, "ActiveBatches.Count", "batches", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -62,7 +63,7 @@ public class ChannelStats implements Channel
 			}
 		});
 
-		statsManager.createCounterStat(groupName, "Batches.Size", new StatCallBack()
+		statsManager.createCounterStat(groupName, "ActiveBatches.Size", "kb", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -73,15 +74,16 @@ public class ChannelStats implements Channel
 					channelPayloadSize += batch.getBytes();
 				}
 
-				return channelPayloadSize / KBytes;
+				return channelPayloadSize / Defaults.KBytes;
 			}
 		});
 
 		if (channel.getChannelMetaData().isRedundant())
 		{
-			this.addBackupMessageSizeStat = statsManager.createAvgAndCountStat(groupName, "AddBackupMessage.Size", "AddBackupMessage.Count");
+			this.addBackupMessageSizeStat = statsManager.createAvgStat(groupName, "AddBackupMessage.Size", "bytes");
+			this.addBackupMessageSizeStat.activateCountStat("AddBackupMessage.Count", "messages");
 
-			statsManager.createCounterStat(groupName, "BackupBatches.Count", new StatCallBack()
+			statsManager.createCounterStat(groupName, "ActiveBackupBatches.Count", "batches", new StatCallBack()
 			{
 				public long getValue()
 				{
@@ -89,7 +91,7 @@ public class ChannelStats implements Channel
 				}
 			});
 
-			statsManager.createCounterStat(groupName, "BackupBatches.Size", new StatCallBack()
+			statsManager.createCounterStat(groupName, "ActiveBackupBatches.Size", "kb", new StatCallBack()
 			{
 				public long getValue()
 				{
@@ -100,7 +102,7 @@ public class ChannelStats implements Channel
 						channelPayloadSize += batch.getBytes();
 					}
 
-					return channelPayloadSize / KBytes;
+					return channelPayloadSize / Defaults.KBytes;
 				}
 			});
 		}

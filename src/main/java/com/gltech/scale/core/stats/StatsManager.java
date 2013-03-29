@@ -9,17 +9,13 @@ public interface StatsManager extends LifeCycle
 {
 	void start();
 
-	AvgStatOverTime createAvgStat(String groupName, String statName);
+	AvgStatOverTime createAvgStat(String groupName, String statName, String unitOfMeasure);
 
-	AvgStatOverTime createAvgStat(String groupName, String statName, StatCallBack statCallBack);
+	AvgStatOverTime createAvgStat(String groupName, String statName, String unitOfMeasure, StatCallBack statCallBack);
 
-	AvgStatOverTime createAvgAndCountStat(String groupName, String avgStatName, String countStatName);
+	CounterStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure);
 
-	AvgStatOverTime createAvgAndCountStat(String groupName, String avgStatName, String countStatName, StatCallBack statCallBack);
-
-	CounterStatOverTime createCounterStat(String groupName, String statName);
-
-	CounterStatOverTime createCounterStat(String groupName, String statName, StatCallBack statCallBack);
+	CounterStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure, StatCallBack statCallBack);
 
 	byte[] toBytes();
 

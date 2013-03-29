@@ -38,7 +38,8 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 		this.channelCache = channelCache;
 		this.statsManager = statsManager;
 
-		AvgStatOverTime collectBatchAvgTime = statsManager.createAvgAndCountStat(groupName, "CollectBatch.AvgTime", "CollectBatch.Count");
+		AvgStatOverTime collectBatchAvgTime = statsManager.createAvgStat(groupName, "CollectBatch.AvgTime", "milliseconds");
+		collectBatchAvgTime.activateCountStat("CollectBatch.Count", "batches");
 
 		activeStorageWriters = props.get("storage_writer.active_collectors", Defaults.STORAGE_WRITER_ACTIVE_WRITERS);
 
@@ -83,7 +84,8 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 								batchWriter.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());
 
 								// Get a stat based on channel name.
-								AvgStatOverTime channelStat = statsManager.createAvgAndCountStat(groupName, batchPeriodMapper.getChannelName() + ".AvgTime", batchPeriodMapper.getChannelName() + ".Count");
+								AvgStatOverTime channelStat = statsManager.createAvgStat(groupName, batchPeriodMapper.getChannelName() + ".AvgTime", "milliseconds");
+								channelStat.activateCountStat(batchPeriodMapper.getChannelName() + ".Count", "batches");
 								batchWriter.setChannelStat(channelStat);
 
 								threadPoolExecutor.submit(batchWriter);

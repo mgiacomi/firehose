@@ -8,7 +8,9 @@ public interface StatOverTime
 
 	void stopTimer();
 
-	String getStatName();
+	String getName();
+
+	String getUnitOfMeasure();
 
 	void cleanOldThanTwoHours();
 }

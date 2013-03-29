@@ -12,22 +12,25 @@ public class AvgStatOverTime implements StatOverTime
 {
 	private ConcurrentMap<DateTime, AtomicLong> totalsBy5SecPeriods = new ConcurrentHashMap<>();
 	private final ThreadLocal<Long> startTime = new ThreadLocal<>();
-	private CounterStatOverTime counterStatOverTime;
+	private final CounterStatOverTime counterStatOverTime;
 	private String statName;
+	private String unitOfMeasure;
 
 	// Only allow classes in this package to create a stat.
-	protected AvgStatOverTime(String statName)
+	protected AvgStatOverTime(String statName, String unitOfMeasure)
 	{
 		this.statName = statName;
-		counterStatOverTime = new CounterStatOverTime(null);
+		this.unitOfMeasure = unitOfMeasure;
+		counterStatOverTime = new CounterStatOverTime(null, null);
 	}
 
 	// Only allow classes in this package to create a stat.
-	protected AvgStatOverTime(String statName, String countStatName)
+	public void activateCountStat(String countStatName, String unitOfMeasure)
 	{
-		this.statName = statName;
-		counterStatOverTime = new CounterStatOverTime(countStatName);
+		counterStatOverTime.setStatName(countStatName);
+		counterStatOverTime.setUnitOfMeasure(unitOfMeasure);
 	}
+
 
 	@Override
 	public void startTimer()
@@ -66,9 +69,15 @@ public class AvgStatOverTime implements StatOverTime
 	}
 
 	@Override
-	public String getStatName()
+	public String getName()
 	{
 		return statName;
+	}
+
+	@Override
+	public String getUnitOfMeasure()
+	{
+		return unitOfMeasure;
 	}
 
 	public CounterStatOverTime getCounterStatOverTime()

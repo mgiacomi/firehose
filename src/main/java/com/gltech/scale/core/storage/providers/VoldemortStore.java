@@ -1,6 +1,7 @@
 package com.gltech.scale.core.storage.providers;
 
 import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.storage.KeyAlreadyExistsException;
@@ -36,10 +37,12 @@ public class VoldemortStore implements Storage
 		this.channelClient = VoldemortClient.createFactory().getStoreClient("ChannelStore");
 
 		String groupName = "Storage";
-		keyWrittenTimeStat = statsManager.createAvgAndCountStat(groupName, "KeysWritten.AvgTime", "KeysWritten.Count");
-		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten.Size");
-		keyReadTimeStat = statsManager.createAvgAndCountStat(groupName, "KeysRead.AvgTime", "KeysRead.Count");
-		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead.Size");
+		keyWrittenTimeStat = statsManager.createAvgStat(groupName, "KeysWritten.AvgTime", "milliseconds");
+		keyWrittenTimeStat.activateCountStat("KeysWritten.Count", "keys");
+		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten.Size", "kb");
+		keyReadTimeStat = statsManager.createAvgStat(groupName, "KeysRead.AvgTime", "milliseconds");
+		keyReadTimeStat.activateCountStat("KeysRead.Count", "keys");
+		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead.Size", "kb");
 	}
 
 	@Override
@@ -79,7 +82,7 @@ public class VoldemortStore implements Storage
 			byte[] bytes = IOUtils.toByteArray(inputStream);
 			messageClient.put(channelMetaData.getName() +"|"+id, bytes);
 			keyWrittenTimeStat.stopTimer();
-			keyWrittenSizeStat.add(bytes.length);
+			keyWrittenSizeStat.add(bytes.length / Defaults.KBytes);
 			logger.info("Wrote {} bytes for key {}", bytes.length, channelMetaData.getName() +"|"+id);
 		}
 		catch (IOException e)
@@ -101,7 +104,7 @@ public class VoldemortStore implements Storage
 			if (versioned != null && versioned.getValue().length > 0)
 			{
 				outputStream.write(versioned.getValue());
-				keyReadSizeStat.add(versioned.getValue().length);
+				keyReadSizeStat.add(versioned.getValue().length / Defaults.KBytes);
 			}
 			keyReadTimeStat.stopTimer();
 		}
@@ -118,7 +121,7 @@ public class VoldemortStore implements Storage
 		keyWrittenTimeStat.startTimer();
 		messageClient.put(channelMetaData.getName() +"|"+id, data);
 		keyWrittenTimeStat.stopTimer();
-		keyWrittenSizeStat.add(data.length);
+		keyWrittenSizeStat.add(data.length / Defaults.KBytes);
 	}
 
 	@Override
@@ -128,7 +131,7 @@ public class VoldemortStore implements Storage
 		keyReadTimeStat.startTimer();
 		byte[] data = messageClient.get(channelMetaData.getName() +"|"+id).getValue();
 		keyReadTimeStat.stopTimer();
-		keyReadSizeStat.add(data.length);
+		keyReadSizeStat.add(data.length / Defaults.KBytes);
 		return data;
 	}
 }

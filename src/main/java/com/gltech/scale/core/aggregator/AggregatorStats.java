@@ -34,16 +34,18 @@ public class AggregatorStats implements Aggregator
 		this.aggregator = aggregator;
 
 		String groupName = "Aggregator";
-		this.addMessageSizeStat = statsManager.createAvgAndCountStat(groupName, "AddMessage.Size", "AddMessage.Count");
-		this.addMessageTimeStat = statsManager.createAvgStat(groupName, "AddMessage.Time");
-		this.addBackupMessageSizeStat = statsManager.createAvgAndCountStat(groupName, "AddBackupMessage.Size", "AddBackupMessage.Count");
-		this.addBackupMessageTimeStat = statsManager.createAvgStat(groupName, "AddBackupMessage.Time");
-		this.messagesWrittenTimeStat = statsManager.createAvgStat(groupName, "MessagesWritten.Time");
-		this.messagesWrittenCountStat = statsManager.createCounterStat(groupName, "MessagesWritten.Count");
-		this.backupMessagesWrittenTimeStat = statsManager.createAvgStat(groupName, "BackupMessagesWritten.Time");
-		this.backupMessagesWrittenCountStat = statsManager.createCounterStat(groupName, "BackupMessagesWritten.Count");
-		this.clearCountStat = statsManager.createCounterStat(groupName, "Clear.Count");
-		statsManager.createAvgStat(groupName, "ActiveBatches.Avg", new StatCallBack()
+		this.addMessageSizeStat = statsManager.createAvgStat(groupName, "AddMessage.Size", "bytes");
+		this.addMessageSizeStat.activateCountStat("AddMessage.Count", "messages");
+		this.addMessageTimeStat = statsManager.createAvgStat(groupName, "AddMessage.Time", "milliseconds");
+		this.addBackupMessageSizeStat = statsManager.createAvgStat(groupName, "AddBackupMessage.Size", "bytes");
+		this.addBackupMessageSizeStat.activateCountStat("AddBackupMessage.Count", "messages");
+		this.addBackupMessageTimeStat = statsManager.createAvgStat(groupName, "AddBackupMessage.Time", "milliseconds");
+		this.messagesWrittenTimeStat = statsManager.createAvgStat(groupName, "MessagesWritten.Time", "milliseconds");
+		this.messagesWrittenCountStat = statsManager.createCounterStat(groupName, "MessagesWritten.Count", "messages");
+		this.backupMessagesWrittenTimeStat = statsManager.createAvgStat(groupName, "BackupMessagesWritten.Time", "milliseconds");
+		this.backupMessagesWrittenCountStat = statsManager.createCounterStat(groupName, "BackupMessagesWritten.Count", "messages");
+		this.clearCountStat = statsManager.createCounterStat(groupName, "Clear.Count", "calls");
+		statsManager.createAvgStat(groupName, "ActiveBatches.Avg", "batches", new StatCallBack()
 		{
 			public long getValue()
 			{

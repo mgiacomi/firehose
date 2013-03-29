@@ -2,6 +2,7 @@ package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Batch;
+import com.gltech.scale.core.stats.StatsManager;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
@@ -29,13 +30,15 @@ public class AggregatorImpl implements Aggregator
 	private ChannelCache channelCache;
 	private ClusterService clusterService;
 	private TimePeriodUtils timePeriodUtils;
+	private StatsManager statsManager;
 
 	@Inject
-	public AggregatorImpl(ChannelCache channelCache, ClusterService clusterService, TimePeriodUtils timePeriodUtils)
+	public AggregatorImpl(ChannelCache channelCache, ClusterService clusterService, TimePeriodUtils timePeriodUtils, StatsManager statsManager)
 	{
 		this.channelCache = channelCache;
 		this.clusterService = clusterService;
 		this.timePeriodUtils = timePeriodUtils;
+		this.statsManager = statsManager;
 
 		// Register the aggregator with the coordination service, so that the storage writer can find us
 		clusterService.getRegistrationService().registerAsAggregator();
@@ -49,7 +52,7 @@ public class AggregatorImpl implements Aggregator
 
 		if (channel == null)
 		{
-			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils));
+			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils), statsManager);
 			channel = channels.putIfAbsent(channelMetaData, newChannel);
 			if (channel == null)
 			{
@@ -71,7 +74,7 @@ public class AggregatorImpl implements Aggregator
 		if (channel == null)
 		{
 			logger.info("Creating Channel: " + channelName);
-			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils));
+			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils), statsManager);
 			channel = channels.putIfAbsent(channelMetaData, newChannel);
 			if (channel == null)
 			{
