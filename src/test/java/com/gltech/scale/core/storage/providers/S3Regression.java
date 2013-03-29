@@ -4,13 +4,10 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.stats.StatsManagerImpl;
-import com.gltech.scale.core.storage.providers.AwsS3Store;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.List;
 
 public class S3Regression
 {

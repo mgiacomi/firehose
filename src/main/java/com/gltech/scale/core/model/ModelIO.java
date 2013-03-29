@@ -1,4 +1,4 @@
-package com.gltech.scale.util;
+package com.gltech.scale.core.model;
 
 import com.dyuproject.protostuff.JsonIOUtil;
 import com.dyuproject.protostuff.LinkedBuffer;

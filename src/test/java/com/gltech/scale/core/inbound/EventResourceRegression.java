@@ -7,7 +7,7 @@ import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.Storage;
 import com.gltech.scale.core.storage.providers.MemoryStore;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import com.gltech.scale.util.Props;
 import com.google.inject.Binder;
 import com.google.inject.Module;

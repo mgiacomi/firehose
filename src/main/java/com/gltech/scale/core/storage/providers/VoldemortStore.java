@@ -6,7 +6,7 @@ import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.storage.KeyAlreadyExistsException;
 import com.gltech.scale.core.storage.Storage;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import com.gltech.scale.util.VoldemortClient;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;

@@ -1,12 +1,11 @@
 package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.model.Message;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import com.google.protobuf.CodedInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 

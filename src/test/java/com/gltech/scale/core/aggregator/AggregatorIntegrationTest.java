@@ -4,7 +4,7 @@ import com.gltech.scale.core.inbound.InboundRestClient;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.storage.Storage;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
@@ -18,12 +18,10 @@ import org.joda.time.DateTime;
 import org.junit.*;
 
 import javax.ws.rs.core.MediaType;
-import java.io.EOFException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 

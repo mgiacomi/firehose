@@ -2,7 +2,7 @@ package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.stats.StatsManager;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import com.google.inject.Inject;
 import org.joda.time.DateTime;
 
@@ -17,14 +17,12 @@ import java.io.OutputStream;
 public class AggregatorResource
 {
 	private Aggregator aggregator;
-	private StatsManager statsManager;
 	private ModelIO modelIO;
 
 	@Inject
-	public AggregatorResource(Aggregator aggregator, StatsManager statsManager, ModelIO modelIO)
+	public AggregatorResource(Aggregator aggregator, ModelIO modelIO)
 	{
 		this.aggregator = aggregator;
-		this.statsManager = statsManager;
 		this.modelIO = modelIO;
 	}
 

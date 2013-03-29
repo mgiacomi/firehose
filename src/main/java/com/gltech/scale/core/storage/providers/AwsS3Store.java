@@ -10,7 +10,7 @@ import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.stats.StatsThreadPoolExecutor;
 import com.gltech.scale.core.storage.StreamSplitter;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import com.google.common.base.Throwables;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.Storage;
@@ -85,12 +85,11 @@ public class AwsS3Store implements Storage
 	@Override
 	public ChannelMetaData getChannelMetaData(String channelName)
 	{
-		String key = channelName;
 		S3Object s3Object = null;
 
 		try
 		{
-			s3Object = s3Client.getObject(s3BucketName, key);
+			s3Object = s3Client.getObject(s3BucketName, channelName);
 		}
 		catch (AmazonServiceException e)
 		{

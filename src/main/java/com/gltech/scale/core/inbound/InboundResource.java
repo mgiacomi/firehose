@@ -2,7 +2,7 @@ package com.gltech.scale.core.inbound;
 
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.storage.StorageClient;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import com.google.inject.Inject;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.ChannelCache;

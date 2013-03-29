@@ -2,10 +2,9 @@ package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.BatchMetaData;
-import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.util.ClientCreator;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import com.google.inject.Inject;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
-import java.util.List;
 
 public class AggregatorRestClient
 {

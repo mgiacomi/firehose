@@ -29,7 +29,6 @@ import com.gltech.scale.util.Props;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
-//todo - gfm - 9/24/12 - This seems closely coupled with EmbeddedServer.  Should it be moved there?
 public class GuiceServletConfig extends GuiceServletContextListener
 {
 	private Props props = Props.getProps();

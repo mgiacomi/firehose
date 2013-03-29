@@ -7,7 +7,7 @@ import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.util.ClientCreator;
-import com.gltech.scale.util.ModelIO;
+import com.gltech.scale.core.model.ModelIO;
 import com.gltech.scale.util.Props;
 import com.gltech.scale.voldemort.VoldemortTestUtil;
 import com.netflix.curator.test.TestingServer;
