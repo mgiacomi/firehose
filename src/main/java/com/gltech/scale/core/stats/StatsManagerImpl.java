@@ -121,7 +121,7 @@ public class StatsManagerImpl implements StatsManager
 					{
 						try
 						{
-							logger.debug("publishing " + avgStat.getName() + " " + avgStat.getMin1().getAverage());
+							logger.debug("publishing " + avgStat.getName() + " " + avgStat.getMin1().getAverage() +" : "+ avgStat.getUnitOfMeasure());
 							gMetric.announce(avgStat.getName(), String.valueOf(avgStat.getMin1().getAverage()), GMetricType.DOUBLE, avgStat.getUnitOfMeasure(), GMetricSlope.BOTH, 60, 1440 * 60, groupStats.getName());
 						}
 						catch (Exception e)
@@ -133,7 +133,7 @@ public class StatsManagerImpl implements StatsManager
 					{
 						try
 						{
-							logger.debug("publishing " + countStat.getName() + " " + countStat.getMin1());
+							logger.debug("publishing " + countStat.getName() + " " + countStat.getMin1() +" : "+ countStat.getUnitOfMeasure());
 							gMetric.announce(countStat.getName(), String.valueOf(countStat.getMin1()), GMetricType.DOUBLE, countStat.getUnitOfMeasure(), GMetricSlope.BOTH, 60, 1440 * 60, groupStats.getName());
 						}
 						catch (Exception e)
@@ -277,6 +277,7 @@ public class StatsManagerImpl implements StatsManager
 
 					OverTime<AvgStat> avgOverTime = new OverTime<>(
 							avgStatOverTime.getName(),
+							avgStatOverTime.getUnitOfMeasure(),
 							avgStatOverTime.getAvgOverMinutes(1),
 							avgStatOverTime.getAvgOverMinutes(5),
 							avgStatOverTime.getAvgOverMinutes(30),
@@ -289,6 +290,7 @@ public class StatsManagerImpl implements StatsManager
 					{
 						OverTime<Long> countOverTime = new OverTime<>(
 								avgStatOverTime.getCounterStatOverTime().getName(),
+								avgStatOverTime.getCounterStatOverTime().getUnitOfMeasure(),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(1),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(5),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(30),
@@ -304,6 +306,7 @@ public class StatsManagerImpl implements StatsManager
 
 					OverTime<Long> countOverTime = new OverTime<>(
 							counterStatOverTime.getName(),
+							counterStatOverTime.getUnitOfMeasure(),
 							counterStatOverTime.getCountOverMinutes(1),
 							counterStatOverTime.getCountOverMinutes(5),
 							counterStatOverTime.getCountOverMinutes(30),

@@ -17,9 +17,10 @@ public class OverTime<T>
 	@Tag(6)
 	private T hour2;
 
-	public OverTime(String name, T min1, T min5, T min30, T hour2)
+	public OverTime(String name, String unitOfMeasure, T min1, T min5, T min30, T hour2)
 	{
 		this.name = name;
+		this.unitOfMeasure = unitOfMeasure;
 		this.min1 = min1;
 		this.min5 = min5;
 		this.min30 = min30;

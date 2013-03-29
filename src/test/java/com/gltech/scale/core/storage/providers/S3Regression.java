@@ -1,4 +1,4 @@
-package com.gltech.scale.load;
+package com.gltech.scale.core.storage.providers;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
