@@ -11,24 +11,43 @@ import com.netflix.curator.test.TestingServer;
 
 public class MonitoringRegression
 {
-	public static void main(String[] args) throws Exception
+	static public class AppInstance
 	{
-		Props props = Props.getProps();
-		props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/monitoring.properties");
-
-		TestingServer testingServer = new TestingServer(21818);
-
-		EmbeddedServer.start(9090, new Module()
+		public static void main(String[] args) throws Exception
 		{
-			public void configure(Binder binder)
+			Props props = Props.getProps();
+			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/monitoring.properties");
+
+			TestingServer testingServer = new TestingServer(21818);
+
+			EmbeddedServer.start(8181, new Module()
 			{
-				binder.bind(Storage.class).to(MemoryStore.class).in(Singleton.class);
-			}
-		});
+				public void configure(Binder binder)
+				{
+					binder.bind(Storage.class).to(MemoryStore.class).in(Singleton.class);
+				}
+			});
 
-		while (true)
+			while (true)
+			{
+				Thread.sleep(60000);
+			}
+		}
+	}
+
+	static public class MonitoringInstance
+	{
+		public static void main(String[] args) throws Exception
 		{
-			Thread.sleep(60000);
+			Props props = Props.getProps();
+			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/monitoring.properties");
+
+			com.gltech.scale.monitoring.server.EmbeddedServer.start(9090);
+
+			while (true)
+			{
+				Thread.sleep(60000);
+			}
 		}
 	}
 }

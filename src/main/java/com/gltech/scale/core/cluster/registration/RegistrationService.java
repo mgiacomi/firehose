@@ -10,6 +10,8 @@ public interface RegistrationService
 
 	void unRegisterAsServer();
 
+	List<ServiceMetaData> getRegisteredServers();
+
 	void registerAsInboundService();
 
 	void unRegisterAsInboundService();

@@ -5,6 +5,8 @@ import com.gltech.scale.core.cluster.ClusterServiceImpl;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.RegistrationServiceImpl;
 import com.gltech.scale.monitoring.resources.MonitoringResource;
+import com.gltech.scale.monitoring.services.ClusterStatsService;
+import com.gltech.scale.monitoring.services.ClusterStatsServiceImpl;
 import com.gltech.scale.util.Props;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -46,7 +48,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					bind(RegistrationService.class).to(RegistrationServiceImpl.class).in(Singleton.class);
 
 					// Monitoring Specific
-					bind(ClusterService.class).to(ClusterServiceImpl.class).in(Singleton.class);
+					bind(ClusterStatsService.class).to(ClusterStatsServiceImpl.class).in(Singleton.class);
 
 					serve("/*").with(GuiceContainer.class);
 				}

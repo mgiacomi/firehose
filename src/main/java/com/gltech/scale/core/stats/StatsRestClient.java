@@ -1,28 +1,33 @@
 package com.gltech.scale.core.stats;
 
-import com.dyuproject.protostuff.ProtostuffIOUtil;
-import com.dyuproject.protostuff.Schema;
-import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.stats.results.GroupStats;
+import com.gltech.scale.core.stats.results.ResultsIO;
+import com.gltech.scale.core.stats.results.ServerStats;
 import com.gltech.scale.util.ClientCreator;
 import com.google.common.base.Throwables;
+import com.google.inject.Inject;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.List;
 
 public class StatsRestClient
 {
 	private final Client client = ClientCreator.createCached();
-	private Schema<GroupStats> groupStatsSchema = RuntimeSchema.getSchema(GroupStats.class);
+	private ResultsIO resultsIO;
 
-	public List<GroupStats> getGroupStats(ServiceMetaData inboundService)
+	@Inject
+	public StatsRestClient(ResultsIO resultsIO)
 	{
-		String url = "http://" + inboundService.getListenAddress() + ":" + inboundService.getListenPort() + "/inbound/stats";
+		this.resultsIO = resultsIO;
+	}
+
+	public ServerStats getServerStats(ServiceMetaData serverService)
+	{
+		String url = "http://" + serverService.getListenAddress() + ":" + serverService.getListenPort() + "/stats/all";
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.accept(MediaType.APPLICATION_OCTET_STREAM_TYPE).get(ClientResponse.class);
 
@@ -33,7 +38,7 @@ public class StatsRestClient
 
 		try
 		{
-			return ProtostuffIOUtil.parseListFrom(response.getEntityInputStream(), groupStatsSchema);
+			return resultsIO.toServerStats(IOUtils.toByteArray(response.getEntityInputStream()));
 		}
 		catch (IOException e)
 		{

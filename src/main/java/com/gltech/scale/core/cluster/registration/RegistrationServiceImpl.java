@@ -59,6 +59,7 @@ public class RegistrationServiceImpl implements RegistrationService
 
 		try
 		{
+			serverCache.start();
 			inboundServiceCache.start();
 			storageWriterCache.start();
 			aggregatorCache.start();
@@ -102,6 +103,19 @@ public class RegistrationServiceImpl implements RegistrationService
 	{
 		serverAdvertiser.unavailable(localServerMetaData);
 		logger.info("Unregistered server host=" + localServerMetaData.getListenAddress() + " port=" + localServerMetaData.getListenPort());
+	}
+
+	@Override
+	public List<ServiceMetaData> getRegisteredServers()
+	{
+		List<ServiceMetaData> serviceMetaDataList = new ArrayList<>();
+
+		for (ServiceInstance<ServiceMetaData> serviceMetaData : serverCache.getInstances())
+		{
+			serviceMetaDataList.add(serviceMetaData.getPayload());
+		}
+
+		return serviceMetaDataList;
 	}
 
 	@Override

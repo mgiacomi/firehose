@@ -68,6 +68,22 @@ public class CoreManualRegression
 		}
 	}
 
+	static public class MonitoringInstance
+	{
+		public static void main(String[] args) throws Exception
+		{
+			Props props = Props.getProps();
+			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/monitoring.properties");
+
+			com.gltech.scale.monitoring.server.EmbeddedServer.start(9292);
+
+			while (true)
+			{
+				Thread.sleep(60000);
+			}
+		}
+	}
+
 	static public class CreateBuckets
 	{
 		public static void main(String[] args) throws Exception

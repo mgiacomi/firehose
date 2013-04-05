@@ -11,6 +11,8 @@ import ganglia.gmetric.GMetricType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -288,6 +290,16 @@ public class StatsManagerImpl implements StatsManager
 
 		ServerStats serverStats = new ServerStats();
 		serverStats.setWorkerId(registrationService.getLocalServerMetaData().getWorkerId().toString());
+
+		try
+		{
+			serverStats.setHostname(InetAddress.getLocalHost().getHostName());
+		}
+		catch (UnknownHostException e)
+		{
+			serverStats.setHostname("unknown");
+		}
+
 		serverStats.setGroupStatsList(groupStatsList);
 
 		return serverStats;

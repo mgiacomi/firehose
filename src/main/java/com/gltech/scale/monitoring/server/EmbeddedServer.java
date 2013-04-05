@@ -76,10 +76,7 @@ public class EmbeddedServer
 		// Must add DefaultServlet for embedded Jetty.
 		// Failing to do this will cause 404 errors.
 		// This is not needed if web.xml is used instead.
-		servletContextHandler.addServlet(DefaultServlet.class, "/aggregator/*");
-		servletContextHandler.addServlet(DefaultServlet.class, "/inbound/*");
-		servletContextHandler.addServlet(DefaultServlet.class, "/storagewriter/*");
-		servletContextHandler.addServlet(DefaultServlet.class, "/stats/*");
+		servletContextHandler.addServlet(DefaultServlet.class, "/monitoring/*");
 
 		// websocket handler
 //		myWebSocketHandler myWebSocketHandler = new myWebSocketHandler();
@@ -102,7 +99,7 @@ public class EmbeddedServer
 	{
 		// Registered CoordinationService for shutdown
 		final ClusterService clusterService = injector.getInstance(ClusterService.class);
-		clusterService.getRegistrationService().registerAsServer();
+		//clusterService.getRegistrationService().registerAsServer();
 		LifeCycleManager.getInstance().add(clusterService, LifeCycle.Priority.FINAL);
 
 		// Registered StatsManager for shutdown

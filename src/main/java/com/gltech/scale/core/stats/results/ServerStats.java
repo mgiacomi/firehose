@@ -10,6 +10,8 @@ public class ServerStats
 	@Tag(1)
 	private String workerId;
 	@Tag(2)
+	private String hostname;
+	@Tag(3)
 	private Set<GroupStats> groupStatsList = new HashSet<>();
 
 	public String getWorkerId()
@@ -20,6 +22,16 @@ public class ServerStats
 	public void setWorkerId(String workerId)
 	{
 		this.workerId = workerId;
+	}
+
+	public String getHostname()
+	{
+		return hostname;
+	}
+
+	public void setHostname(String hostname)
+	{
+		this.hostname = hostname;
 	}
 
 	public Set<GroupStats> getGroupStatsList()
