@@ -4,6 +4,12 @@ import java.util.List;
 
 public interface RegistrationService
 {
+	ServiceMetaData getLocalServerMetaData();
+
+	void registerAsServer();
+
+	void unRegisterAsServer();
+
 	void registerAsInboundService();
 
 	void unRegisterAsInboundService();

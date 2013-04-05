@@ -22,21 +22,18 @@ public class ModelIO
 	{
 		LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 		return ProtostuffIOUtil.toByteArray(message, messageSchema, linkedBuffer);
-
 	}
 
 	public byte[] toBytes(ChannelMetaData channelMetaData)
 	{
 		LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 		return ProtostuffIOUtil.toByteArray(channelMetaData, channelMetaDataSchema, linkedBuffer);
-
 	}
 
 	public byte[] toBytes(BatchMetaData batchMetaData)
 	{
 		LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 		return ProtostuffIOUtil.toByteArray(batchMetaData, batchMetadataSchema, linkedBuffer);
-
 	}
 
 	public String toJson(Message message)

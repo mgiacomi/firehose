@@ -22,12 +22,15 @@ import java.util.List;
 public class RegistrationServiceImpl implements RegistrationService
 {
 	private static final Logger logger = LoggerFactory.getLogger(RegistrationServiceImpl.class);
+	private ServiceAdvertiser serverAdvertiser;
 	private ServiceAdvertiser inboundServiceAdvertiser;
 	private ServiceAdvertiser storageWriterAdvertiser;
 	private ServiceAdvertiser aggregatorAdvertiser;
+	private ServiceMetaData localServerMetaData;
 	private ServiceMetaData localInboundServiceMetaData;
 	private ServiceMetaData localStorageWriterMetaData;
 	private ServiceMetaData localAggregatorMetaData;
+	private ServiceCache<ServiceMetaData> serverCache;
 	private ServiceCache<ServiceMetaData> inboundServiceCache;
 	private ServiceCache<ServiceMetaData> storageWriterCache;
 	private ServiceCache<ServiceMetaData> aggregatorCache;
@@ -38,6 +41,10 @@ public class RegistrationServiceImpl implements RegistrationService
 
 	public RegistrationServiceImpl()
 	{
+		serverAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.SERVER);
+		serverCache = serverAdvertiser.getServiceCache();
+		serverCache.addListener(new ServerCacheListener());
+
 		inboundServiceAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.INBOUND_SERVICE);
 		inboundServiceCache = inboundServiceAdvertiser.getServiceCache();
 		inboundServiceCache.addListener(new InboundServiceCacheListener());
@@ -62,6 +69,42 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
+	@Override
+	public ServiceMetaData getLocalServerMetaData()
+	{
+		return localServerMetaData;
+	}
+
+	@Override
+	public void registerAsServer()
+	{
+		String host = props.get("server_host", Defaults.REST_HOST);
+		int port = props.get("server_port", -1);
+
+		if(port == -1)
+		{
+			throw new IllegalStateException("RegistrationService could not determine the port for the Server on this host.");
+		}
+
+		try
+		{
+			localServerMetaData = serverAdvertiser.available(host, port);
+			logger.info("Registering Server server host=" + host + " port=" + port);
+		}
+		catch (Exception e)
+		{
+			throw new ClusterException("Failed to register Server host=" + host + " port=" + port, e);
+		}
+	}
+
+	@Override
+	public void unRegisterAsServer()
+	{
+		serverAdvertiser.unavailable(localServerMetaData);
+		logger.info("Unregistered server host=" + localServerMetaData.getListenAddress() + " port=" + localServerMetaData.getListenPort());
+	}
+
+	@Override
 	public void registerAsInboundService()
 	{
 		String host = props.get("server_host", Defaults.REST_HOST);
@@ -83,17 +126,20 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
+	@Override
 	public void unRegisterAsInboundService()
 	{
 		inboundServiceAdvertiser.unavailable(localInboundServiceMetaData);
 		logger.info("Unregistered InboundService server host=" + localInboundServiceMetaData.getListenAddress() + " port=" + localInboundServiceMetaData.getListenPort());
 	}
 
+	@Override
 	public ServiceMetaData getLocalStorageWriterMetaData()
 	{
 		return localStorageWriterMetaData;
 	}
 
+	@Override
 	public void registerAsStorageWriter()
 	{
 		String host = props.get("storage_writer.rest_host", Defaults.REST_HOST);
@@ -115,12 +161,14 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
+	@Override
 	public void unRegisterAsStorageWriter()
 	{
 		storageWriterAdvertiser.unavailable(localStorageWriterMetaData);
 		logger.info("Unregistered StorageWriter server host=" + localStorageWriterMetaData.getListenAddress() + " port=" + localStorageWriterMetaData.getListenPort());
 	}
 
+	@Override
 	public void registerAsAggregator()
 	{
 		String host = props.get("aggregator.rest_host", Defaults.REST_HOST);
@@ -142,17 +190,20 @@ public class RegistrationServiceImpl implements RegistrationService
 		}
 	}
 
+	@Override
 	public void unRegisterAsAggregator()
 	{
 		aggregatorAdvertiser.unavailable(localAggregatorMetaData);
 		logger.info("Unregistered aggregator server host=" + localAggregatorMetaData.getListenAddress() + " port=" + localAggregatorMetaData.getListenPort());
 	}
 
+	@Override
 	public ServiceMetaData getLocalAggregatorMetaData()
 	{
 		return localAggregatorMetaData;
 	}
 
+	@Override
 	public ServiceMetaData getAggregatorMetaDataById(String id)
 	{
 		for (ServiceInstance<ServiceMetaData> serviceInstance : aggregatorCache.getInstances())
@@ -166,6 +217,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		return null;
 	}
 
+	@Override
 	public List<ServiceMetaData> getRegisteredAggregators()
 	{
 		List<ServiceMetaData> serviceMetaDataList = new ArrayList<>();
@@ -178,10 +230,14 @@ public class RegistrationServiceImpl implements RegistrationService
 		return serviceMetaDataList;
 	}
 
+	@Override
 	public void shutdown()
 	{
 		try
 		{
+			unRegisterAsServer();
+
+			serverCache.close();
 			inboundServiceCache.close();
 			storageWriterCache.close();
 			aggregatorCache.close();
@@ -191,6 +247,20 @@ public class RegistrationServiceImpl implements RegistrationService
 		catch (IOException | IllegalStateException e)
 		{
 			logger.error("Failed to close the Service Cache");
+		}
+	}
+
+	private class ServerCacheListener implements ServiceCacheListener
+	{
+		@Override
+		public void cacheChanged()
+		{
+			logger.info("Registered Server list has been updated. " + serverCache.getInstances().size() + " Server(s) are active.");
+		}
+
+		@Override
+		public void stateChanged(CuratorFramework curatorFramework, ConnectionState connectionState)
+		{
 		}
 	}
 

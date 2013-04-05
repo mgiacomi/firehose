@@ -33,4 +33,21 @@ public class GroupStats
 	{
 		return countStats;
 	}
+
+	public boolean equals(Object o)
+	{
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		GroupStats that = (GroupStats) o;
+
+		if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) return false;
+
+		return true;
+	}
+
+	public int hashCode()
+	{
+		return groupName != null ? groupName.hashCode() : 0;
+	}
 }

@@ -1,44 +1,40 @@
 package com.gltech.scale.core.stats;
 
-import com.dyuproject.protostuff.LinkedBuffer;
-import com.dyuproject.protostuff.ProtostuffIOUtil;
-import com.dyuproject.protostuff.Schema;
-import com.dyuproject.protostuff.runtime.RuntimeSchema;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.model.Defaults;
-import com.gltech.scale.core.stats.results.GroupStats;
-import com.gltech.scale.core.stats.results.OverTime;
-import com.gltech.scale.core.stats.results.AvgStat;
-import com.gltech.scale.lifecycle.LifeCycle;
-import com.gltech.scale.lifecycle.LifeCycleManager;
+import com.gltech.scale.core.stats.results.*;
 import com.gltech.scale.util.Props;
-import com.google.common.base.Throwables;
+import com.google.inject.Inject;
 import ganglia.gmetric.GMetric;
 import ganglia.gmetric.GMetricSlope;
 import ganglia.gmetric.GMetricType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.*;
 
 public class StatsManagerImpl implements StatsManager
 {
 	private static final Logger logger = LoggerFactory.getLogger(StatsManagerImpl.class);
-	LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
-	private Schema<GroupStats> groupStatsSchema = RuntimeSchema.getSchema(GroupStats.class);
 	private static ScheduledExecutorService scheduledCleanUpService;
 	private static ScheduledExecutorService scheduledCallBackService;
 	private static ScheduledExecutorService scheduledPublishService;
-	Props props = Props.getProps();
+	private Props props = Props.getProps();
+	private RegistrationService registrationService;
 
 	// Multi-level Map used to hold group and name level stat data.
 	private static final ConcurrentMap<String, ConcurrentMap<String, StatOverTime>> stats = new ConcurrentHashMap<>();
 
 	// List of callbacks that need to be returned into their associated stat
 	private static final ConcurrentMap<StatOverTime, StatCallBack> callbacks = new ConcurrentHashMap<>();
+
+	@Inject
+	public StatsManagerImpl(RegistrationService registrationService)
+	{
+		this.registrationService = registrationService;
+	}
 
 	@Override
 	public synchronized void start()
@@ -115,7 +111,7 @@ public class StatsManagerImpl implements StatsManager
 				int port = props.get("gangliaPort", 8649);
 				GMetric gMetric = new GMetric(ipAddress, port, GMetric.UDPAddressingMode.UNICAST, true);
 
-				for (GroupStats groupStats : getGroupStats())
+				for (GroupStats groupStats : getServerStats().getGroupStatsList())
 				{
 					for(OverTime<AvgStat> avgStat : groupStats.getAvgStats())
 					{
@@ -144,8 +140,6 @@ public class StatsManagerImpl implements StatsManager
 				}
 			}
 		}, 60, 60, TimeUnit.SECONDS);
-		LifeCycleManager.getInstance().add(this, LifeCycle.Priority.INITIAL);
-
 	}
 
 	@Override
@@ -213,7 +207,6 @@ public class StatsManagerImpl implements StatsManager
 			{
 				groupMap = newGroupMap;
 			}
-
 		}
 
 		if (statCallBack != null)
@@ -231,37 +224,10 @@ public class StatsManagerImpl implements StatsManager
 		return statOverTime;
 	}
 
-	public byte[] toBytes()
+	@Override
+	public ServerStats getServerStats()
 	{
-		try
-		{
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ProtostuffIOUtil.writeListTo(out, getGroupStats(), groupStatsSchema, linkedBuffer);
-			linkedBuffer.clear();
-			return out.toByteArray();
-		}
-		catch (IOException e)
-		{
-			throw Throwables.propagate(e);
-		}
-	}
-
-	public String toJson()
-	{
-		try
-		{
-			ObjectMapper mapper = new ObjectMapper();
-			return mapper.writeValueAsString(getGroupStats());
-		}
-		catch (IOException e)
-		{
-			throw Throwables.propagate(e);
-		}
-	}
-
-	public ArrayList<GroupStats> getGroupStats()
-	{
-		ArrayList<GroupStats> groupStatsList = new ArrayList<>();
+		Set<GroupStats> groupStatsList = new HashSet<>();
 
 		for (String groupName : stats.keySet())
 		{
@@ -320,6 +286,10 @@ public class StatsManagerImpl implements StatsManager
 			groupStatsList.add(groupStats);
 		}
 
-		return groupStatsList;
+		ServerStats serverStats = new ServerStats();
+		serverStats.setWorkerId(registrationService.getLocalServerMetaData().getWorkerId().toString());
+		serverStats.setGroupStatsList(groupStatsList);
+
+		return serverStats;
 	}
 }

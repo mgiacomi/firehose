@@ -1,9 +1,7 @@
 package com.gltech.scale.core.stats;
 
-import com.gltech.scale.core.stats.results.GroupStats;
+import com.gltech.scale.core.stats.results.ServerStats;
 import com.gltech.scale.lifecycle.LifeCycle;
-
-import java.util.ArrayList;
 
 public interface StatsManager extends LifeCycle
 {
@@ -17,9 +15,5 @@ public interface StatsManager extends LifeCycle
 
 	CounterStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure, StatCallBack statCallBack);
 
-	byte[] toBytes();
-
-	String toJson();
-
-	ArrayList<GroupStats> getGroupStats();
+	ServerStats getServerStats();
 }

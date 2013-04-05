@@ -1,5 +1,6 @@
 package com.gltech.scale.core.stats;
 
+import com.gltech.scale.core.stats.results.ResultsIO;
 import com.google.inject.Inject;
 
 import javax.ws.rs.GET;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.*;
 public class StatsResource
 {
 	private StatsManager statsManager;
+	private ResultsIO resultsIO;
 
 	@Context
 	private HttpHeaders httpHeaders;
@@ -19,17 +21,10 @@ public class StatsResource
 	private UriInfo uriInfo;
 
 	@Inject
-	public StatsResource(StatsManager statsManager)
+	public StatsResource(StatsManager statsManager, ResultsIO resultsIO)
 	{
 		this.statsManager = statsManager;
-	}
-
-	@GET
-	@Path("/all")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public Response getProtoStats()
-	{
-		return Response.ok(statsManager.toBytes(), MediaType.APPLICATION_OCTET_STREAM).build();
+		this.resultsIO = resultsIO;
 	}
 
 	@GET
@@ -37,6 +32,16 @@ public class StatsResource
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getJsonStats()
 	{
-		return Response.ok(statsManager.toJson(), MediaType.APPLICATION_JSON).build();
+		String json = resultsIO.toJson(statsManager.getServerStats());
+		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
+	@GET
+	@Path("/all")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public Response getProtoStats()
+	{
+		byte[] bytes = resultsIO.toBytes(statsManager.getServerStats());
+		return Response.ok(bytes, MediaType.APPLICATION_OCTET_STREAM).build();
 	}
 }

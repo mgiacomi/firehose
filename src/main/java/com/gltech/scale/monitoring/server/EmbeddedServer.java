@@ -1,22 +1,18 @@
-package com.gltech.scale.core.server;
+package com.gltech.scale.monitoring.server;
 
-import com.gltech.scale.core.cluster.ChannelCoordinator;
+import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.model.Defaults;
-import com.gltech.scale.core.stats.StatsManager;
+import com.gltech.scale.lifecycle.LifeCycle;
+import com.gltech.scale.lifecycle.LifeCycleManager;
+import com.gltech.scale.monitoring.services.GatheringService;
+import com.gltech.scale.util.Props;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
-import com.gltech.scale.core.writer.StorageWriteManager;
-import com.gltech.scale.core.cluster.ClusterService;
-import com.gltech.scale.core.inbound.InboundService;
-import com.gltech.scale.lifecycle.LifeCycle;
-import com.gltech.scale.lifecycle.LifeCycleManager;
-import com.gltech.scale.core.aggregator.Aggregator;
-import com.gltech.scale.core.aggregator.WeightManager;
-import com.gltech.scale.util.Props;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.slf4j.Logger;
@@ -33,7 +29,7 @@ public class EmbeddedServer
 
 	public static void main(String[] args) throws Exception
 	{
-		start(8080);
+		start(9090);
 		server.join();
 	}
 
@@ -59,6 +55,12 @@ public class EmbeddedServer
 		// Create the server.
 		server = new Server(port);
 
+		// static files handler
+		ResourceHandler resourceHandler = new ResourceHandler();
+		resourceHandler.setDirectoriesListed(true);
+		resourceHandler.setResourceBase("public_html");
+		resourceHandler.setWelcomeFiles(new String[]{"index.html"});
+
 		// servlet handler
 		ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 		servletContextHandler.setContextPath("/");
@@ -74,11 +76,18 @@ public class EmbeddedServer
 		// Must add DefaultServlet for embedded Jetty.
 		// Failing to do this will cause 404 errors.
 		// This is not needed if web.xml is used instead.
-		servletContextHandler.addServlet(DefaultServlet.class, "/");
+		servletContextHandler.addServlet(DefaultServlet.class, "/aggregator/*");
+		servletContextHandler.addServlet(DefaultServlet.class, "/inbound/*");
+		servletContextHandler.addServlet(DefaultServlet.class, "/storagewriter/*");
+		servletContextHandler.addServlet(DefaultServlet.class, "/stats/*");
+
+		// websocket handler
+//		myWebSocketHandler myWebSocketHandler = new myWebSocketHandler();
 
 		// Bind all resources
 		HandlerCollection handlerList = new HandlerCollection();
-		handlerList.setHandlers(new Handler[]{servletContextHandler});
+//		handlerList.setHandlers(new Handler[]{webSocketHandler,servletContextHandler,resourceHandler});
+		handlerList.setHandlers(new Handler[]{servletContextHandler,resourceHandler});
 		server.setHandler(handlerList);
 
 		// Handle all non jersey services here
@@ -97,42 +106,10 @@ public class EmbeddedServer
 		LifeCycleManager.getInstance().add(clusterService, LifeCycle.Priority.FINAL);
 
 		// Registered StatsManager for shutdown
-		final StatsManager statsManager = injector.getInstance(StatsManager.class);
-		statsManager.start();
-		LifeCycleManager.getInstance().add(statsManager, LifeCycle.Priority.FINAL);
+		final GatheringService gatheringService = injector.getInstance(GatheringService.class);
+		gatheringService.start();
+		LifeCycleManager.getInstance().add(gatheringService, LifeCycle.Priority.FINAL);
 
-		if (props.get("enable.inbound_service", true))
-		{
-			// Registered InboundService for shutdown
-			InboundService inboundService = injector.getInstance(InboundService.class);
-			LifeCycleManager.getInstance().add(inboundService, LifeCycle.Priority.INITIAL);
-		}
-
-		if (props.get("enable.aggregator", true))
-		{
-			// Registered aggregator for shutdown
-			Aggregator aggregator = injector.getInstance(Aggregator.class);
-			LifeCycleManager.getInstance().add(aggregator, LifeCycle.Priority.INITIAL);
-
-			// Start WeightManager and registered it for shutdown
-			WeightManager weightManager = injector.getInstance(WeightManager.class);
-			weightManager.start();
-			LifeCycleManager.getInstance().add(weightManager, LifeCycle.Priority.INITIAL);
-		}
-
-		if (props.get("enable.storage_writer", true))
-		{
-			// Start the CollectorManager and register it for shutdown
-			StorageWriteManager storageWriteManager = injector.getInstance(StorageWriteManager.class);
-			storageWriteManager.setInjector(injector);
-			storageWriteManager.start();
-			LifeCycleManager.getInstance().add(storageWriteManager, LifeCycle.Priority.INITIAL);
-
-			// Start the ChannelCoordinator and register it for shutdown
-			ChannelCoordinator channelCoordinator = injector.getInstance(ChannelCoordinator.class);
-			channelCoordinator.start();
-			LifeCycleManager.getInstance().add(channelCoordinator, LifeCycle.Priority.INITIAL);
-		}
 	}
 
 	public static synchronized void stop() throws Exception

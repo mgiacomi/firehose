@@ -16,6 +16,7 @@ import java.util.UUID;
 
 public class ServiceAdvertiser
 {
+	public static final String SERVER = "Server";
 	public static final String INBOUND_SERVICE = "InboundService";
 	public static final String STORAGE_WRITER = "StorageWriter";
 	public static final String AGGREGATOR_SERVICE = "AggregatorService";
