@@ -4,6 +4,7 @@ import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.StatsRestClient;
+import com.gltech.scale.core.stats.results.ResultsIO;
 import com.gltech.scale.core.stats.results.ServerStats;
 import com.gltech.scale.lifecycle.LifeCycle;
 import com.gltech.scale.util.Props;

@@ -24,6 +24,11 @@ public class ResultsIO
 
 	public String toJson(ServerStats serverStats)
 	{
+		if(serverStats == null)
+		{
+			return "{}";
+		}
+
 		try
 		{
 			StringWriter writer = new StringWriter();
@@ -53,6 +58,11 @@ public class ResultsIO
 
 	public String toJson(List<ServerStats> serverStatsList)
 	{
+		if(serverStatsList == null)
+		{
+			return "{}";
+		}
+
 		try
 		{
 			StringWriter writer = new StringWriter();
