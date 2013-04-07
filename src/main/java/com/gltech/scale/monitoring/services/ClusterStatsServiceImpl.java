@@ -4,16 +4,15 @@ import com.gltech.scale.core.stats.results.ResultsIO;
 import com.gltech.scale.core.stats.results.ServerStats;
 import com.google.inject.Inject;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class ClusterStatsServiceImpl implements ClusterStatsService
 {
 	private ConcurrentMap<String, ServerStats> serverStatsMap = new ConcurrentHashMap<>();
+	private Set<ClusterStatsCallBack> callBacks = new CopyOnWriteArraySet<>();
 	private ResultsIO resultsIO;
 
 	@Inject
@@ -26,6 +25,11 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 	public void updateGroupStats(ServerStats serverStats)
 	{
 		serverStatsMap.put(serverStats.getWorkerId(), serverStats);
+
+		for(ClusterStatsCallBack clusterStatsCallBack : callBacks)
+		{
+			clusterStatsCallBack.serverStatsUpdate(serverStats);
+		}
 	}
 
 	@Override
@@ -47,5 +51,17 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 	public String getJsonStatsByServer(String workerId)
 	{
 		return resultsIO.toJson(serverStatsMap.get(workerId));
+	}
+
+	@Override
+	public void registerCallback(ClusterStatsCallBack clusterStatsCallBack)
+	{
+		callBacks.add(clusterStatsCallBack);
+	}
+
+	@Override
+	public void unRegisterCallback(ClusterStatsCallBack clusterStatsCallBack)
+	{
+		callBacks.remove(clusterStatsCallBack);
 	}
 }

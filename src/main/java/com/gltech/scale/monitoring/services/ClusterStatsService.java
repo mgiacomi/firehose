@@ -9,4 +9,8 @@ public interface ClusterStatsService
 	String getJsonStatsAll();
 
 	String getJsonStatsByServer(String workerId);
+
+	void registerCallback(ClusterStatsCallBack clusterStatsCallBack);
+
+	void unRegisterCallback(ClusterStatsCallBack clusterStatsCallBack);
 }
