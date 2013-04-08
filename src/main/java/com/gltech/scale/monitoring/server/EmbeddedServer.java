@@ -11,7 +11,7 @@ import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -80,12 +80,14 @@ public class EmbeddedServer
 		servletContextHandler.addServlet(DefaultServlet.class, "/monitoring/*");
 
 		// WebSocket handler
-		MonitorWebSocketHandler monitorWebSocketHandler = new MonitorWebSocketHandler(injector);
-		monitorWebSocketHandler.registerForServerStatUpdates();
+		StatsPushHandler statsPushHandler = new StatsPushHandler(injector);
+		ContextHandler statsPushContextHandler = new ContextHandler();
+		statsPushContextHandler.setContextPath("/socket/stats");
+		statsPushContextHandler.setHandler(statsPushHandler);
 
 		// Bind all resources
 		HandlerCollection handlerList = new HandlerCollection();
-		handlerList.setHandlers(new Handler[]{monitorWebSocketHandler,servletContextHandler,resourceHandler});
+		handlerList.setHandlers(new Handler[]{statsPushHandler,servletContextHandler,resourceHandler});
 		server.setHandler(handlerList);
 
 		// Handle all non jersey services here
