@@ -86,7 +86,7 @@ public class EmbeddedServer
 
 		// Start the server
 		server.start();
-		logger.info("server started on port " + port);
+		logger.info("Server started on port {}", port);
 	}
 
 	private static void startServices()
