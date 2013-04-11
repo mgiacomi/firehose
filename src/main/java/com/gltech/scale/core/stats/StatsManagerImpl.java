@@ -3,11 +3,14 @@ package com.gltech.scale.core.stats;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.results.*;
+import com.gltech.scale.monitoring.model.ServerStats;
 import com.gltech.scale.util.Props;
 import com.google.inject.Inject;
 import ganglia.gmetric.GMetric;
 import ganglia.gmetric.GMetricSlope;
 import ganglia.gmetric.GMetricType;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,11 +118,11 @@ public class StatsManagerImpl implements StatsManager
 
 				for (GroupStats groupStats : getServerStats().getGroupStatsList())
 				{
-					for(OverTime<AvgStat> avgStat : groupStats.getAvgStats())
+					for (OverTime<AvgStat> avgStat : groupStats.getAvgStats())
 					{
 						try
 						{
-							logger.debug("publishing " + avgStat.getName() + " " + avgStat.getMin1().getAverage() +" : "+ avgStat.getUnitOfMeasure());
+							logger.debug("publishing " + avgStat.getName() + " " + avgStat.getMin1().getAverage() + " : " + avgStat.getUnitOfMeasure());
 							gMetric.announce(avgStat.getName(), String.valueOf(avgStat.getMin1().getAverage()), GMetricType.DOUBLE, avgStat.getUnitOfMeasure(), GMetricSlope.BOTH, 60, 1440 * 60, groupStats.getName());
 						}
 						catch (Exception e)
@@ -127,11 +130,11 @@ public class StatsManagerImpl implements StatsManager
 							logger.warn("unable to publish GMetric: " + avgStat.getName(), e);
 						}
 					}
-					for(OverTime<Long> countStat : groupStats.getCountStats())
+					for (OverTime<Long> countStat : groupStats.getCountStats())
 					{
 						try
 						{
-							logger.debug("publishing " + countStat.getName() + " " + countStat.getMin1() +" : "+ countStat.getUnitOfMeasure());
+							logger.debug("publishing " + countStat.getName() + " " + countStat.getMin1() + " : " + countStat.getUnitOfMeasure());
 							gMetric.announce(countStat.getName(), String.valueOf(countStat.getMin1()), GMetricType.DOUBLE, countStat.getUnitOfMeasure(), GMetricSlope.BOTH, 60, 1440 * 60, groupStats.getName());
 						}
 						catch (Exception e)
@@ -290,6 +293,9 @@ public class StatsManagerImpl implements StatsManager
 
 		ServerStats serverStats = new ServerStats();
 		serverStats.setWorkerId(registrationService.getLocalServerMetaData().getWorkerId().toString());
+		serverStats.setRoles(registrationService.getRoles());
+		serverStats.setJoinDate(registrationService.getLocalServerRegistrationTime().toString(ISODateTimeFormat.basicDateTime()));
+		serverStats.setStatus("Running");
 
 		try
 		{

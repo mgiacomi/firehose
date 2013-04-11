@@ -51,7 +51,7 @@ public class ChannelCoordinatorTest
 		RegistrationService registrationService = mock(RegistrationService.class);
 		ChannelCoordinator channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
 		when(registrationService.getAggregatorMetaDataById(rm0.getWorkerId().toString())).thenReturn(rm0);
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm0);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm0);
 		channelCoordinator.registerWeight(true, 3, 2, 0);
 
 		channelCoordinator.getAggregatorPeriodMatrix(DateTime.now());
@@ -83,9 +83,9 @@ public class ChannelCoordinatorTest
 
 		ChannelCoordinator channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm0);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm0);
 		channelCoordinator.registerWeight(true, 3, 2, 0);
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm1);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm1);
 		channelCoordinator.registerWeight(true, 2, 2, 0);
 
 		AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(2));
@@ -129,7 +129,7 @@ public class ChannelCoordinatorTest
 
 		ChannelCoordinator channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm1);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm1);
 		channelCoordinator.registerWeight(true, 2, 2, 0);
 
 		AggregatorsByPeriod aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(1));
@@ -137,7 +137,7 @@ public class ChannelCoordinatorTest
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
 		assertNull(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup());
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm0);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm0);
 		channelCoordinator.registerWeight(true, 3, 2, 0);
 
 		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(2));
@@ -145,7 +145,7 @@ public class ChannelCoordinatorTest
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 1);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 0);
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm5);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm5);
 		channelCoordinator.registerWeight(false, 0, 0, 111);
 
 		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(3));
@@ -153,7 +153,7 @@ public class ChannelCoordinatorTest
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 1);
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm2);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm2);
 		channelCoordinator.registerWeight(true, 1, 2, 0);
 
 		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(4));
@@ -161,7 +161,7 @@ public class ChannelCoordinatorTest
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 2);
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm3);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm3);
 		channelCoordinator.registerWeight(true, 0, 1, 0);
 
 		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(5));
@@ -169,7 +169,7 @@ public class ChannelCoordinatorTest
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 5);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 3);
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm7);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm7);
 		channelCoordinator.registerWeight(false, 0, 0, 12);
 
 		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(6));
@@ -177,7 +177,7 @@ public class ChannelCoordinatorTest
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 7);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 5);
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm4);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm4);
 		channelCoordinator.registerWeight(true, 0, 0, 0);
 
 		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(7));
@@ -185,7 +185,7 @@ public class ChannelCoordinatorTest
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 7);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 5);
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm9);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm9);
 		channelCoordinator.registerWeight(false, 0, 0, 1);
 
 		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(8));
@@ -193,7 +193,7 @@ public class ChannelCoordinatorTest
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getPrimary().getListenPort(), 9);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(0).getBackup().getListenPort(), 7);
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm6);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm6);
 		channelCoordinator.registerWeight(false, 0, 0, 21);
 
 		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now().minusHours(9));
@@ -203,7 +203,7 @@ public class ChannelCoordinatorTest
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getPrimary().getListenPort(), 6);
 		assertEquals(aggregatorsByPeriod.getPrimaryBackupSets().get(1).getBackup().getListenPort(), 5);
 
-		when(registrationService.getLocalAggregatorMetaData()).thenReturn(rm8);
+		when(registrationService.getLocalServerMetaData()).thenReturn(rm8);
 		channelCoordinator.registerWeight(false, 0, 0, 2);
 
 		aggregatorsByPeriod = channelCoordinator.getAggregatorPeriodMatrix(DateTime.now());

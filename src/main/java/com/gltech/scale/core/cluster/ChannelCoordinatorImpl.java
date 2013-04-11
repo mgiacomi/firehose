@@ -94,7 +94,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	public void registerWeight(boolean active, int primaries, int backups, int restedfor)
 	{
 		long weight = WeightBreakdown.toWeight(active, primaries, backups, restedfor);
-		ServiceMetaData aggregator = registrationService.getLocalAggregatorMetaData();
+		ServiceMetaData aggregator = registrationService.getLocalServerMetaData();
 		if (aggregator != null)
 		{
 			try

@@ -38,7 +38,7 @@ public class ChannelImpl implements Channel
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(new DateTime());
 
 		// Using Received date for redundant insurances that primary and backup messages are collected together.
-		if(channelMetaData.isRedundant())
+		if (channelMetaData.isRedundant())
 		{
 			Message message = modelIO.toMessage(bytes);
 			nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
@@ -68,7 +68,7 @@ public class ChannelImpl implements Channel
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(new DateTime());
 
 		// Using Received date for redundant insurances that primary and backup messages are collected together.
-		if(channelMetaData.isRedundant())
+		if (channelMetaData.isRedundant())
 		{
 			Message message = modelIO.toMessage(bytes);
 			nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());

@@ -50,7 +50,7 @@ public class StorageClient
 		storage.putMessages(channelMetaData, id, inputStream);
 	}
 
-	public void putMessage(ChannelMetaData channelMetaData, String id, byte[] data )
+	public void putMessage(ChannelMetaData channelMetaData, String id, byte[] data)
 	{
 		storage.putBytes(channelMetaData, id, data);
 	}

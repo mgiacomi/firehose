@@ -11,29 +11,30 @@ Firehose.module('Dashboard', function (Dashboard, App, Backbone, Marionette, $, 
     });
 
     // Controller
-    Dashboard.Controller = function () {};
+    Dashboard.Controller = function () {
+    };
 
     _.extend(Dashboard.Controller.prototype, {
 
         // Default action
-        index: function() {
+        index:function () {
             App.middlenav.show(new Dashboard.Views.Nav());
-            App.content.show(new Dashboard.Views.Main());
+            App.content.show(new Dashboard.Views.Main({model: clusterStats}));
         },
 
-        roles: function() {
+        roles:function () {
             App.middlenav.show(new Dashboard.Views.Nav());
-            App.content.show(new Dashboard.Views.Roles());
+            App.content.show(new Dashboard.Views.Roles({model:clusterStats}));
         },
 
-        servers: function() {
+        servers:function () {
             App.middlenav.show(new Dashboard.Views.Nav());
-            App.content.show(new Dashboard.Views.Servers());
+            App.content.show(new Dashboard.Views.Servers({model:clusterStats}));
         },
 
-        performance: function() {
+        performance:function () {
             App.middlenav.show(new Dashboard.Views.Nav());
-            App.content.show(new Dashboard.Views.Performance());
+            App.content.show(new Dashboard.Views.Performance({model:clusterStats}));
         }
     });
 
@@ -44,5 +45,4 @@ Firehose.module('Dashboard', function (Dashboard, App, Backbone, Marionette, $, 
             controller:controller
         });
     });
-
 });

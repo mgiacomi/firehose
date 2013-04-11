@@ -1,6 +1,6 @@
 package com.gltech.scale.core.stats;
 
-import com.gltech.scale.core.stats.results.ResultsIO;
+import com.gltech.scale.monitoring.model.ResultsIO;
 import com.google.inject.Inject;
 
 import javax.ws.rs.GET;

@@ -4,14 +4,14 @@ import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.StatsRestClient;
-import com.gltech.scale.core.stats.results.ResultsIO;
-import com.gltech.scale.core.stats.results.ServerStats;
+import com.gltech.scale.monitoring.model.ServerStats;
 import com.gltech.scale.lifecycle.LifeCycle;
 import com.gltech.scale.util.Props;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -54,19 +54,21 @@ public class GatheringService implements LifeCycle
 				public void run()
 				{
 					List<ServiceMetaData> servers = registrationService.getRegisteredServers();
+					List<ServerStats> serverStatsList = new ArrayList<>();
 
 					for (ServiceMetaData serviceMetaData : servers)
 					{
 						try
 						{
-							ServerStats serverStats = statsRestClient.getServerStats(serviceMetaData);
-							clusterStatsService.updateGroupStats(serverStats);
+							serverStatsList.add(statsRestClient.getServerStats(serviceMetaData));
 						}
 						catch (Exception e)
 						{
 							logger.error("Failed to gather stats for server {}", serviceMetaData, e);
 						}
 					}
+
+					clusterStatsService.updateGroupStats(serverStatsList);
 
 					logger.debug("Stats have been updated for {} servers", servers.size());
 				}

@@ -41,7 +41,7 @@ public class MessageInputStream implements MessageStream
 
 		try
 		{
-			if(!codedInputStream.isAtEnd())
+			if (!codedInputStream.isAtEnd())
 			{
 				byte[] bytes = codedInputStream.readRawBytes(codedInputStream.readRawVarint32());
 				currentMessage = modelIO.toMessage(bytes);

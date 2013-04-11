@@ -15,18 +15,18 @@ Firehose.module('Outbound', function (Outbound, App, Backbone, Marionette, $, _)
     _.extend(Outbound.Controller.prototype, {
 
         overview: function() {
-            App.content.show(new Outbound.Views.Overview());
             App.middlenav.show(new Outbound.Views.Nav());
+            App.content.show(new Outbound.Views.Overview({model:clusterStats}));
         },
 
         live_stats: function() {
-            App.content.show(new Outbound.Views.LiveStats());
             App.middlenav.show(new Outbound.Views.Nav());
+            App.content.show(new Outbound.Views.LiveStats({model:clusterStats}));
         },
 
         performance: function() {
-            App.content.show(new Outbound.Views.Performance());
             App.middlenav.show(new Outbound.Views.Nav());
+            App.content.show(new Outbound.Views.Performance({model:clusterStats}));
         }
     });
 

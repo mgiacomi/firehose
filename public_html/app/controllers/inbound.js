@@ -15,18 +15,18 @@ Firehose.module('Inbound', function (Inbound, App, Backbone, Marionette, $, _) {
     _.extend(Inbound.Controller.prototype, {
 
         overview: function() {
-            App.content.show(new Inbound.Views.Overview());
             App.middlenav.show(new Inbound.Views.Nav());
+            App.content.show(new Inbound.Views.Overview({model:clusterStats}));
         },
 
         live_stats: function() {
-            App.content.show(new Inbound.Views.LiveStats());
             App.middlenav.show(new Inbound.Views.Nav());
+            App.content.show(new Inbound.Views.LiveStats({model:clusterStats}));
         },
 
         performance: function() {
-            App.content.show(new Inbound.Views.Performance());
             App.middlenav.show(new Inbound.Views.Nav());
+            App.content.show(new Inbound.Views.Performance({model:clusterStats}));
         }
     });
 

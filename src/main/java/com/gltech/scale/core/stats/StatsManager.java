@@ -1,6 +1,6 @@
 package com.gltech.scale.core.stats;
 
-import com.gltech.scale.core.stats.results.ServerStats;
+import com.gltech.scale.monitoring.model.ServerStats;
 import com.gltech.scale.lifecycle.LifeCycle;
 
 public interface StatsManager extends LifeCycle

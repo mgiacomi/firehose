@@ -51,10 +51,8 @@ public class ServiceAdvertiser
 		}
 	}
 
-	public ServiceMetaData available(String listenAddress, int listenPort)
+	public void available(ServiceMetaData serviceMetaData)
 	{
-		ServiceMetaData serviceMetaData = new ServiceMetaData(UUID.randomUUID(), listenAddress, listenPort);
-
 		try
 		{
 			ServiceDiscovery<ServiceMetaData> discovery = getDiscovery();
@@ -66,8 +64,6 @@ public class ServiceAdvertiser
 		{
 			throw Throwables.propagate(e);
 		}
-
-		return serviceMetaData;
 	}
 
 	public void unavailable(ServiceMetaData serviceMetaData)

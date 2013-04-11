@@ -1,10 +1,9 @@
 package com.gltech.scale.monitoring.server;
 
-import com.gltech.scale.core.stats.results.ResultsIO;
-import com.gltech.scale.core.stats.results.ServerStats;
+import com.gltech.scale.monitoring.model.ResultsIO;
+import com.gltech.scale.monitoring.model.ServerStats;
 import com.gltech.scale.monitoring.services.ClusterStatsCallBack;
 import com.gltech.scale.monitoring.services.ClusterStatsService;
-import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -36,14 +36,14 @@ public class StatsPushSocket implements ClusterStatsCallBack
 	}
 
 	@Override
-	public void serverStatsUpdate(ServerStats serverStats)
+	public void serverStatsUpdate(List<ServerStats> serverStatsList)
 	{
 		for (Session session : sessions)
 		{
 			// send a message to the current client WebSocket.
 			try
 			{
-				session.getRemote().sendString(resultsIO.toJson(serverStats));
+				session.getRemote().sendString(resultsIO.toJson(serverStatsList));
 			}
 			catch (IOException e)
 			{
@@ -62,7 +62,7 @@ public class StatsPushSocket implements ClusterStatsCallBack
 	@OnWebSocketMessage
 	public void onText(Session session, String message)
 	{
-		System.out.println("WEBSOCKET MESSAGE: "+ message);
+		System.out.println("WEBSOCKET MESSAGE: " + message);
 	}
 
 	@OnWebSocketClose

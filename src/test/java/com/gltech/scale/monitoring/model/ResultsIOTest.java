@@ -1,4 +1,4 @@
-package com.gltech.scale.core.stats.results;
+package com.gltech.scale.monitoring.model;
 
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;

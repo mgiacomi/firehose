@@ -20,14 +20,14 @@ public class StatsThreadPoolExecutor extends ThreadPoolExecutor
 	protected void beforeExecute(Thread t, Runnable r)
 	{
 		super.beforeExecute(t, r);
-		startTime.set(System.nanoTime()  / 1000 / 1000);
+		startTime.set(System.nanoTime() / 1000 / 1000);
 	}
 
 	protected void afterExecute(Runnable r, Throwable t)
 	{
 		try
 		{
-			statOverTime.add((System.nanoTime()  / 1000 / 1000) - startTime.get());
+			statOverTime.add((System.nanoTime() / 1000 / 1000) - startTime.get());
 		}
 		finally
 		{

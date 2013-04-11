@@ -15,7 +15,8 @@ public class CounterStatOverTime implements StatOverTime
 	private String unitOfMeasure;
 
 	// Only allow classes in this package to create a stat.
-	protected CounterStatOverTime(String statName, String unitOfMeasure) {
+	protected CounterStatOverTime(String statName, String unitOfMeasure)
+	{
 		this.statName = statName;
 		this.unitOfMeasure = unitOfMeasure;
 	}
@@ -23,7 +24,7 @@ public class CounterStatOverTime implements StatOverTime
 	@Override
 	public void startTimer()
 	{
-		startTime.set(System.nanoTime()  / 1000 / 1000);
+		startTime.set(System.nanoTime() / 1000 / 1000);
 	}
 
 	@Override
@@ -104,7 +105,8 @@ public class CounterStatOverTime implements StatOverTime
 
 	long getTotalCount(int loops)
 	{
-		if(loops > 1440) {
+		if (loops > 1440)
+		{
 			throw new IllegalArgumentException("You can only query 2 hours back in time.");
 		}
 
@@ -129,10 +131,10 @@ public class CounterStatOverTime implements StatOverTime
 	@Override
 	public void cleanOldThanTwoHours()
 	{
-		for(DateTime period : countsBy5SecPeriods.keySet())
+		for (DateTime period : countsBy5SecPeriods.keySet())
 		{
 			DateTime twoHoursAgo = DateTime.now().minusHours(2);
-			if(period.isAfter(twoHoursAgo))
+			if (period.isAfter(twoHoursAgo))
 			{
 				countsBy5SecPeriods.remove(twoHoursAgo);
 			}

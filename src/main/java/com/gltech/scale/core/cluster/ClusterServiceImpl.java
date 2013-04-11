@@ -85,7 +85,7 @@ public class ClusterServiceImpl implements ClusterService
 						{
 							// Convert the ServiceMetaData to a JSON byte[]
 							ObjectMapper mapper = new ObjectMapper();
-							byte[] storageWriterMetaData = mapper.writeValueAsBytes(registrationService.getLocalStorageWriterMetaData());
+							byte[] storageWriterMetaData = mapper.writeValueAsBytes(registrationService.getLocalServerMetaData());
 
 							// Write to storage writer batch node.
 							client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/writer/batches/" + shortName, storageWriterMetaData);

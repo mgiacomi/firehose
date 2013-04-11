@@ -87,7 +87,7 @@ public class EmbeddedServer
 
 		// Bind all resources
 		HandlerCollection handlerList = new HandlerCollection();
-		handlerList.setHandlers(new Handler[]{statsPushHandler,servletContextHandler,resourceHandler});
+		handlerList.setHandlers(new Handler[]{statsPushHandler, servletContextHandler, resourceHandler});
 		server.setHandler(handlerList);
 
 		// Handle all non jersey services here

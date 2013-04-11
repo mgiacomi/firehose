@@ -10,12 +10,12 @@
 
 	<!-- Marionette libraries -->
 	<script type="text/javascript" src="/lib/jquery.min.js"></script>
+	<script type="text/javascript" src="/lib/jquery-migrate-1.1.1.min.js"></script>
 	<script type="text/javascript" src="/lib/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="/lib/lodash.min.js"></script>
 	<script type="text/javascript" src="/lib/backbone.js"></script>
-	<script type="text/javascript" src="/lib/backbone-localStorage.js"></script>
 	<script type="text/javascript" src="/lib/backbone.marionette.js"></script>
-	<script type="text/javascript" src="/lib/handlebars.min.js"></script>
+	<script type="text/javascript" src="/lib/backbone.babysitter.js"></script>
 
 	<!-- Template libraries -->
 	<script type="text/javascript" src="/lib/plugins/flot/jquery.flot.js"></script>
@@ -60,8 +60,10 @@
 
 	<!-- Project JS -->
 	<script type="text/javascript" src="/js/firehose.js"></script>
+	<script type="text/javascript" src="/js/channel_websockets.js"></script>
 
 	<script type="text/javascript" src="/app/firehose.js"></script>
+	<script type="text/javascript" src="/app/models/cluster_stats.js"></script>
 	<script type="text/javascript" src="/app/views/layout.js"></script>
 	<script type="text/javascript" src="/app/views/dashboard.js"></script>
 	<script type="text/javascript" src="/app/views/inbound.js"></script>
@@ -98,6 +100,13 @@
 
 	<script>
 		$(function () {
+			if (window.WebSocket) {
+				webSocketChannel.init();
+			}
+			else {
+				console.log("StatsManager initialized using LongPolling.");
+			}
+
 			var templates = [
 				'topbar','leftnav','footer',
 				'dashboard_nav','dashboard_overview','dashboard_roles','dashboard_servers','dashboard_performance',

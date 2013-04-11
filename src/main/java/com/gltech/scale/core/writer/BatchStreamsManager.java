@@ -114,7 +114,7 @@ public class BatchStreamsManager
 			}
 			catch (IOException e)
 			{
-				logger.error("Error while closing stream "+ customerBatchPeriod, e);
+				logger.error("Error while closing stream " + customerBatchPeriod, e);
 			}
 
 			for (MessageStream messageStream : batchStreams)

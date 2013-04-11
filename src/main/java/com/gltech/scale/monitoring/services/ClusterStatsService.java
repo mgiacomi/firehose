@@ -1,14 +1,14 @@
 package com.gltech.scale.monitoring.services;
 
-import com.gltech.scale.core.stats.results.ServerStats;
+import com.gltech.scale.monitoring.model.ServerStats;
+
+import java.util.List;
 
 public interface ClusterStatsService
 {
-	void updateGroupStats(ServerStats serverStats);
+	void updateGroupStats(List<ServerStats> serverStatsList);
 
 	String getJsonStatsAll();
-
-	String getJsonStatsByServer(String workerId);
 
 	void registerCallback(ClusterStatsCallBack clusterStatsCallBack);
 

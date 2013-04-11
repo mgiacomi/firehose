@@ -1,16 +1,13 @@
 package com.gltech.scale.core.stats;
 
-import com.dyuproject.protostuff.ProtostuffIOUtil;
-import com.dyuproject.protostuff.Schema;
-import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.stats.results.*;
+import com.gltech.scale.monitoring.model.ResultsIO;
+import com.gltech.scale.monitoring.model.ServerStats;
 import junit.framework.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;

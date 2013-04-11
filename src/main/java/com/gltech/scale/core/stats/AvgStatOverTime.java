@@ -35,7 +35,7 @@ public class AvgStatOverTime implements StatOverTime
 	@Override
 	public void startTimer()
 	{
-		startTime.set(System.nanoTime()  / 1000 / 1000);
+		startTime.set(System.nanoTime() / 1000 / 1000);
 	}
 
 	@Override

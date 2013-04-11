@@ -80,10 +80,10 @@ public class VoldemortStore implements Storage
 		{
 			keyWrittenTimeStat.startTimer();
 			byte[] bytes = IOUtils.toByteArray(inputStream);
-			messageClient.put(channelMetaData.getName() +"|"+id, bytes);
+			messageClient.put(channelMetaData.getName() + "|" + id, bytes);
 			keyWrittenTimeStat.stopTimer();
 			keyWrittenSizeStat.add(bytes.length / Defaults.KBytes);
-			logger.info("Wrote {} bytes for key {}", bytes.length, channelMetaData.getName() +"|"+id);
+			logger.info("Wrote {} bytes for key {}", bytes.length, channelMetaData.getName() + "|" + id);
 		}
 		catch (IOException e)
 		{
@@ -99,7 +99,7 @@ public class VoldemortStore implements Storage
 		try
 		{
 			keyReadTimeStat.startTimer();
-			Versioned<byte[]> versioned = messageClient.get(channelMetaData.getName() +"|"+id);
+			Versioned<byte[]> versioned = messageClient.get(channelMetaData.getName() + "|" + id);
 
 			if (versioned != null && versioned.getValue().length > 0)
 			{
@@ -119,7 +119,7 @@ public class VoldemortStore implements Storage
 	{
 		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
 		keyWrittenTimeStat.startTimer();
-		messageClient.put(channelMetaData.getName() +"|"+id, data);
+		messageClient.put(channelMetaData.getName() + "|" + id, data);
 		keyWrittenTimeStat.stopTimer();
 		keyWrittenSizeStat.add(data.length / Defaults.KBytes);
 	}
@@ -129,7 +129,7 @@ public class VoldemortStore implements Storage
 	{
 		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
 		keyReadTimeStat.startTimer();
-		byte[] data = messageClient.get(channelMetaData.getName() +"|"+id).getValue();
+		byte[] data = messageClient.get(channelMetaData.getName() + "|" + id).getValue();
 		keyReadTimeStat.stopTimer();
 		keyReadSizeStat.add(data.length / Defaults.KBytes);
 		return data;

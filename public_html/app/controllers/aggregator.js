@@ -16,18 +16,18 @@ Firehose.module('Aggregator', function (Aggregator, App, Backbone, Marionette, $
     _.extend(Aggregator.Controller.prototype, {
 
         overview:function () {
-            App.content.show(new Aggregator.Views.Overview());
             App.middlenav.show(new Aggregator.Views.Nav());
+            App.content.show(new Aggregator.Views.Overview({model:clusterStats}));
         },
 
         live_stats:function () {
-            App.content.show(new Aggregator.Views.LiveStats());
             App.middlenav.show(new Aggregator.Views.Nav());
+            App.content.show(new Aggregator.Views.LiveStats({model:clusterStats}));
         },
 
         performance:function () {
-            App.content.show(new Aggregator.Views.Performance());
             App.middlenav.show(new Aggregator.Views.Nav());
+            App.content.show(new Aggregator.Views.Performance({model:clusterStats}));
         }
     });
 

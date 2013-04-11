@@ -140,7 +140,7 @@ public class AggregatorRegression
 		{
 			RegistrationService registrationService = mock(RegistrationService.class);
 			channelCoordinator = new ChannelCoordinatorImpl(registrationService, new TimePeriodUtils());
-			when(registrationService.getLocalAggregatorMetaData()).thenReturn(serviceMetaData);
+			when(registrationService.getLocalServerMetaData()).thenReturn(serviceMetaData);
 		}
 
 		public void assign(boolean primary, DateTime nearestPeriodCeiling)

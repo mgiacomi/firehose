@@ -1,9 +1,16 @@
 package com.gltech.scale.core.cluster.registration;
 
+import org.joda.time.DateTime;
+
 import java.util.List;
+import java.util.Set;
 
 public interface RegistrationService
 {
+	Set<String> getRoles();
+
+	DateTime getLocalServerRegistrationTime();
+
 	ServiceMetaData getLocalServerMetaData();
 
 	void registerAsServer();
@@ -16,8 +23,6 @@ public interface RegistrationService
 
 	void unRegisterAsInboundService();
 
-	ServiceMetaData getLocalStorageWriterMetaData();
-
 	void registerAsStorageWriter();
 
 	void unRegisterAsStorageWriter();
@@ -27,8 +32,6 @@ public interface RegistrationService
 	void unRegisterAsAggregator();
 
 	List<ServiceMetaData> getRegisteredAggregators();
-
-	ServiceMetaData getLocalAggregatorMetaData();
 
 	ServiceMetaData getAggregatorMetaDataById(String id);
 

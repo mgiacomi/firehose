@@ -1,7 +1,7 @@
 package com.gltech.scale.monitoring.services;
 
-import com.gltech.scale.core.stats.results.ResultsIO;
-import com.gltech.scale.core.stats.results.ServerStats;
+import com.gltech.scale.monitoring.model.ResultsIO;
+import com.gltech.scale.monitoring.model.ServerStats;
 import com.google.inject.Inject;
 
 import java.util.*;
@@ -22,13 +22,17 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 	}
 
 	@Override
-	public void updateGroupStats(ServerStats serverStats)
+	public void updateGroupStats(List<ServerStats> serverStatsList)
 	{
-		serverStatsMap.put(serverStats.getWorkerId(), serverStats);
-
-		for(ClusterStatsCallBack clusterStatsCallBack : callBacks)
+		ConcurrentMap<String, ServerStats> newServerStatsMap = new ConcurrentHashMap<>();
+		for (ServerStats serverStats : serverStatsList)
 		{
-			clusterStatsCallBack.serverStatsUpdate(serverStats);
+			newServerStatsMap.put(serverStats.getWorkerId(), serverStats);
+		}
+
+		for (ClusterStatsCallBack clusterStatsCallBack : callBacks)
+		{
+			clusterStatsCallBack.serverStatsUpdate(serverStatsList);
 		}
 	}
 
@@ -45,12 +49,6 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 		});
 
 		return resultsIO.toJson(sortedStatsList);
-	}
-
-	@Override
-	public String getJsonStatsByServer(String workerId)
-	{
-		return resultsIO.toJson(serverStatsMap.get(workerId));
 	}
 
 	@Override

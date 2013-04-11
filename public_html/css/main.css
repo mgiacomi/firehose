@@ -195,6 +195,7 @@ blockquote:after { content: close-quote; font-weight: bold; }
 
 .red { color: #B55D5C; }
 .green { color: #2a8827; }
+.orange { color: #d3a40a; }
 
 .p12 { padding: 12px; }
 .pt12 { padding-top: 12px; }

@@ -4,8 +4,7 @@ import com.dyuproject.protostuff.runtime.ExplicitIdStrategy;
 import com.gltech.scale.core.stats.results.AvgStat;
 import com.gltech.scale.core.stats.results.GroupStats;
 import com.gltech.scale.core.stats.results.OverTime;
-import com.gltech.scale.core.stats.results.ServerStats;
-import com.gltech.scale.monitoring.services.ClusterStatsServiceImpl;
+import com.gltech.scale.monitoring.model.ServerStats;
 
 public class Defaults
 {

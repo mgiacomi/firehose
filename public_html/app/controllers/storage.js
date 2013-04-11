@@ -16,18 +16,18 @@ Firehose.module('Storage', function (Storage, App, Backbone, Marionette, $, _) {
     _.extend(Storage.Controller.prototype, {
 
         overview:function () {
-            App.content.show(new Storage.Views.Overview());
             App.middlenav.show(new Storage.Views.Nav());
+            App.content.show(new Storage.Views.Overview({model:clusterStats}));
         },
 
         live_stats:function () {
-            App.content.show(new Storage.Views.LiveStats());
             App.middlenav.show(new Storage.Views.Nav());
+            App.content.show(new Storage.Views.LiveStats({model:clusterStats}));
         },
 
         performance:function () {
-            App.content.show(new Storage.Views.Performance());
             App.middlenav.show(new Storage.Views.Nav());
+            App.content.show(new Storage.Views.Performance({model:clusterStats}));
         }
     });
 

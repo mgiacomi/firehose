@@ -1,8 +1,8 @@
 package com.gltech.scale.core.stats;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.stats.results.ResultsIO;
-import com.gltech.scale.core.stats.results.ServerStats;
+import com.gltech.scale.monitoring.model.ResultsIO;
+import com.gltech.scale.monitoring.model.ServerStats;
 import com.gltech.scale.util.ClientCreator;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;

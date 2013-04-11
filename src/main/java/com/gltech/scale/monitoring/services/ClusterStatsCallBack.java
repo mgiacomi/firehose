@@ -1,8 +1,10 @@
 package com.gltech.scale.monitoring.services;
 
-import com.gltech.scale.core.stats.results.ServerStats;
+import com.gltech.scale.monitoring.model.ServerStats;
+
+import java.util.List;
 
 public interface ClusterStatsCallBack
 {
-	void serverStatsUpdate(ServerStats serverStats);
+	void serverStatsUpdate(List<ServerStats> serverStatsList);
 }

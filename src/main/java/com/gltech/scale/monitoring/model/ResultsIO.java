@@ -1,4 +1,4 @@
-package com.gltech.scale.core.stats.results;
+package com.gltech.scale.monitoring.model;
 
 import com.dyuproject.protostuff.JsonIOUtil;
 import com.dyuproject.protostuff.LinkedBuffer;
@@ -24,7 +24,7 @@ public class ResultsIO
 
 	public String toJson(ServerStats serverStats)
 	{
-		if(serverStats == null)
+		if (serverStats == null)
 		{
 			return "{}";
 		}
@@ -58,7 +58,7 @@ public class ResultsIO
 
 	public String toJson(List<ServerStats> serverStatsList)
 	{
-		if(serverStatsList == null)
+		if (serverStatsList == null)
 		{
 			return "{}";
 		}
