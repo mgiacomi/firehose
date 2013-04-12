@@ -8,7 +8,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         template:'dashboard_overview',
 
         modelEvents:{
-            "change:stats":"render"
+            //"change:stats":"render"
         }
     });
 
@@ -23,9 +23,37 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
 
     Views.Servers = Marionette.ItemView.extend({
         template:'dashboard_servers',
+        templateHelpers: clusterStatsHelpers,
 
         modelEvents:{
-            "change:stats":"render"
+            "change:stats":"updateTable"
+        },
+
+        updateTable:function() {
+            oTable.fnClearTable();
+
+
+            $.each(this.model.get("stats"), function (idx, server) {
+                var row = [];
+
+                row[0] = server.hostname;
+                row[1] = server.workerId;
+
+                var roles = "";
+                $.each(server.roles, function (idx, role) {
+                    if(idx > 0) {
+                        roles += ", ";
+                    }
+                    roles += role;
+                });
+
+                row[2] = roles;
+                row[3] = '<strong class="'+ clusterStatsHelpers.colorByStatus(server.status) +'">'+ server.status +'</strong>';
+                row[4] = clusterStatsHelpers.prettyDate(server.joinDate);
+
+
+                oTable.fnAddData(row);
+            });
         }
     });
 

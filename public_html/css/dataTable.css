@@ -116,8 +116,13 @@ table.display tr.even.gradeX { background-color: #ffeeee; }
 table.display tr.odd.gradeU { background-color: #ddd; }
 table.display tr.even.gradeU { background-color: #eee; }
 
+
+tr.odd { background-color: #fafafa; }
+tr.even { background-color: #f5f5f5; }
+/*
 tr.odd { background-color: #E2E4FF; }
 tr.even { background-color: white; }
+*/
 
 
 
