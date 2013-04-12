@@ -294,7 +294,7 @@ public class StatsManagerImpl implements StatsManager
 		ServerStats serverStats = new ServerStats();
 		serverStats.setWorkerId(registrationService.getLocalServerMetaData().getWorkerId().toString());
 		serverStats.setRoles(registrationService.getRoles());
-		serverStats.setJoinDate(registrationService.getLocalServerRegistrationTime().toString(ISODateTimeFormat.basicDateTime()));
+		serverStats.setJoinDate(registrationService.getLocalServerRegistrationTime().toString(ISODateTimeFormat.dateTime()));
 		serverStats.setStatus("Running");
 
 		try

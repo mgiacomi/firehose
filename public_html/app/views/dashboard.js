@@ -14,9 +14,10 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
 
     Views.Roles = Marionette.ItemView.extend({
         template:'dashboard_roles',
+        templateHelpers: clusterStatsHelpers,
 
         modelEvents:{
-            //"change:stats":"render"
+            "change:stats":"render"
         }
     });
 

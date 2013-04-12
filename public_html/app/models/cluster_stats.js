@@ -3,7 +3,7 @@ var ClusterStats = Backbone.Model.extend({
 
     update:function (data) {
         this.set("stats", jQuery.parseJSON(data));
-console.log(data);
+//console.log(data);
 //        this.trigger("change:stats");
 //        Firehose.vent.trigger("stats:updated");
         /*
@@ -28,15 +28,6 @@ console.log(data);
          console.log("server list:"+ servers);
          console.log("--------------------------------------");
          */
-    },
-
-    servers:function () {
-        var servers = "";
-        $.each(statsManager._stats_data, function (idx, slist) {
-            servers = servers + " " + slist.hostname + "(" + slist.workerId + ") ";
-        });
-        console.log("server list:" + servers);
-        console.log("--------------------------------------");
     }
 });
 var clusterStats = new ClusterStats();

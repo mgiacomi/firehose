@@ -7,92 +7,86 @@
 			<div class="head">
 				<h5 class="iArrowDown">Inbound Servers</h5>
 
-				<div class="num"><a href="javascript:void(0)" class="greenNum">3 Servers</a></div>
+				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('Inbound')) %>"><%= serversByRole('Inbound').length %> Servers</a></div>
 			</div>
-			<div class="supTicket nobg">
+			<% _.each(serversByRole("Inbound"), function(stat, idx){ %>
+			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title="">newzealand</a></span>
-					<span class="issueNum" style="margin-top:-1px;"><a href="#" title="" style="font-size:.8em;">[
-						0f8544f5-7544-4336-914c-922c74b665d8 ]</a></span>
+					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
+					<span class="issueNum" style="margin-top:-1px;">
+						<a href="#" title="" style="font-size:.8em;">[ <%= stat.workerId %> ]</a>
+					</span>
 				</div>
 				<div class="issueSummary">
 					<a href="#" title="" class="floatleft"><img src="images/computer.png" alt=""></a>
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="green">[ Running ]</strong></li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
 							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even">35 days ago</li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
 						</ul>
 					</div>
 				</div>
 			</div>
-			<div class="supTicket">
-				<div class="issueType">
-					<span class="issueInfo"><a href="#" title="">newzealand</a></span>
-					<span class="issueNum" style="margin-top:-1px;"><a href="#" title="" style="font-size:.8em;">[
-						0f8544f5-7544-4336-914c-922c74b665d8 ]</a></span>
-				</div>
-				<div class="issueSummary">
-					<a href="#" title="" class="floatleft"><img src="images/computer.png" alt=""></a>
-
-					<div class="ticketInfo">
-						<ul>
-							<li>Status:</li>
-							<li class="even"><strong class="orange">[ Offline ]</strong></li>
-							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even">10 hours ago</li>
-						</ul>
-					</div>
-				</div>
-			</div>
+			<% }); %>
 		</div>
 
 		<!-- Storage Writers -->
 		<div class="widget" style="margin-top:20px;">
 			<div class="head">
-				<h5 class="iShuffle">Storage Writers</h5>
+				<h5 class="iArrowDown">Storage Writers</h5>
 
-				<div class="num"><a href="javascript:void(0)" class="redNum">3 Servers</a></div>
+				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('StorageWriter')) %>"><%= serversByRole('StorageWriter').length %> Servers</a></div>
 			</div>
-			<div class="supTicket nobg">
+			<% _.each(serversByRole("StorageWriter"), function(stat, idx){ %>
+			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title="">newzealand</a></span>
-					<span class="issueNum" style="margin-top:-1px;"><a href="#" title="" style="font-size:.8em;">[
-						0f8544f5-7544-4336-914c-922c74b665d8 ]</a></span>
+					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
+					<span class="issueNum" style="margin-top:-1px;">
+						<a href="#" title="" style="font-size:.8em;">[ <%= stat.workerId %> ]</a>
+					</span>
 				</div>
 				<div class="issueSummary">
 					<a href="#" title="" class="floatleft"><img src="images/computer.png" alt=""></a>
-
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="green">[ Running ]</strong></li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
 							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even">35 days ago</li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
 						</ul>
 					</div>
 				</div>
 			</div>
-			<div class="supTicket">
+			<% }); %>
+		</div>
+
+		<!-- Storage Servers -->
+		<div class="widget" style="margin-top:20px;">
+			<div class="head">
+				<h5 class="iArrowUp">Storage Servers</h5>
+
+				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('Storage')) %>"><%= serversByRole('Storage').length %> Servers</a></div>
+			</div>
+			<% _.each(serversByRole("Storage"), function(stat, idx){ %>
+			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title="">newzealand</a></span>
-					<span class="issueNum" style="margin-top:-1px;"><a href="#" title="" style="font-size:.8em;">[
-						0f8544f5-7544-4336-914c-922c74b665d8 ]</a></span>
+					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
 				</div>
 				<div class="issueSummary">
 					<a href="#" title="" class="floatleft"><img src="images/computer.png" alt=""></a>
-
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="orange">[ Offline ]</strong></li>
-							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even">10 hours ago</li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
+							<li>Up Since:</li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
 						</ul>
 					</div>
 				</div>
 			</div>
+			<% }); %>
 		</div>
 	</div>
 
@@ -102,93 +96,59 @@
 			<div class="head">
 				<h5 class="iArrowUp">Outbound Servers</h5>
 
-				<div class="num"><a href="javascript:void(0)" class="blueNum">3 Servers</a></div>
+				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('Outbound')) %>"><%= serversByRole('Outbound').length %> Servers</a></div>
 			</div>
-			<div class="supTicket nobg">
+			<% _.each(serversByRole("Outbound"), function(stat, idx){ %>
+			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title="">newzealand</a></span>
-					<span class="issueNum" style="margin-top:-1px;"><a href="#" title="" style="font-size:.8em;">[
-						0f8544f5-7544-4336-914c-922c74b665d8 ]</a></span>
+					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
+					<span class="issueNum" style="margin-top:-1px;">
+						<a href="#" title="" style="font-size:.8em;">[ <%= stat.workerId %> ]</a>
+					</span>
 				</div>
 				<div class="issueSummary">
 					<a href="#" title="" class="floatleft"><img src="images/computer.png" alt=""></a>
-
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="green">[ Running ]</strong></li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
 							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even">35 days ago</li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
 						</ul>
 					</div>
 				</div>
 			</div>
-			<div class="supTicket">
-				<div class="issueType">
-					<span class="issueInfo"><a href="#" title="">newzealand</a></span>
-					<span class="issueNum" style="margin-top:-1px;"><a href="#" title="" style="font-size:.8em;">[
-						0f8544f5-7544-4336-914c-922c74b665d8 ]</a></span>
-				</div>
-				<div class="issueSummary">
-					<a href="#" title="" class="floatleft"><img src="images/computer.png" alt=""></a>
-
-					<div class="ticketInfo">
-						<ul>
-							<li>Status:</li>
-							<li class="even"><strong class="orange">[ Offline ]</strong></li>
-							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even">10 hours ago</li>
-						</ul>
-					</div>
-				</div>
-			</div>
+			<% }); %>
 		</div>
 
 		<!-- Message Aggregators -->
 		<div class="widget" style="margin-top:20px;">
 			<div class="head">
-				<h5 class="iInbox2">Message Aggregators</h5>
+				<h5 class="iArrowDown">Aggregators</h5>
 
-				<div class="num">6 Servers</div>
+				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('Aggregator')) %>"><%= serversByRole('Aggregator').length %> Servers</a></div>
 			</div>
-			<div class="supTicket nobg">
+			<% _.each(serversByRole("Aggregator"), function(stat, idx){ %>
+			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title="">newzealand</a></span>
-					<span class="issueNum" style="margin-top:-1px;"><a href="#" title="" style="font-size:.8em;">[
-						0f8544f5-7544-4336-914c-922c74b665d8 ]</a></span>
+					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
+					<span class="issueNum" style="margin-top:-1px;">
+						<a href="#" title="" style="font-size:.8em;">[ <%= stat.workerId %> ]</a>
+					</span>
 				</div>
 				<div class="issueSummary">
 					<a href="#" title="" class="floatleft"><img src="images/computer.png" alt=""></a>
-
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="green">[ Running ]</strong></li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
 							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even">35 days ago</li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
 						</ul>
 					</div>
 				</div>
 			</div>
-			<div class="supTicket">
-				<div class="issueType">
-					<span class="issueInfo"><a href="#" title="">newzealand</a></span>
-					<span class="issueNum" style="margin-top:-1px;"><a href="#" title="" style="font-size:.8em;">[
-						0f8544f5-7544-4336-914c-922c74b665d8 ]</a></span>
-				</div>
-				<div class="issueSummary">
-					<a href="#" title="" class="floatleft"><img src="images/computer.png" alt=""></a>
-
-					<div class="ticketInfo">
-						<ul>
-							<li>Status:</li>
-							<li class="even"><strong class="green">[ Running ]</strong></li>
-							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even">35 days ago</li>
-						</ul>
-					</div>
-				</div>
-			</div>
+			<% }); %>
 		</div>
 	</div>
 </div>
