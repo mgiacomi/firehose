@@ -1,3 +1,201 @@
+<script>
+	_.defer(function (caller) {
+
+		//===== Chart Auto Update =====//
+		// we use an inline data source in the example, usually data would
+		// be fetched from a server
+		var data = [], totalPoints = 200;
+		var data2 = [];
+		var data3 = [];
+		var data4 = [];
+
+		function getRandomData() {
+			if (data.length > 0)
+				data = data.slice(1);
+
+			// do a random walk
+			while (data.length < totalPoints) {
+				var prev = data.length > 0 ? data[data.length - 1] : 50;
+				var y = prev + Math.random() * 10 - 5;
+				if (y < 0)
+					y = 0;
+				if (y > 100)
+					y = 100;
+				data.push(y);
+			}
+
+			// zip the generated y values with the x values
+			var res = [];
+			for (var i = 0; i < data.length; ++i)
+				res.push([i, data[i]])
+			return res;
+		}
+
+		function getRandomData2() {
+			if (data2.length > 0)
+				data2 = data2.slice(1);
+
+			// do a random walk
+			while (data2.length < totalPoints) {
+				var prev = data2.length > 0 ? data2[data2.length - 1] : 50;
+				var y = prev + Math.random() * 10 - 5;
+				if (y < 0)
+					y = 0;
+				if (y > 100)
+					y = 100;
+				data2.push(y);
+			}
+
+			// zip the generated y values with the x values
+			var res = [];
+			for (var i = 0; i < data2.length; ++i)
+				res.push([i, data2[i]])
+			return res;
+		}
+
+		function getRandomData3() {
+			if (data3.length > 0)
+				data3 = data3.slice(1);
+
+			// do a random walk
+			while (data3.length < totalPoints) {
+				var prev = data3.length > 0 ? data3[data3.length - 1] : 50;
+				var y = prev + Math.random() * 10 - 5;
+				if (y < 0)
+					y = 0;
+				if (y > 100)
+					y = 100;
+				data3.push(y);
+			}
+
+			// zip the generated y values with the x values
+			var res = [];
+			for (var i = 0; i < data3.length; ++i)
+				res.push([i, data3[i]])
+			return res;
+		}
+
+		// setup control widget
+		var updateInterval = 1000;
+		$("#updateInterval").val(updateInterval).change(function () {
+			var v = $(this).val();
+			if (v && !isNaN(+v)) {
+				updateInterval = +v;
+				if (updateInterval < 1)
+					updateInterval = 1;
+				if (updateInterval > 2000)
+					updateInterval = 2000;
+				$(this).val("" + updateInterval);
+			}
+		});
+
+		function percentFormatter(v, axis) {
+			return v.toFixed(axis.tickDecimals) + "%";
+		}
+		function psFormatter(v, axis) {
+			return v.toFixed(axis.tickDecimals) + "k mps";
+		}
+		function kbFormatter(v, axis) {
+			return v.toFixed(axis.tickDecimals) + "kb";
+		}
+
+		function mbFormatter(v, axis) {
+			return v.toFixed(axis.tickDecimals) + "mb";
+		}
+
+		// setup plot
+		var inboundOptions = {
+			yaxis: { min:0 },
+			yaxes: [{
+				min: 0,
+				tickFormatter: psFormatter
+			},{
+				alignTicksWithAxis: 1,
+				position: "right",
+				tickFormatter: kbFormatter
+			},{
+				min: 0,
+				max: 100,
+				position: "right",
+				tickFormatter: percentFormatter
+			}],
+			series:{
+				lines:{	lineWidth:2 }
+			}
+		};
+
+		var inboundPlot = $.plot($("#inbound"), [
+			{ data: getRandomData(), label: "Messages Per/Sec (mps)" },
+			{ data: getRandomData2(), label: "Message Size", yaxis: 2 },
+			{ data: getRandomData3(), label: "CPU %", yaxis: 3 }
+		], inboundOptions);
+
+		// setup plot
+		var aggregatorOptions = {
+			yaxis: { min:0 },
+			yaxes: [{
+				min: 0
+			},{
+				alignTicksWithAxis: 1,
+				position: "right",
+				tickFormatter: mbFormatter
+			},{
+				min: 0,
+				position: "right"
+			}],
+			series:{
+				lines:{	lineWidth:2 }
+			}
+		};
+
+		var aggregatorPlot = $.plot($("#aggregator"), [
+			{ data: getRandomData(), label: "Messages In Process" },
+			{ data: getRandomData2(), label: "Total In Process Size", yaxis: 2 },
+			{ data: getRandomData3(), label: "Active Batches", yaxis: 3 }
+		], aggregatorOptions);
+
+		// Update for all charts
+		function update() {
+			inboundPlot.setData([
+				{ data: getRandomData(), label: "Messages Per/Sec (mps)" },
+				{ data: getRandomData2(), label: "Message Size", yaxis: 2 },
+				{ data: getRandomData3(), label: "CPU %", yaxis: 3 }
+			]);
+			inboundPlot.setupGrid();
+			inboundPlot.draw();
+
+			aggregatorPlot.setData([
+				{ data: getRandomData(), label: "Messages In Process" },
+				{ data: getRandomData2(), label: "Total In Process Size", yaxis: 2 },
+				{ data: getRandomData3(), label: "Active Batches", yaxis: 3 }
+			]);
+			aggregatorPlot.setupGrid();
+			aggregatorPlot.draw();
+
+			setTimeout(update, updateInterval);
+		}
+
+		update();
+
+	}, this);
+
+
+</script>
+
 <div class="title"><h5>Dashboard <span style="margin-left:5px; margin-right:5px">&gt;</span> Performance</h5></div>
 
-blah blah blah
+<!-- Lines with fill -->
+<div class="widget">
+	<div class="head"><h5 class="iGraph">Inbound Messages</h5></div>
+	<div class="body">
+		<div id="inbound" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iInbox2">Message Aggregators</h5></div>
+	<div class="body">
+		<div id="aggregator" class="autoUpdate"></div>
+	</div>
+</div>
+
