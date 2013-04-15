@@ -92,85 +92,186 @@
 		function percentFormatter(v, axis) {
 			return v.toFixed(axis.tickDecimals) + "%";
 		}
-		function psFormatter(v, axis) {
-			return v.toFixed(axis.tickDecimals) + "k mps";
-		}
-		function kbFormatter(v, axis) {
-			return v.toFixed(axis.tickDecimals) + "kb";
+
+		function totFormatter(v, axis) {
+			return v.toFixed(axis.tickDecimals) + "k";
 		}
 
-		function mbFormatter(v, axis) {
-			return v.toFixed(axis.tickDecimals) + "mb";
+		function byteFormatter(v, axis) {
+			return v.toFixed(axis.tickDecimals) + ' kb';
 		}
 
-		// setup plot
+		function ageFormatter(v, axis) {
+			return v.toFixed(axis.tickDecimals) + 's';
+		}
+
+
+		// Inbound
 		var inboundOptions = {
-			yaxis: { min:0 },
-			yaxes: [{
-				min: 0,
-				tickFormatter: psFormatter
-			},{
-				alignTicksWithAxis: 1,
-				position: "right",
-				tickFormatter: kbFormatter
-			},{
-				min: 0,
-				max: 100,
-				position: "right",
-				tickFormatter: percentFormatter
-			}],
+			xaxis:{ ticks: false },
+			yaxes:[
+				{
+					min:0,
+					position:"right",
+					color:"#54cb4b",
+					tickFormatter:totFormatter
+				},
+				{
+					alignTicksWithAxis:1,
+					position:"right",
+					color:"#6db6ee",
+					tickFormatter:byteFormatter
+				},
+				{
+					min:0,
+					max:100,
+					position:"right",
+					color:"#ee7951",
+					tickFormatter:percentFormatter
+				}
+			],
 			series:{
-				lines:{	lineWidth:2 }
+				lines:{ lineWidth:2 }
 			}
 		};
 
 		var inboundPlot = $.plot($("#inbound"), [
-			{ data: getRandomData(), label: "Messages Per/Sec (mps)" },
-			{ data: getRandomData2(), label: "Message Size", yaxis: 2 },
-			{ data: getRandomData3(), label: "CPU %", yaxis: 3 }
+			{ data:getRandomData() },{ data:getRandomData2() },{ data:getRandomData3() }
 		], inboundOptions);
 
-		// setup plot
+
+		// Aggregator
 		var aggregatorOptions = {
-			yaxis: { min:0 },
-			yaxes: [{
-				min: 0
-			},{
-				alignTicksWithAxis: 1,
-				position: "right",
-				tickFormatter: mbFormatter
-			},{
-				min: 0,
-				position: "right"
-			}],
+			xaxis:{ ticks: false },
+			yaxes:[
+				{
+					min:0,
+					position:"right",
+					color:"#54cb4b",
+					tickFormatter:totFormatter
+				},
+				{
+					alignTicksWithAxis:1,
+					position:"right",
+					color:"#6db6ee",
+					tickFormatter:byteFormatter
+				},
+				{
+					min:0,
+					position:"right",
+					color:"#ee7951",
+					tickFormatter:ageFormatter
+				}
+			],
 			series:{
-				lines:{	lineWidth:2 }
+				lines:{ lineWidth:2 }
 			}
 		};
 
 		var aggregatorPlot = $.plot($("#aggregator"), [
-			{ data: getRandomData(), label: "Messages In Process" },
-			{ data: getRandomData2(), label: "Total In Process Size", yaxis: 2 },
-			{ data: getRandomData3(), label: "Active Batches", yaxis: 3 }
+			{ data:getRandomData() },{ data:getRandomData2() },{ data:getRandomData3() }
 		], aggregatorOptions);
+
+
+
+		// StorageWriter
+		var storageWriterOptions = {
+			xaxis:{ ticks: false },
+			yaxes:[
+				{
+					min:0,
+					position:"right",
+					color:"#54cb4b",
+					tickFormatter:totFormatter
+				},
+				{
+					alignTicksWithAxis:1,
+					position:"right",
+					color:"#6db6ee",
+					tickFormatter:byteFormatter
+				},
+				{
+					min:0,
+					position:"right",
+					color:"#ee7951"
+				}
+			],
+			series:{
+				lines:{ lineWidth:2 }
+			}
+		};
+
+		var storageWriterPlot = $.plot($("#storageWriter"), [
+			{ data:getRandomData() },{ data:getRandomData2() },{ data:getRandomData3() }
+		], storageWriterOptions);
+
+
+		// Outbound
+		var outboundOptions = {
+			xaxis:{ ticks: false },
+			yaxes:[
+				{
+					min:0,
+					position:"right",
+					color:"#54cb4b",
+					tickFormatter:totFormatter
+				},
+				{
+					alignTicksWithAxis:1,
+					position:"right",
+					color:"#6db6ee",
+					tickFormatter:byteFormatter
+				},
+				{
+					min:0,
+					max:100,
+					position:"right",
+					color:"#ee7951"
+				}
+			],
+			series:{
+				lines:{ lineWidth:2 }
+			}
+		};
+
+		var outboundPlot = $.plot($("#outbound"), [
+			{ data:getRandomData() },{ data:getRandomData2() },{ data:getRandomData3() }
+		], outboundOptions);
+
 
 		// Update for all charts
 		function update() {
 			inboundPlot.setData([
-				{ data: getRandomData(), label: "Messages Per/Sec (mps)" },
-				{ data: getRandomData2(), label: "Message Size", yaxis: 2 },
-				{ data: getRandomData3(), label: "CPU %", yaxis: 3 }
+				{ data:getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
+				{ data:getRandomData2(), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
+				{ data:getRandomData3(), color:"#ee7951", label:"CPU %", yaxis:3 }
 			]);
 			inboundPlot.setupGrid();
 			inboundPlot.draw();
 
 			aggregatorPlot.setData([
-				{ data: getRandomData(), label: "Messages In Process" },
-				{ data: getRandomData2(), label: "Total In Process Size", yaxis: 2 },
-				{ data: getRandomData3(), label: "Active Batches", yaxis: 3 }
+				{ data:getRandomData(), color:"#54cb4b", label:"Messages In Queue" },
+				{ data:getRandomData2(), color:"#6db6ee", label:"Queue Size", yaxis:2 },
+				{ data:getRandomData3(), color:"#ee7951", label:"Queue Age (seconds)", yaxis:3 }
 			]);
 			aggregatorPlot.setupGrid();
 			aggregatorPlot.draw();
+
+			storageWriterPlot.setData([
+				{ data:getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
+				{ data:getRandomData2(), color:"#6db6ee", label:"Bytes Per/Sec", yaxis:2 },
+				{ data:getRandomData3(), color:"#ee7951", label:"Batches Being Written", yaxis:3 }
+			]);
+			storageWriterPlot.setupGrid();
+			storageWriterPlot.draw();
+
+			outboundPlot.setData([
+				{ data:getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
+				{ data:getRandomData2(), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
+				{ data:getRandomData3(), color:"#ee7951", label:"Active Queries", yaxis:3 }
+			]);
+			outboundPlot.setupGrid();
+			outboundPlot.draw();
 
 			setTimeout(update, updateInterval);
 		}
@@ -186,7 +287,7 @@
 
 <!-- Lines with fill -->
 <div class="widget">
-	<div class="head"><h5 class="iGraph">Inbound Messages</h5></div>
+	<div class="head"><h5 class="iArrowDown">Inbound Messages</h5></div>
 	<div class="body">
 		<div id="inbound" class="autoUpdate"></div>
 	</div>
@@ -196,6 +297,20 @@
 	<div class="head"><h5 class="iInbox2">Message Aggregators</h5></div>
 	<div class="body">
 		<div id="aggregator" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iInbox2">Storage Writers</h5></div>
+	<div class="body">
+		<div id="storageWriter" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iArrowUp">Outbound Messages</h5></div>
+	<div class="body">
+		<div id="outbound" class="autoUpdate"></div>
 	</div>
 </div>
 
