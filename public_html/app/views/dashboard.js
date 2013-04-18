@@ -59,13 +59,274 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
 
     Views.Performance = Marionette.ItemView.extend({
         template:'dashboard_performance',
+        inboundPlot: {},
+        aggregatorPlot: {},
+        storageWriterPlot: {},
+        outboundPlot: {},
+        data: [],
+        data2: [],
+        data3: [],
+        data4: [],
+        totalPoints: 200,
+
+        initialize: function() {
+            this.listenTo(this,'render',this.afterRender);
+        },
 
         modelEvents:{
             "change:stats":"updateData"
         },
 
+        afterRender: function() {
+            var that = this;
+            _.defer(function (caller) {
+                that.inboundPlot = $.plot($("#inbound"), [
+                    { data:that.getRandomData() },{ data:that.getRandomData2() },{ data:that.getRandomData3() }
+                ], that.inboundOptions);
+
+                that.aggregatorPlot = $.plot($("#aggregator"), [
+                    { data:that.getRandomData() },{ data:that.getRandomData2() },{ data:that.getRandomData3() }
+                ], that.aggregatorOptions);
+
+                that.storageWriterPlot = $.plot($("#storageWriter"), [
+                    { data:that.getRandomData() },{ data:that.getRandomData2() },{ data:that.getRandomData3() }
+                ], that.storageWriterOptions);
+
+                that.outboundPlot = $.plot($("#outbound"), [
+                    { data:that.getRandomData() },{ data:that.getRandomData2() },{ data:that.getRandomData3() }
+                ], that.outboundOptions);
+
+            }, this);
+        },
+
         updateData:function () {
-            console.log("update data now");
+
+            this.inboundPlot.setData([
+                { data:this.getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
+                { data:this.getRandomData2(), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
+                { data:this.getRandomData3(), color:"#ee7951", label:"CPU %", yaxis:3 }
+            ]);
+            this.inboundPlot.setupGrid();
+            this.inboundPlot.draw();
+
+            this.aggregatorPlot.setData([
+                { data:this.getRandomData(), color:"#54cb4b", label:"Messages In Queue" },
+                { data:this.getRandomData2(), color:"#6db6ee", label:"Queue Size", yaxis:2 },
+                { data:this.getRandomData3(), color:"#ee7951", label:"Queue Age (seconds)", yaxis:3 }
+            ]);
+            this.aggregatorPlot.setupGrid();
+            this.aggregatorPlot.draw();
+
+            this.storageWriterPlot.setData([
+                { data:this.getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
+                { data:this.getRandomData2(), color:"#6db6ee", label:"Bytes Per/Sec", yaxis:2 },
+                { data:this.getRandomData3(), color:"#ee7951", label:"Batches Being Written", yaxis:3 }
+            ]);
+            this.storageWriterPlot.setupGrid();
+            this.storageWriterPlot.draw();
+
+            this.outboundPlot.setData([
+                { data:this.getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
+                { data:this.getRandomData2(), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
+                { data:this.getRandomData3(), color:"#ee7951", label:"Active Queries", yaxis:3 }
+            ]);
+            this.outboundPlot.setupGrid();
+            this.outboundPlot.draw();
+
+        },
+
+        // Inbound
+        inboundOptions: {
+            xaxis:{ ticks: false },
+            yaxes:[
+                {
+                    min:0,
+                    position:"right",
+                    color:"#54cb4b",
+                    tickFormatter:this.totFormatter
+                },
+                {
+                    alignTicksWithAxis:1,
+                    position:"right",
+                    color:"#6db6ee",
+                    tickFormatter:this.byteFormatter
+                },
+                {
+                    min:0,
+                    max:100,
+                    position:"right",
+                    color:"#ee7951",
+                    tickFormatter:this.percentFormatter
+                }
+            ],
+            series:{
+                lines:{ lineWidth:2 }
+            }
+        },
+
+        // Aggregator
+        aggregatorOptions: {
+            xaxis:{ ticks: false },
+            yaxes:[
+                {
+                    min:0,
+                    position:"right",
+                    color:"#54cb4b",
+                    tickFormatter:this.totFormatter
+                },
+                {
+                    alignTicksWithAxis:1,
+                    position:"right",
+                    color:"#6db6ee",
+                    tickFormatter:this.byteFormatter
+                },
+                {
+                    min:0,
+                    position:"right",
+                    color:"#ee7951",
+                    tickFormatter:this.ageFormatter
+                }
+            ],
+            series:{
+                lines:{ lineWidth:2 }
+            }
+        },
+
+        // StorageWriter
+        storageWriterOptions: {
+            xaxis:{ ticks: false },
+            yaxes:[
+                {
+                    min:0,
+                    position:"right",
+                    color:"#54cb4b",
+                    tickFormatter:this.totFormatter
+                },
+                {
+                    alignTicksWithAxis:1,
+                    position:"right",
+                    color:"#6db6ee",
+                    tickFormatter:this.byteFormatter
+                },
+                {
+                    min:0,
+                    position:"right",
+                    color:"#ee7951"
+                }
+            ],
+            series:{
+                lines:{ lineWidth:2 }
+            }
+        },
+
+        // Outbound
+        outboundOptions: {
+            xaxis:{ ticks: false },
+            yaxes:[
+                {
+                    min:0,
+                    position:"right",
+                    color:"#54cb4b",
+                    tickFormatter:this.totFormatter
+                },
+                {
+                    alignTicksWithAxis:1,
+                    position:"right",
+                    color:"#6db6ee",
+                    tickFormatter:this.byteFormatter
+                },
+                {
+                    min:0,
+                    max:100,
+                    position:"right",
+                    color:"#ee7951"
+                }
+            ],
+            series:{
+                lines:{ lineWidth:2 }
+            }
+        },
+
+        percentFormatter: function (v, axis) {
+            return v.toFixed(axis.tickDecimals) + "%";
+        },
+
+        totFormatter: function (v, axis) {
+            return v.toFixed(axis.tickDecimals) + "k";
+        },
+
+        byteFormatter: function (v, axis) {
+            return v.toFixed(axis.tickDecimals) + ' kb';
+        },
+
+        ageFormatter: function (v, axis) {
+            return v.toFixed(axis.tickDecimals) + 's';
+        },
+
+        getRandomData:function () {
+            if (this.data.length > 0)
+                this.data = this.data.slice(1);
+
+            // do a random walk
+            while (this.data.length < this.totalPoints) {
+                var prev = this.data.length > 0 ? this.data[this.data.length - 1] : 50;
+                var y = prev + Math.random() * 10 - 5;
+                if (y < 0)
+                    y = 0;
+                if (y > 100)
+                    y = 100;
+                this.data.push(y);
+            }
+
+            // zip the generated y values with the x values
+            var res = [];
+            for (var i = 0; i < this.data.length; ++i)
+                res.push([i, this.data[i]])
+            return res;
+        },
+
+        getRandomData2:function () {
+            if (this.data2.length > 0)
+                this.data2 = this.data2.slice(1);
+
+            // do a random walk
+            while (this.data2.length < this.totalPoints) {
+                var prev = this.data2.length > 0 ? this.data2[this.data2.length - 1] : 50;
+                var y = prev + Math.random() * 10 - 5;
+                if (y < 0)
+                    y = 0;
+                if (y > 100)
+                    y = 100;
+                this.data2.push(y);
+            }
+
+            // zip the generated y values with the x values
+            var res = [];
+            for (var i = 0; i < this.data2.length; ++i)
+                res.push([i, this.data2[i]])
+            return res;
+        },
+
+        getRandomData3: function () {
+            if (this.data3.length > 0)
+                this.data3 = this.data3.slice(1);
+
+            // do a random walk
+            while (this.data3.length < this.totalPoints) {
+                var prev = this.data3.length > 0 ? this.data3[this.data3.length - 1] : 50;
+                var y = prev + Math.random() * 10 - 5;
+                if (y < 0)
+                    y = 0;
+                if (y > 100)
+                    y = 100;
+                this.data3.push(y);
+            }
+
+            // zip the generated y values with the x values
+            var res = [];
+            for (var i = 0; i < this.data3.length; ++i)
+                res.push([i, this.data3[i]])
+            return res;
         }
     });
 
