@@ -9,7 +9,6 @@ import com.google.inject.Inject;
 import ganglia.gmetric.GMetric;
 import ganglia.gmetric.GMetricSlope;
 import ganglia.gmetric.GMetricType;
-import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -249,6 +248,7 @@ public class StatsManagerImpl implements StatsManager
 					OverTime<AvgStat> avgOverTime = new OverTime<>(
 							avgStatOverTime.getName(),
 							avgStatOverTime.getUnitOfMeasure(),
+							avgStatOverTime.getAvgOverSeconds(5),
 							avgStatOverTime.getAvgOverMinutes(1),
 							avgStatOverTime.getAvgOverMinutes(5),
 							avgStatOverTime.getAvgOverMinutes(30),
@@ -262,6 +262,7 @@ public class StatsManagerImpl implements StatsManager
 						OverTime<Long> countOverTime = new OverTime<>(
 								avgStatOverTime.getCounterStatOverTime().getName(),
 								avgStatOverTime.getCounterStatOverTime().getUnitOfMeasure(),
+								avgStatOverTime.getCounterStatOverTime().getCountOverSeconds(5),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(1),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(5),
 								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(30),
@@ -278,6 +279,7 @@ public class StatsManagerImpl implements StatsManager
 					OverTime<Long> countOverTime = new OverTime<>(
 							counterStatOverTime.getName(),
 							counterStatOverTime.getUnitOfMeasure(),
+							counterStatOverTime.getCountOverSeconds(5),
 							counterStatOverTime.getCountOverMinutes(1),
 							counterStatOverTime.getCountOverMinutes(5),
 							counterStatOverTime.getCountOverMinutes(30),

@@ -2,6 +2,7 @@ package com.gltech.scale.core.server;
 
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.stats.StatCallBack;
 import com.gltech.scale.core.stats.StatsManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -22,6 +23,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.concurrent.TimeUnit;
 
 public class EmbeddedServer
@@ -84,6 +87,9 @@ public class EmbeddedServer
 		// Handle all non jersey services here
 		startServices();
 
+		// Monitor System level stats.
+		monitorSystemStats();
+
 		// Start the server
 		server.start();
 		logger.info("Server started on port {}", port);
@@ -133,6 +139,21 @@ public class EmbeddedServer
 			channelCoordinator.start();
 			LifeCycleManager.getInstance().add(channelCoordinator, LifeCycle.Priority.INITIAL);
 		}
+	}
+
+	private static void monitorSystemStats() {
+		final OperatingSystemMXBean osStats = ManagementFactory.getOperatingSystemMXBean();
+		StatsManager statsManager = injector.getInstance(StatsManager.class);
+
+		statsManager.createAvgStat("System", "LoadAvg", "LoadUnits", new StatCallBack()
+		{
+			public long getValue()
+			{
+				return Math.round(osStats.getSystemLoadAverage());
+			}
+		});
+
+
 	}
 
 	public static synchronized void stop() throws Exception

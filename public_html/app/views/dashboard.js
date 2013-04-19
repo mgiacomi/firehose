@@ -32,7 +32,6 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         updateTable:function() {
             oTable.fnClearTable();
 
-
             $.each(this.model.get("stats"), function (idx, server) {
                 var row = [];
 
@@ -63,11 +62,14 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         aggregatorPlot: {},
         storageWriterPlot: {},
         outboundPlot: {},
+        inboundLoad: [],
+        inboundAvgMsgSize: [],
+        inboundMsgPerSec: [],
         data: [],
         data2: [],
         data3: [],
         data4: [],
-        totalPoints: 200,
+        totalPoints: 300,
 
         initialize: function() {
             this.listenTo(this,'render',this.afterRender);
@@ -81,7 +83,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
             var that = this;
             _.defer(function (caller) {
                 that.inboundPlot = $.plot($("#inbound"), [
-                    { data:that.getRandomData() },{ data:that.getRandomData2() },{ data:that.getRandomData3() }
+                    { data:that.updateDataArray(that.inboundMsgPerSec, 0) },{ data:that.updateDataArray(that.inboundAvgMsgSize, 0) },{ data:that.updateDataArray(that.inboundLoad, 0) }
                 ], that.inboundOptions);
 
                 that.aggregatorPlot = $.plot($("#aggregator"), [
@@ -100,11 +102,13 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         },
 
         updateData:function () {
+            this.inboundMsgPerSec = this.updateDataArray(this.inboundMsgPerSec, this.model.get("aggregateStats").inboundMsgPerSec);
+            this.inboundAvgMsgSize = this.updateDataArray(this.inboundAvgMsgSize, this.model.get("aggregateStats").inboundAvgMsgSize);
 
             this.inboundPlot.setData([
-                { data:this.getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
-                { data:this.getRandomData2(), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
-                { data:this.getRandomData3(), color:"#ee7951", label:"CPU %", yaxis:3 }
+                { data:this.toFlotArray(this.inboundMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
+                { data:this.toFlotArray(this.inboundAvgMsgSize), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
+                { data:this.getRandomData3(), color:"#ee7951", label:"Load Avg", yaxis:3 }
             ]);
             this.inboundPlot.setupGrid();
             this.inboundPlot.draw();
@@ -143,24 +147,23 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                     min:0,
                     position:"right",
                     color:"#54cb4b",
-                    tickFormatter:this.totFormatter
+                    tickFormatter:flotTotFormatter
                 },
                 {
                     alignTicksWithAxis:1,
                     position:"right",
                     color:"#6db6ee",
-                    tickFormatter:this.byteFormatter
+                    tickFormatter:flotByteFormatter
                 },
                 {
                     min:0,
                     max:100,
                     position:"right",
-                    color:"#ee7951",
-                    tickFormatter:this.percentFormatter
+                    color:"#ee7951"
                 }
             ],
             series:{
-                lines:{ lineWidth:2 }
+                lines:{ lineWidth:1 }
             }
         },
 
@@ -172,23 +175,23 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                     min:0,
                     position:"right",
                     color:"#54cb4b",
-                    tickFormatter:this.totFormatter
+                    tickFormatter:flotTotFormatter
                 },
                 {
                     alignTicksWithAxis:1,
                     position:"right",
                     color:"#6db6ee",
-                    tickFormatter:this.byteFormatter
+                    tickFormatter:flotByteFormatter
                 },
                 {
                     min:0,
                     position:"right",
                     color:"#ee7951",
-                    tickFormatter:this.ageFormatter
+                    tickFormatter:flotAgeFormatter
                 }
             ],
             series:{
-                lines:{ lineWidth:2 }
+                lines:{ lineWidth:1 }
             }
         },
 
@@ -200,13 +203,13 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                     min:0,
                     position:"right",
                     color:"#54cb4b",
-                    tickFormatter:this.totFormatter
+                    tickFormatter:flotTotFormatter
                 },
                 {
                     alignTicksWithAxis:1,
                     position:"right",
                     color:"#6db6ee",
-                    tickFormatter:this.byteFormatter
+                    tickFormatter:flotByteFormatter
                 },
                 {
                     min:0,
@@ -215,7 +218,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                 }
             ],
             series:{
-                lines:{ lineWidth:2 }
+                lines:{ lineWidth:1 }
             }
         },
 
@@ -227,13 +230,13 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                     min:0,
                     position:"right",
                     color:"#54cb4b",
-                    tickFormatter:this.totFormatter
+                    tickFormatter:flotTotFormatter
                 },
                 {
                     alignTicksWithAxis:1,
                     position:"right",
                     color:"#6db6ee",
-                    tickFormatter:this.byteFormatter
+                    tickFormatter:flotByteFormatter
                 },
                 {
                     min:0,
@@ -243,24 +246,33 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                 }
             ],
             series:{
-                lines:{ lineWidth:2 }
+                lines:{ lineWidth:1 }
             }
         },
 
-        percentFormatter: function (v, axis) {
-            return v.toFixed(axis.tickDecimals) + "%";
+        updateDataArray: function(data, value){
+            // Pad with 0's
+            while (data.length < this.totalPoints) {
+                data.push(0);
+            }
+
+            // Remove oldest
+            if (data.length > 0) {
+                data = data.slice(1);
+            }
+
+            // Add newest
+            data.push(value);
+
+            return data;
         },
 
-        totFormatter: function (v, axis) {
-            return v.toFixed(axis.tickDecimals) + "k";
-        },
-
-        byteFormatter: function (v, axis) {
-            return v.toFixed(axis.tickDecimals) + ' kb';
-        },
-
-        ageFormatter: function (v, axis) {
-            return v.toFixed(axis.tickDecimals) + 's';
+        toFlotArray: function(data) {
+            var res = [];
+            for (var i = 0; i < data.length; ++i) {
+                res.push([i, data[i]])
+            }
+            return res;
         },
 
         getRandomData:function () {

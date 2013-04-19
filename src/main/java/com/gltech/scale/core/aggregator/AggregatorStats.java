@@ -9,6 +9,7 @@ import com.gltech.scale.core.stats.StatsManager;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -50,6 +51,52 @@ public class AggregatorStats implements Aggregator
 			public long getValue()
 			{
 				return aggregator.getActiveBatches().size();
+			}
+		});
+		statsManager.createAvgStat(groupName, "ActiveBackupBatches.Avg", "batches", new StatCallBack()
+		{
+			public long getValue()
+			{
+				return aggregator.getActiveBackupBatches().size();
+			}
+		});
+		statsManager.createAvgStat(groupName, "TotalQueueSize.Avg", "bytes", new StatCallBack()
+		{
+			public long getValue()
+			{
+				long total = 0;
+				for(Batch batch : aggregator.getActiveBatches())
+				{
+					total += batch.getBytes();
+				}
+				return total;
+			}
+		});
+		statsManager.createAvgStat(groupName, "MessagesInQueue.Avg", "messages", new StatCallBack()
+		{
+			public long getValue()
+			{
+				long total = 0;
+				for(Batch batch : aggregator.getActiveBatches())
+				{
+					total += batch.getMessages().size();
+				}
+				return total;
+			}
+		});
+		statsManager.createAvgStat(groupName, "OldestInQueue.Avg", "seconds", new StatCallBack()
+		{
+			public long getValue()
+			{
+				DateTime oldest = new DateTime();
+				for(Batch batch : aggregator.getActiveBatches())
+				{
+					if(batch.getFirstMessageTime().isBefore(oldest))
+					{
+						oldest = batch.getFirstMessageTime();
+					}
+				}
+				return Seconds.secondsBetween(oldest, new DateTime()).getSeconds();
 			}
 		});
 	}

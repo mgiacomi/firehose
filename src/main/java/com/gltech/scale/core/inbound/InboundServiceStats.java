@@ -21,7 +21,7 @@ public class InboundServiceStats implements InboundService
 	{
 		this.inboundService = inboundService;
 
-		String groupName = "Inbound Service";
+		String groupName = "Inbound";
 		this.addMessageSizeStat = statsManager.createAvgStat(groupName, "AddMessage.Size", "bytes");
 		this.addMessageSizeStat.activateCountStat("AddMessage.Count", "messages");
 		this.addMessageTimeStat = statsManager.createAvgStat(groupName, "AddMessage.Time", "milliseconds");

@@ -1,7 +1,7 @@
 package com.gltech.scale.monitoring.server;
 
+import com.gltech.scale.monitoring.model.ClusterStats;
 import com.gltech.scale.monitoring.model.ResultsIO;
-import com.gltech.scale.monitoring.model.ServerStats;
 import com.gltech.scale.monitoring.services.ClusterStatsCallBack;
 import com.gltech.scale.monitoring.services.ClusterStatsService;
 import com.google.inject.Inject;
@@ -36,14 +36,14 @@ public class StatsPushSocket implements ClusterStatsCallBack
 	}
 
 	@Override
-	public void serverStatsUpdate(List<ServerStats> serverStatsList)
+	public void clusterStatsUpdate(ClusterStats clusterStats)
 	{
 		for (Session session : sessions)
 		{
 			// send a message to the current client WebSocket.
 			try
 			{
-				session.getRemote().sendString(resultsIO.toJson(serverStatsList));
+				session.getRemote().sendString(resultsIO.toJson(clusterStats));
 			}
 			catch (IOException e)
 			{

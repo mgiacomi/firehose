@@ -9,18 +9,21 @@ public class OverTime<T>
 	@Tag(2)
 	private String unitOfMeasure;
 	@Tag(3)
-	private T min1;
+	private T sec5;
 	@Tag(4)
-	private T min5;
+	private T min1;
 	@Tag(5)
-	private T min30;
+	private T min5;
 	@Tag(6)
+	private T min30;
+	@Tag(7)
 	private T hour2;
 
-	public OverTime(String name, String unitOfMeasure, T min1, T min5, T min30, T hour2)
+	public OverTime(String name, String unitOfMeasure, T sec5, T min1, T min5, T min30, T hour2)
 	{
 		this.name = name;
 		this.unitOfMeasure = unitOfMeasure;
+		this.sec5 = sec5;
 		this.min1 = min1;
 		this.min5 = min5;
 		this.min30 = min30;
@@ -35,6 +38,11 @@ public class OverTime<T>
 	public String getUnitOfMeasure()
 	{
 		return unitOfMeasure;
+	}
+
+	public T getSec5()
+	{
+		return sec5;
 	}
 
 	public T getMin1()

@@ -1,3 +1,20 @@
+function flotPercentFormatter(v, axis) {
+    return v.toFixed(axis.tickDecimals) + "%";
+}
+
+function flotTotFormatter(v, axis) {
+    return v.toFixed(axis.tickDecimals) + "k";
+}
+
+function flotByteFormatter(v, axis) {
+    return v.toFixed(axis.tickDecimals) + 'kb';
+}
+
+function flotAgeFormatter(v, axis) {
+    return v.toFixed(axis.tickDecimals) + 's';
+}
+
+
 function initAccordion() {
     //===== Accordion =====//
     $('div.menu_body:eq(0)').show();

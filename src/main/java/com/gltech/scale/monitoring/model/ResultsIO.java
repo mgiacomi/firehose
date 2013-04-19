@@ -41,6 +41,25 @@ public class ResultsIO
 		}
 	}
 
+	public String toJson(ClusterStats clusterStats)
+	{
+		if (clusterStats == null)
+		{
+			return "{}";
+		}
+
+		try
+		{
+			StringWriter writer = new StringWriter();
+			mapper.writeValue(writer, clusterStats);
+			return writer.toString();
+		}
+		catch (IOException e)
+		{
+			throw Throwables.propagate(e);
+		}
+	}
+
 	public byte[] toBytes(List<ServerStats> serverStatsList)
 	{
 		try
