@@ -75,9 +75,6 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 		clusterStats.setStats(serverStatsList);
 
 /*
-		int aggregatorMsgInQue;
-		int aggregatorQueSize;
-		int aggregatorQueAge;
 		int storageWriterMsgPerSec;
 		int storageWriterBytesPerSec;
 		int storageWriterBatchesBeingWritten;
@@ -114,14 +111,14 @@ StorageWriter
 					inboundMsgPerSec += msgPerSec.getSec5();
 				}
 
-				OverTime<Long> queSize = getCountStatByName("Aggregator", "TotalQueueSize.Avg", serverStats);
+				OverTime<AvgStat> queSize = getAvgStatByName("Aggregator", "TotalQueueSize.Avg", serverStats);
 				if(queSize != null) {
-					aggregatorQueSize += queSize.getSec5();
+					aggregatorQueSize += queSize.getSec5().getAverage();
 				}
 
-				OverTime<Long> msgInQue = getCountStatByName("Aggregator", "MessagesInQueue.Avg", serverStats);
+				OverTime<AvgStat> msgInQue = getAvgStatByName("Aggregator", "MessagesInQueue.Avg", serverStats);
 				if(msgInQue != null) {
-					aggregatorMsgInQue += msgInQue.getSec5();
+					aggregatorMsgInQue += msgInQue.getSec5().getAverage();
 				}
 
 				OverTime<AvgStat> queAge = getAvgStatByName("Aggregator", "OldestInQueue.Avg", serverStats);
@@ -131,7 +128,6 @@ StorageWriter
 						aggregatorQueAge = Math.round(queAge.getSec5().getAverage());
 					}
 				}
-
 /*
 				OverTime<AvgStat> xxx = getAvgStatByName("xxx", "xxx", serverStats);
 				if(xxx != null) {
@@ -145,6 +141,7 @@ StorageWriter
 				if(xxx != null) {
 					inboundxxx.add(xxx.getSec5().getAverage());
 				}
+
 				OverTime<AvgStat> xxx = getAvgStatByName("xxx", "xxx", serverStats);
 				if(xxx != null) {
 					inboundxxx.add(xxx.getSec5().getAverage());

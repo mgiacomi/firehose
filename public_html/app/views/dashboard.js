@@ -65,11 +65,15 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         inboundLoad: [],
         inboundAvgMsgSize: [],
         inboundMsgPerSec: [],
+        aggregatorMsgInQue: [],
+        aggregatorQueSize: [],
+        aggregatorQueAge: [],
+
         data: [],
         data2: [],
         data3: [],
         data4: [],
-        totalPoints: 300,
+        totalPoints: 200,
 
         initialize: function() {
             this.listenTo(this,'render',this.afterRender);
@@ -87,7 +91,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                 ], that.inboundOptions);
 
                 that.aggregatorPlot = $.plot($("#aggregator"), [
-                    { data:that.getRandomData() },{ data:that.getRandomData2() },{ data:that.getRandomData3() }
+                    { data:that.updateDataArray(that.aggregatorMsgInQue, 0) },{ data:that.updateDataArray(that.aggregatorQueSize, 0) },{ data:that.updateDataArray(that.aggregatorQueAge, 0) }
                 ], that.aggregatorOptions);
 
                 that.storageWriterPlot = $.plot($("#storageWriter"), [
@@ -104,19 +108,24 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         updateData:function () {
             this.inboundMsgPerSec = this.updateDataArray(this.inboundMsgPerSec, this.model.get("aggregateStats").inboundMsgPerSec);
             this.inboundAvgMsgSize = this.updateDataArray(this.inboundAvgMsgSize, this.model.get("aggregateStats").inboundAvgMsgSize);
+            this.inboundLoad = this.updateDataArray(this.inboundLoad, this.model.get("aggregateStats").inboundLoad);
 
             this.inboundPlot.setData([
                 { data:this.toFlotArray(this.inboundMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
                 { data:this.toFlotArray(this.inboundAvgMsgSize), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
-                { data:this.getRandomData3(), color:"#ee7951", label:"Load Avg", yaxis:3 }
+                { data:this.toFlotArray(this.inboundLoad), color:"#ee7951", label:"Load Avg", yaxis:3 }
             ]);
             this.inboundPlot.setupGrid();
             this.inboundPlot.draw();
 
+            this.aggregatorMsgInQue = this.updateDataArray(this.aggregatorMsgInQue, this.model.get("aggregateStats").aggregatorMsgInQue);
+            this.aggregatorQueSize = this.updateDataArray(this.aggregatorQueSize, this.model.get("aggregateStats").aggregatorQueSize);
+            this.aggregatorQueAge = this.updateDataArray(this.aggregatorQueAge, this.model.get("aggregateStats").aggregatorQueAge);
+
             this.aggregatorPlot.setData([
-                { data:this.getRandomData(), color:"#54cb4b", label:"Messages In Queue" },
-                { data:this.getRandomData2(), color:"#6db6ee", label:"Queue Size", yaxis:2 },
-                { data:this.getRandomData3(), color:"#ee7951", label:"Queue Age (seconds)", yaxis:3 }
+                { data:this.toFlotArray(this.aggregatorMsgInQue), color:"#54cb4b", label:"Messages In Queue" },
+                { data:this.toFlotArray(this.aggregatorQueSize), color:"#6db6ee", label:"Queue Size", yaxis:2 },
+                { data:this.toFlotArray(this.aggregatorQueAge), color:"#ee7951", label:"Queue Age (seconds)", yaxis:3 }
             ]);
             this.aggregatorPlot.setupGrid();
             this.aggregatorPlot.draw();
@@ -150,7 +159,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                     tickFormatter:flotTotFormatter
                 },
                 {
-                    alignTicksWithAxis:1,
+                    min:0,
                     position:"right",
                     color:"#6db6ee",
                     tickFormatter:flotByteFormatter
@@ -178,7 +187,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                     tickFormatter:flotTotFormatter
                 },
                 {
-                    alignTicksWithAxis:1,
+                    min:0,
                     position:"right",
                     color:"#6db6ee",
                     tickFormatter:flotByteFormatter
@@ -206,7 +215,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                     tickFormatter:flotTotFormatter
                 },
                 {
-                    alignTicksWithAxis:1,
+                    min:0,
                     position:"right",
                     color:"#6db6ee",
                     tickFormatter:flotByteFormatter
@@ -252,12 +261,15 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
 
         updateDataArray: function(data, value){
             // Pad with 0's
-            while (data.length < this.totalPoints) {
+//            while (data.length < this.totalPoints) {
+/*
+            while (data.length < 5) {
                 data.push(0);
             }
+*/
 
             // Remove oldest
-            if (data.length > 0) {
+            if (data.length > 0 && data.length > this.totalPoints) {
                 data = data.slice(1);
             }
 
