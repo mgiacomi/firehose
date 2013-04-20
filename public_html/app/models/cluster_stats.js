@@ -1,7 +1,7 @@
 var ClusterStats = Backbone.Model.extend({
-    defaults: {
-        stats: {},
-        aggregateStats: {}
+    defaults:{
+        stats:{},
+        aggregateStats:{}
     },
 
     update:function (data) {

@@ -19,7 +19,7 @@ Firehose.module('Dashboard', function (Dashboard, App, Backbone, Marionette, $, 
         // Default action
         index:function () {
             App.middlenav.show(new Dashboard.Views.Nav());
-            App.content.show(new Dashboard.Views.Main({model: clusterStats}));
+            App.content.show(new Dashboard.Views.Main({model:clusterStats}));
         },
 
         roles:function () {

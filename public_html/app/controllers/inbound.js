@@ -10,21 +10,22 @@ Firehose.module('Inbound', function (Inbound, App, Backbone, Marionette, $, _) {
     });
 
     // Controller
-    Inbound.Controller = function () {};
+    Inbound.Controller = function () {
+    };
 
     _.extend(Inbound.Controller.prototype, {
 
-        overview: function() {
+        overview:function () {
             App.middlenav.show(new Inbound.Views.Nav());
             App.content.show(new Inbound.Views.Overview({model:clusterStats}));
         },
 
-        live_stats: function() {
+        live_stats:function () {
             App.middlenav.show(new Inbound.Views.Nav());
             App.content.show(new Inbound.Views.LiveStats({model:clusterStats}));
         },
 
-        performance: function() {
+        performance:function () {
             App.middlenav.show(new Inbound.Views.Nav());
             App.content.show(new Inbound.Views.Performance({model:clusterStats}));
         }

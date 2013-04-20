@@ -1,9 +1,7 @@
 package com.gltech.scale.core.writer;
 
 import com.gltech.scale.core.model.Defaults;
-import com.gltech.scale.core.stats.AvgStatOverTime;
-import com.gltech.scale.core.stats.StatsManager;
-import com.gltech.scale.core.stats.StatsThreadPoolExecutor;
+import com.gltech.scale.core.stats.*;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -38,14 +36,22 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 		this.channelCache = channelCache;
 		this.statsManager = statsManager;
 
-		AvgStatOverTime collectBatchAvgTime = statsManager.createAvgStat(groupName, "CollectBatch.AvgTime", "milliseconds");
-		collectBatchAvgTime.activateCountStat("CollectBatch.Count", "batches");
+		AvgStatOverTime batchesWrittenAvgTime = statsManager.createAvgStat(groupName, "BatchesWritten.AvgTime", "milliseconds");
+		batchesWrittenAvgTime.activateCountStat("BatchesWritten.Count", "batches");
 
 		activeStorageWriters = props.get("storage_writer.active_collectors", Defaults.STORAGE_WRITER_ACTIVE_WRITERS);
 
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
-		threadPoolExecutor = new StatsThreadPoolExecutor(activeStorageWriters, activeStorageWriters, 1, TimeUnit.MINUTES, queue, new StorageWriterThreadFactory(), collectBatchAvgTime);
+		threadPoolExecutor = new StatsThreadPoolExecutor(activeStorageWriters, activeStorageWriters, 1, TimeUnit.MINUTES, queue, new StorageWriterThreadFactory(), batchesWrittenAvgTime);
 		logger.info("ThreadPoolExecutor started with " + activeStorageWriters + " active collectors.");
+
+		statsManager.createAvgStat(groupName, "WritingBatches.Avg", "batches", new StatCallBack()
+		{
+			public long getValue()
+			{
+				return threadPoolExecutor.getActiveCount();
+			}
+		});
 
 		// Register the event service with the coordination service
 		clusterService.getRegistrationService().registerAsStorageWriter();
@@ -80,13 +86,19 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 							{
 								ChannelMetaData channelMetaData = channelCache.getChannelMetaData(batchPeriodMapper.getChannelName(), true);
 
-								BatchWriter batchWriter = injector.getInstance(BatchWriter.class);
-								batchWriter.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());
-
 								// Get a stat based on channel name.
 								AvgStatOverTime channelStat = statsManager.createAvgStat(groupName, batchPeriodMapper.getChannelName() + ".AvgTime", "milliseconds");
 								channelStat.activateCountStat(batchPeriodMapper.getChannelName() + ".Count", "batches");
+
+								// Get stats for message size and number
+								CounterStatOverTime messagesWritten = statsManager.createCounterStat(groupName, "MessagesWritten.Count", "messages");
+								CounterStatOverTime bytesWritten = statsManager.createCounterStat(groupName, "MessagesWritten.Size", "bytes");
+
+								BatchWriter batchWriter = injector.getInstance(BatchWriter.class);
+								batchWriter.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());
 								batchWriter.setChannelStat(channelStat);
+								batchWriter.setMessagesWrittenStat(messagesWritten);
+								batchWriter.setBytesWrittenStat(bytesWritten);
 
 								threadPoolExecutor.submit(batchWriter);
 							}

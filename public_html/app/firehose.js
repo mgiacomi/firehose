@@ -1,14 +1,14 @@
 var Firehose = new Backbone.Marionette.Application();
 
 Firehose.addRegions({
-    topbar: '#topbarWrapper',
-    middlenav: '#middleNavWrapper',
-    leftnav: '#leftnavWrapper',
-    footer: '#footerWrapper',
-    content: '#contentWrapper'
+    topbar:'#topbarWrapper',
+    middlenav:'#middleNavWrapper',
+    leftnav:'#leftnavWrapper',
+    footer:'#footerWrapper',
+    content:'#contentWrapper'
 });
 
-Firehose.on('initialize:after', function() {
+Firehose.on('initialize:after', function () {
     Backbone.history.start();
 });
 

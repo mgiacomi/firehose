@@ -21,11 +21,11 @@ Firehose.module('Layout.Views', function (Views, App, Backbone, Marionette, $, _
         },
 
         onRender:function () {
-            setTimeout(function() {
-                if(Backbone.history.fragment.length > 1) {
+            setTimeout(function () {
+                if (Backbone.history.fragment.length > 1) {
                     $(".leftNavLink").each(function () {
                         $(this).removeClass('active');
-                        if('#'+Backbone.history.fragment.split("/")[0] == $(this).attr('href').split("/")[0]) {
+                        if ('#' + Backbone.history.fragment.split("/")[0] == $(this).attr('href').split("/")[0]) {
                             $(this).addClass('active');
                         }
                     });

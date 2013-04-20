@@ -5,6 +5,7 @@ import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.stats.AvgStatOverTime;
+import com.gltech.scale.core.stats.CounterStatOverTime;
 import com.gltech.scale.core.storage.StorageClient;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
@@ -32,6 +33,8 @@ public class BatchWriterImpl implements BatchWriter
 	private ChannelCoordinator channelCoordinator;
 	private String customerBatchPeriod;
 	private AvgStatOverTime channelStat;
+	private CounterStatOverTime messagesWrittenStat;
+	private CounterStatOverTime bytesWrittenStat;
 
 	@Inject
 	public BatchWriterImpl(AggregatorRestClient aggregatorRestClient, StorageClient storageClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
@@ -104,6 +107,8 @@ public class BatchWriterImpl implements BatchWriter
 			}
 
 			final BatchStreamsManager batchStreamsManager = new BatchStreamsManager(channelMetaData, nearestPeriodCeiling);
+			batchStreamsManager.setMessagesWrittenStat(messagesWrittenStat);
+			batchStreamsManager.setBytesWrittenStat(bytesWrittenStat);
 
 			// Register aggregator streams with the stream manager.
 			for (ServiceMetaData aggregator : aggregators)
@@ -153,5 +158,17 @@ public class BatchWriterImpl implements BatchWriter
 	public void setChannelStat(AvgStatOverTime channelStat)
 	{
 		this.channelStat = channelStat;
+	}
+
+	@Override
+	public void setMessagesWrittenStat(CounterStatOverTime messagesWrittenStat)
+	{
+		this.messagesWrittenStat = messagesWrittenStat;
+	}
+
+	@Override
+	public void setBytesWrittenStat(CounterStatOverTime bytesWrittenStat)
+	{
+		this.bytesWrittenStat = bytesWrittenStat;
 	}
 }

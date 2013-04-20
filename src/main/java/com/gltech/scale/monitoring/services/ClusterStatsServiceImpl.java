@@ -74,91 +74,87 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 		ClusterStats clusterStats = new ClusterStats();
 		clusterStats.setStats(serverStatsList);
 
-/*
-		int storageWriterMsgPerSec;
-		int storageWriterBytesPerSec;
-		int storageWriterBatchesBeingWritten;
-		int outboundMsgPerSec;
-		int outboundAvgMsgSize;
-		int outboundActiveQueries;
-
-Inbound
-Aggregator
-StorageWriter
-*/
 		Averager inboundLoad = new Averager();
 		Averager inboundAvgMsgSize = new Averager();
 		int inboundMsgPerSec = 0;
 		int aggregatorMsgInQue = 0;
 		int aggregatorQueSize = 0;
 		int aggregatorQueAge = 0;
+		int storageWriterMsgPerSec = 0;
+		int storageWriterBytesPerSec = 0;
+		int storageWriterBatchesBeingWritten = 0;
+
+/*
+		int outboundMsgPerSec;
+		int outboundAvgMsgSize;
+		int outboundActiveQueries;
+*/
 
 		for (ServerStats serverStats : serverStatsList)
 		{
-			if(serverStats.getRoles().contains("Inbound")) {
-				OverTime<AvgStat> loadStat = getAvgStatByName("System", "LoadAvg", serverStats);
-				if(loadStat != null) {
-					inboundLoad.add(loadStat.getSec5().getAverage());
+			if (serverStats.getRoles().contains("Inbound"))
+			{
+				OverTime<AvgStat> iLoadStat = getAvgStatByName("System", "LoadAvg", serverStats);
+				if (iLoadStat != null)
+				{
+					inboundLoad.add(iLoadStat.getSec5().getAverage());
 				}
 
-				OverTime<AvgStat> avgMsgSize = getAvgStatByName("Inbound", "AddMessage.Size", serverStats);
-				if(avgMsgSize != null) {
-					inboundAvgMsgSize.add(avgMsgSize.getSec5().getAverage());
+				OverTime<AvgStat> iAvgMsgSize = getAvgStatByName("Inbound", "AddMessage.Size", serverStats);
+				if (iAvgMsgSize != null)
+				{
+					inboundAvgMsgSize.add(iAvgMsgSize.getSec5().getAverage());
 				}
 
-				OverTime<Long> msgPerSec = getCountStatByName("Inbound", "AddMessage.Count", serverStats);
-				if(msgPerSec != null) {
-					inboundMsgPerSec += msgPerSec.getSec5();
+				OverTime<Long> iMsgPerSec = getCountStatByName("Inbound", "AddMessage.Count", serverStats);
+				if (iMsgPerSec != null)
+				{
+					inboundMsgPerSec += iMsgPerSec.getSec5();
 				}
 
-				OverTime<AvgStat> queSize = getAvgStatByName("Aggregator", "TotalQueueSize.Avg", serverStats);
-				if(queSize != null) {
-					aggregatorQueSize += queSize.getSec5().getAverage();
+				OverTime<AvgStat> aQueSize = getAvgStatByName("Aggregator", "TotalQueueSize.Avg", serverStats);
+				if (aQueSize != null)
+				{
+					aggregatorQueSize += aQueSize.getSec5().getAverage();
 				}
 
-				OverTime<AvgStat> msgInQue = getAvgStatByName("Aggregator", "MessagesInQueue.Avg", serverStats);
-				if(msgInQue != null) {
-					aggregatorMsgInQue += msgInQue.getSec5().getAverage();
+				OverTime<AvgStat> aMsgInQue = getAvgStatByName("Aggregator", "MessagesInQueue.Avg", serverStats);
+				if (aMsgInQue != null)
+				{
+					aggregatorMsgInQue += aMsgInQue.getSec5().getAverage();
 				}
 
-				OverTime<AvgStat> queAge = getAvgStatByName("Aggregator", "OldestInQueue.Avg", serverStats);
-				if(queAge != null) {
-					if(queAge.getSec5().getAverage() > aggregatorQueAge)
+				OverTime<AvgStat> aQueAge = getAvgStatByName("Aggregator", "OldestInQueue.Avg", serverStats);
+				if (aQueAge != null)
+				{
+					if (aQueAge.getSec5().getAverage() > aggregatorQueAge)
 					{
-						aggregatorQueAge = Math.round(queAge.getSec5().getAverage());
+						aggregatorQueAge = Math.round(aQueAge.getSec5().getAverage());
 					}
 				}
-/*
-				OverTime<AvgStat> xxx = getAvgStatByName("xxx", "xxx", serverStats);
-				if(xxx != null) {
-					inboundxxx.add(xxx.getSec5().getAverage());
-				}
-				OverTime<AvgStat> xxx = getAvgStatByName("xxx", "xxx", serverStats);
-				if(xxx != null) {
-					inboundxxx.add(xxx.getSec5().getAverage());
-				}
-				OverTime<AvgStat> xxx = getAvgStatByName("xxx", "xxx", serverStats);
-				if(xxx != null) {
-					inboundxxx.add(xxx.getSec5().getAverage());
-				}
 
-				OverTime<AvgStat> xxx = getAvgStatByName("xxx", "xxx", serverStats);
-				if(xxx != null) {
-					inboundxxx.add(xxx.getSec5().getAverage());
+				OverTime<Long> swMsgPerSec = getCountStatByName("Storage Writer", "MessagesWritten.Count", serverStats);
+				if (swMsgPerSec != null)
+				{
+					storageWriterMsgPerSec += swMsgPerSec.getSec5();
 				}
-				OverTime<AvgStat> xxx = getAvgStatByName("xxx", "xxx", serverStats);
-				if(xxx != null) {
-					inboundxxx.add(xxx.getSec5().getAverage());
+				OverTime<Long> swBytesPerSec = getCountStatByName("Storage Writer", "MessagesWritten.Size", serverStats);
+				if (swBytesPerSec != null)
+				{
+					storageWriterBytesPerSec += swBytesPerSec.getSec5();
 				}
-*/
+				OverTime<AvgStat> swBatchesBeingWritten = getAvgStatByName("Storage Writer", "WritingBatches.Avg", serverStats);
+				if (swBatchesBeingWritten != null)
+				{
+					storageWriterBatchesBeingWritten += swBatchesBeingWritten.getSec5().getAverage();
+				}
 			}
-
 		}
 
 		// Inbound
 		clusterStats.getAggregateStats().setInboundLoad(inboundLoad.getAvg());
 		clusterStats.getAggregateStats().setInboundAvgMsgSize(inboundAvgMsgSize.getAvg());
-		if(inboundMsgPerSec > 0)
+		if (inboundMsgPerSec > 0)
 		{
 			clusterStats.getAggregateStats().setInboundMsgPerSec(inboundMsgPerSec / 5);
 		}
@@ -168,18 +164,29 @@ StorageWriter
 		clusterStats.getAggregateStats().setAggregatorQueAge(aggregatorQueAge);
 		clusterStats.getAggregateStats().setAggregatorQueSize(aggregatorQueSize);
 
+		// Storage Writer
+		clusterStats.getAggregateStats().setStorageWriterBatchesBeingWritten(storageWriterBatchesBeingWritten);
+		if (storageWriterBytesPerSec > 0)
+		{
+			clusterStats.getAggregateStats().setStorageWriterBytesPerSec(storageWriterBytesPerSec / 5);
+		}
+		if (storageWriterMsgPerSec > 0)
+		{
+			clusterStats.getAggregateStats().setStorageWriterMsgPerSec(storageWriterMsgPerSec / 5);
+		}
+
 		return clusterStats;
 	}
 
 	private OverTime<AvgStat> getAvgStatByName(String groupName, String statName, ServerStats serverStats)
 	{
-		for(GroupStats groupStats : serverStats.getGroupStatsList())
+		for (GroupStats groupStats : serverStats.getGroupStatsList())
 		{
-			if(groupStats.getName().equalsIgnoreCase(groupName))
+			if (groupStats.getName().equalsIgnoreCase(groupName))
 			{
-				for(OverTime<AvgStat> avgStat : groupStats.getAvgStats())
+				for (OverTime<AvgStat> avgStat : groupStats.getAvgStats())
 				{
-					if(avgStat.getName().equalsIgnoreCase(statName))
+					if (avgStat.getName().equalsIgnoreCase(statName))
 					{
 						return avgStat;
 					}
@@ -192,13 +199,13 @@ StorageWriter
 
 	private OverTime<Long> getCountStatByName(String groupName, String statName, ServerStats serverStats)
 	{
-		for(GroupStats groupStats : serverStats.getGroupStatsList())
+		for (GroupStats groupStats : serverStats.getGroupStatsList())
 		{
-			if(groupStats.getName().equalsIgnoreCase(groupName))
+			if (groupStats.getName().equalsIgnoreCase(groupName))
 			{
-				for(OverTime<Long> countStat : groupStats.getCountStats())
+				for (OverTime<Long> countStat : groupStats.getCountStats())
 				{
-					if(countStat.getName().equalsIgnoreCase(statName))
+					if (countStat.getName().equalsIgnoreCase(statName))
 					{
 						return countStat;
 					}

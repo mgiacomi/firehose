@@ -10,26 +10,26 @@ var clusterStatsHelpers = {
         return servers;
     },
 
-    colorByStatus:function(status) {
-        if(status == 'Running') {
+    colorByStatus:function (status) {
+        if (status == 'Running') {
             return "green";
         }
-        if(status == 'Offline') {
+        if (status == 'Offline') {
             return "orange";
         }
-        if(status == 'Unknown') {
+        if (status == 'Unknown') {
             return "red";
         }
     },
 
-    colorByServers:function(servers) {
+    colorByServers:function (servers) {
         var color = "greenNum";
 
         $.each(this.stats, function (idx, server) {
-            if(server.status == "Offline" && color != "redNum")  {
+            if (server.status == "Offline" && color != "redNum") {
                 color = "blueNum";
             }
-            if(server.status == "Unknown") {
+            if (server.status == "Unknown") {
                 return "redNum";
             }
         });

@@ -65,7 +65,7 @@ public class AggregatorStats implements Aggregator
 			public long getValue()
 			{
 				long total = 0;
-				for(Batch batch : aggregator.getActiveBatches())
+				for (Batch batch : aggregator.getActiveBatches())
 				{
 					total += batch.getBytes();
 				}
@@ -77,7 +77,7 @@ public class AggregatorStats implements Aggregator
 			public long getValue()
 			{
 				long total = 0;
-				for(Batch batch : aggregator.getActiveBatches())
+				for (Batch batch : aggregator.getActiveBatches())
 				{
 					total += batch.getMessages().size();
 				}
@@ -89,9 +89,9 @@ public class AggregatorStats implements Aggregator
 			public long getValue()
 			{
 				DateTime oldest = new DateTime();
-				for(Batch batch : aggregator.getActiveBatches())
+				for (Batch batch : aggregator.getActiveBatches())
 				{
-					if(batch.getFirstMessageTime().isBefore(oldest))
+					if (batch.getFirstMessageTime().isBefore(oldest))
 					{
 						oldest = batch.getFirstMessageTime();
 					}

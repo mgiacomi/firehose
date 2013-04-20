@@ -14,7 +14,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
 
     Views.Roles = Marionette.ItemView.extend({
         template:'dashboard_roles',
-        templateHelpers: clusterStatsHelpers,
+        templateHelpers:clusterStatsHelpers,
 
         modelEvents:{
             "change:stats":"render"
@@ -23,13 +23,13 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
 
     Views.Servers = Marionette.ItemView.extend({
         template:'dashboard_servers',
-        templateHelpers: clusterStatsHelpers,
+        templateHelpers:clusterStatsHelpers,
 
         modelEvents:{
             "change:stats":"updateTable"
         },
 
-        updateTable:function() {
+        updateTable:function () {
             oTable.fnClearTable();
 
             $.each(this.model.get("stats"), function (idx, server) {
@@ -40,14 +40,14 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
 
                 var roles = "";
                 $.each(server.roles, function (idx, role) {
-                    if(idx > 0) {
+                    if (idx > 0) {
                         roles += ", ";
                     }
                     roles += role;
                 });
 
                 row[2] = roles;
-                row[3] = '<strong class="'+ clusterStatsHelpers.colorByStatus(server.status) +'">'+ server.status +'</strong>';
+                row[3] = '<strong class="' + clusterStatsHelpers.colorByStatus(server.status) + '">' + server.status + '</strong>';
                 row[4] = clusterStatsHelpers.prettyDate(server.joinDate);
 
 
@@ -58,49 +58,59 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
 
     Views.Performance = Marionette.ItemView.extend({
         template:'dashboard_performance',
-        inboundPlot: {},
-        aggregatorPlot: {},
-        storageWriterPlot: {},
-        outboundPlot: {},
-        inboundLoad: [],
-        inboundAvgMsgSize: [],
-        inboundMsgPerSec: [],
-        aggregatorMsgInQue: [],
-        aggregatorQueSize: [],
-        aggregatorQueAge: [],
+        inboundPlot:{},
+        inboundLoad:[],
+        inboundAvgMsgSize:[],
+        inboundMsgPerSec:[],
 
-        data: [],
-        data2: [],
-        data3: [],
-        data4: [],
-        totalPoints: 200,
+        aggregatorPlot:{},
+        aggregatorMsgInQue:[],
+        aggregatorQueSize:[],
+        aggregatorQueAge:[],
 
-        initialize: function() {
-            this.listenTo(this,'render',this.afterRender);
+        storageWriterPlot:{},
+        storageWriterMsgPerSec:[],
+        storageWriterBytesPerSec:[],
+        storageWriterBatchesBeingWritten:[],
+
+        outboundPlot:{},
+
+        totalPoints:200,
+
+        initialize:function () {
+            this.listenTo(this, 'render', this.afterRender);
         },
 
         modelEvents:{
             "change:stats":"updateData"
         },
 
-        afterRender: function() {
+        afterRender:function () {
             var that = this;
             _.defer(function (caller) {
                 that.inboundPlot = $.plot($("#inbound"), [
-                    { data:that.updateDataArray(that.inboundMsgPerSec, 0) },{ data:that.updateDataArray(that.inboundAvgMsgSize, 0) },{ data:that.updateDataArray(that.inboundLoad, 0) }
+                    { data:that.updateDataArray(that.inboundMsgPerSec, 0) },
+                    { data:that.updateDataArray(that.inboundAvgMsgSize, 0) },
+                    { data:that.updateDataArray(that.inboundLoad, 0) }
                 ], that.inboundOptions);
 
                 that.aggregatorPlot = $.plot($("#aggregator"), [
-                    { data:that.updateDataArray(that.aggregatorMsgInQue, 0) },{ data:that.updateDataArray(that.aggregatorQueSize, 0) },{ data:that.updateDataArray(that.aggregatorQueAge, 0) }
+                    { data:that.updateDataArray(that.aggregatorMsgInQue, 0) },
+                    { data:that.updateDataArray(that.aggregatorQueSize, 0) },
+                    { data:that.updateDataArray(that.aggregatorQueAge, 0) }
                 ], that.aggregatorOptions);
 
                 that.storageWriterPlot = $.plot($("#storageWriter"), [
-                    { data:that.getRandomData() },{ data:that.getRandomData2() },{ data:that.getRandomData3() }
+                    { data:that.updateDataArray(that.storageWriterMsgPerSec, 0) },
+                    { data:that.updateDataArray(that.storageWriterBytesPerSec, 0) },
+                    { data:that.updateDataArray(that.storageWriterBatchesBeingWritten, 0) }
                 ], that.storageWriterOptions);
 
-                that.outboundPlot = $.plot($("#outbound"), [
-                    { data:that.getRandomData() },{ data:that.getRandomData2() },{ data:that.getRandomData3() }
-                ], that.outboundOptions);
+                /*
+                 that.outboundPlot = $.plot($("#outbound"), [
+                 { data:that.getRandomData() },{ data:that.getRandomData2() },{ data:that.getRandomData3() }
+                 ], that.outboundOptions);
+                 */
 
             }, this);
         },
@@ -130,27 +140,32 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
             this.aggregatorPlot.setupGrid();
             this.aggregatorPlot.draw();
 
+            this.storageWriterMsgPerSec = this.updateDataArray(this.storageWriterMsgPerSec, this.model.get("aggregateStats").storageWriterMsgPerSec);
+            this.storageWriterBytesPerSec = this.updateDataArray(this.storageWriterBytesPerSec, this.model.get("aggregateStats").storageWriterBytesPerSec);
+            this.storageWriterBatchesBeingWritten = this.updateDataArray(this.storageWriterBatchesBeingWritten, this.model.get("aggregateStats").storageWriterBatchesBeingWritten);
+
             this.storageWriterPlot.setData([
-                { data:this.getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
-                { data:this.getRandomData2(), color:"#6db6ee", label:"Bytes Per/Sec", yaxis:2 },
-                { data:this.getRandomData3(), color:"#ee7951", label:"Batches Being Written", yaxis:3 }
+                { data:this.toFlotArray(this.storageWriterMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
+                { data:this.toFlotArray(this.storageWriterBytesPerSec), color:"#6db6ee", label:"Bytes Per/Sec", yaxis:2 },
+                { data:this.toFlotArray(this.storageWriterBatchesBeingWritten), color:"#ee7951", label:"Batches Being Written", yaxis:3 }
             ]);
             this.storageWriterPlot.setupGrid();
             this.storageWriterPlot.draw();
 
-            this.outboundPlot.setData([
-                { data:this.getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
-                { data:this.getRandomData2(), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
-                { data:this.getRandomData3(), color:"#ee7951", label:"Active Queries", yaxis:3 }
-            ]);
-            this.outboundPlot.setupGrid();
-            this.outboundPlot.draw();
-
+            /*
+             this.outboundPlot.setData([
+             { data:this.getRandomData(), color:"#54cb4b", label:"Messages Per/Sec" },
+             { data:this.getRandomData2(), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
+             { data:this.getRandomData3(), color:"#ee7951", label:"Active Queries", yaxis:3 }
+             ]);
+             this.outboundPlot.setupGrid();
+             this.outboundPlot.draw();
+             */
         },
 
         // Inbound
-        inboundOptions: {
-            xaxis:{ ticks: false },
+        inboundOptions:{
+            xaxis:{ ticks:false },
             yaxes:[
                 {
                     min:0,
@@ -177,8 +192,8 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         },
 
         // Aggregator
-        aggregatorOptions: {
-            xaxis:{ ticks: false },
+        aggregatorOptions:{
+            xaxis:{ ticks:false },
             yaxes:[
                 {
                     min:0,
@@ -205,8 +220,8 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         },
 
         // StorageWriter
-        storageWriterOptions: {
-            xaxis:{ ticks: false },
+        storageWriterOptions:{
+            xaxis:{ ticks:false },
             yaxes:[
                 {
                     min:0,
@@ -232,8 +247,8 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         },
 
         // Outbound
-        outboundOptions: {
-            xaxis:{ ticks: false },
+        outboundOptions:{
+            xaxis:{ ticks:false },
             yaxes:[
                 {
                     min:0,
@@ -259,15 +274,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
             }
         },
 
-        updateDataArray: function(data, value){
-            // Pad with 0's
-//            while (data.length < this.totalPoints) {
-/*
-            while (data.length < 5) {
-                data.push(0);
-            }
-*/
-
+        updateDataArray:function (data, value) {
             // Remove oldest
             if (data.length > 0 && data.length > this.totalPoints) {
                 data = data.slice(1);
@@ -279,77 +286,11 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
             return data;
         },
 
-        toFlotArray: function(data) {
+        toFlotArray:function (data) {
             var res = [];
             for (var i = 0; i < data.length; ++i) {
                 res.push([i, data[i]])
             }
-            return res;
-        },
-
-        getRandomData:function () {
-            if (this.data.length > 0)
-                this.data = this.data.slice(1);
-
-            // do a random walk
-            while (this.data.length < this.totalPoints) {
-                var prev = this.data.length > 0 ? this.data[this.data.length - 1] : 50;
-                var y = prev + Math.random() * 10 - 5;
-                if (y < 0)
-                    y = 0;
-                if (y > 100)
-                    y = 100;
-                this.data.push(y);
-            }
-
-            // zip the generated y values with the x values
-            var res = [];
-            for (var i = 0; i < this.data.length; ++i)
-                res.push([i, this.data[i]])
-            return res;
-        },
-
-        getRandomData2:function () {
-            if (this.data2.length > 0)
-                this.data2 = this.data2.slice(1);
-
-            // do a random walk
-            while (this.data2.length < this.totalPoints) {
-                var prev = this.data2.length > 0 ? this.data2[this.data2.length - 1] : 50;
-                var y = prev + Math.random() * 10 - 5;
-                if (y < 0)
-                    y = 0;
-                if (y > 100)
-                    y = 100;
-                this.data2.push(y);
-            }
-
-            // zip the generated y values with the x values
-            var res = [];
-            for (var i = 0; i < this.data2.length; ++i)
-                res.push([i, this.data2[i]])
-            return res;
-        },
-
-        getRandomData3: function () {
-            if (this.data3.length > 0)
-                this.data3 = this.data3.slice(1);
-
-            // do a random walk
-            while (this.data3.length < this.totalPoints) {
-                var prev = this.data3.length > 0 ? this.data3[this.data3.length - 1] : 50;
-                var y = prev + Math.random() * 10 - 5;
-                if (y < 0)
-                    y = 0;
-                if (y > 100)
-                    y = 100;
-                this.data3.push(y);
-            }
-
-            // zip the generated y values with the x values
-            var res = [];
-            for (var i = 0; i < this.data3.length; ++i)
-                res.push([i, this.data3[i]])
             return res;
         }
     });

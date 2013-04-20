@@ -141,7 +141,8 @@ public class EmbeddedServer
 		}
 	}
 
-	private static void monitorSystemStats() {
+	private static void monitorSystemStats()
+	{
 		final OperatingSystemMXBean osStats = ManagementFactory.getOperatingSystemMXBean();
 		StatsManager statsManager = injector.getInstance(StatsManager.class);
 

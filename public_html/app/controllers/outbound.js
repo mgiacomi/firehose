@@ -10,21 +10,22 @@ Firehose.module('Outbound', function (Outbound, App, Backbone, Marionette, $, _)
     });
 
     // Controller
-    Outbound.Controller = function () {};
+    Outbound.Controller = function () {
+    };
 
     _.extend(Outbound.Controller.prototype, {
 
-        overview: function() {
+        overview:function () {
             App.middlenav.show(new Outbound.Views.Nav());
             App.content.show(new Outbound.Views.Overview({model:clusterStats}));
         },
 
-        live_stats: function() {
+        live_stats:function () {
             App.middlenav.show(new Outbound.Views.Nav());
             App.content.show(new Outbound.Views.LiveStats({model:clusterStats}));
         },
 
-        performance: function() {
+        performance:function () {
             App.middlenav.show(new Outbound.Views.Nav());
             App.content.show(new Outbound.Views.Performance({model:clusterStats}));
         }

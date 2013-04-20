@@ -80,7 +80,7 @@ public class RegistrationServiceImpl implements RegistrationService
 
 		for (ServiceInstance<ServiceMetaData> serviceMetaData : inboundServiceCache.getInstances())
 		{
-			if(localServerMetaData.equals(serviceMetaData.getPayload()))
+			if (localServerMetaData.equals(serviceMetaData.getPayload()))
 			{
 				roles.add("Inbound");
 			}
@@ -88,7 +88,7 @@ public class RegistrationServiceImpl implements RegistrationService
 
 		for (ServiceInstance<ServiceMetaData> serviceMetaData : aggregatorCache.getInstances())
 		{
-			if(localServerMetaData.equals(serviceMetaData.getPayload()))
+			if (localServerMetaData.equals(serviceMetaData.getPayload()))
 			{
 				roles.add("Aggregator");
 			}
@@ -96,7 +96,7 @@ public class RegistrationServiceImpl implements RegistrationService
 
 		for (ServiceInstance<ServiceMetaData> serviceMetaData : storageWriterCache.getInstances())
 		{
-			if(localServerMetaData.equals(serviceMetaData.getPayload()))
+			if (localServerMetaData.equals(serviceMetaData.getPayload()))
 			{
 				roles.add("StorageWriter");
 			}
@@ -110,7 +110,7 @@ public class RegistrationServiceImpl implements RegistrationService
 	{
 		for (ServiceInstance<ServiceMetaData> serviceMetaData : serverCache.getInstances())
 		{
-			if(localServerMetaData.equals(serviceMetaData.getPayload()))
+			if (localServerMetaData.equals(serviceMetaData.getPayload()))
 			{
 				return new DateTime(serviceMetaData.getRegistrationTimeUTC(), DateTimeZone.UTC).withZone(DateTimeZone.getDefault());
 			}

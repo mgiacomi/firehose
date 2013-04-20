@@ -1,5 +1,5 @@
 <script>
-	_.defer(function(caller){
+	_.defer(function (caller) {
 
 		//===== Calendar =====//
 		var date = new Date();
@@ -8,76 +8,76 @@
 		var y = date.getFullYear();
 
 		$('#calendar').fullCalendar({
-			header: {
-				left: 'prev,next',
-				center: 'title',
-				right: 'month,basicWeek,basicDay'
+			header:{
+				left:'prev,next',
+				center:'title',
+				right:'month,basicWeek,basicDay'
 			},
-			editable: true,
-			events: [
+			editable:true,
+			events:[
 				{
-					title: 'All day event',
-					start: new Date(y, m, 1)
+					title:'All day event',
+					start:new Date(y, m, 1)
 				},
 				{
-					title: 'Long event',
-					start: new Date(y, m, 5),
-					end: new Date(y, m, 8)
+					title:'Long event',
+					start:new Date(y, m, 5),
+					end:new Date(y, m, 8)
 				},
 				{
-					id: 999,
-					title: 'Repeating event',
-					start: new Date(y, m, 2, 16, 0),
-					end: new Date(y, m, 3, 18, 0),
-					allDay: false
+					id:999,
+					title:'Repeating event',
+					start:new Date(y, m, 2, 16, 0),
+					end:new Date(y, m, 3, 18, 0),
+					allDay:false
 				},
 				{
-					id: 999,
-					title: 'Repeating event',
-					start: new Date(y, m, 9, 16, 0),
-					end: new Date(y, m, 10, 18, 0),
-					allDay: false
+					id:999,
+					title:'Repeating event',
+					start:new Date(y, m, 9, 16, 0),
+					end:new Date(y, m, 10, 18, 0),
+					allDay:false
 				},
 				{
-					title: 'Actually any color could be applied for background',
-					start: new Date(y, m, 30, 10, 30),
-					end: new Date(y, m, d+1, 14, 0),
-					allDay: false,
-					color: '#B55D5C'
+					title:'Actually any color could be applied for background',
+					start:new Date(y, m, 30, 10, 30),
+					end:new Date(y, m, d + 1, 14, 0),
+					allDay:false,
+					color:'#B55D5C'
 				},
 				{
-					title: 'Lunch',
-					start: new Date(y, m, 14, 12, 0),
-					end: new Date(y, m, 15, 14, 0),
-					allDay: false
+					title:'Lunch',
+					start:new Date(y, m, 14, 12, 0),
+					end:new Date(y, m, 15, 14, 0),
+					allDay:false
 				},
 				{
-					title: 'Birthday PARTY',
-					start: new Date(y, m, 18),
-					end: new Date(y, m, 20),
-					allDay: false
+					title:'Birthday PARTY',
+					start:new Date(y, m, 18),
+					end:new Date(y, m, 20),
+					allDay:false
 				},
 				{
-					title: 'Click for Google',
-					start: new Date(y, m, 27),
-					end: new Date(y, m, 29),
-					url: 'http://google.com/'
+					title:'Click for Google',
+					start:new Date(y, m, 27),
+					end:new Date(y, m, 29),
+					url:'http://google.com/'
 				}
 			]
 		});
 
 		//===== Tabs =====//
-		$( ".tabs" ).tabs();
+		$(".tabs").tabs();
 
 		//===== Dynamic data table =====//
 		oTable = $('#example').dataTable({
-			"bJQueryUI": false,
-			"bAutoWidth": false,
-			"sPaginationType": "full_numbers",
-			"sDom": '<"datatable-header"fl>t<"datatable-footer"ip>',
-			"oLanguage": {
-				"sLengthMenu": "<span>Show entries:</span> _MENU_",
-				"oPaginate": { "sFirst": "First", "sLast": "Last", "sNext": ">", "sPrevious": "<" }
+			"bJQueryUI":false,
+			"bAutoWidth":false,
+			"sPaginationType":"full_numbers",
+			"sDom":'<"datatable-header"fl>t<"datatable-footer"ip>',
+			"oLanguage":{
+				"sLengthMenu":"<span>Show entries:</span> _MENU_",
+				"oPaginate":{ "sFirst":"First", "sLast":"Last", "sNext":">", "sPrevious":"<" }
 			}
 		});
 
@@ -105,7 +105,7 @@
 			<a href="#" class="count grey" style="font-size:16px" title="">14</a>
 			<span style="font-size:14px;">Batch<br/>Storage Writers</span>
 		</li>
-		<li  style="margin-left:0;width:20%;" class="last">
+		<li style="margin-left:0;width:20%;" class="last">
 			<a href="#" class="count grey" style="font-size:16px" title="">48</a>
 			<span style="font-size:14px;">Storage<br/>Servers</span>
 		</li>

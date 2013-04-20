@@ -7,6 +7,7 @@ import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.core.stats.CounterStatOverTime;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -25,6 +26,8 @@ public class BatchStreamsManager
 	private int totalStreams = 0;
 	private Set<String> processedMessages = new HashSet<>();
 	private String customerBatchPeriod;
+	private CounterStatOverTime messagesWrittenStat;
+	private CounterStatOverTime bytesWrittenStat;
 	private long bytesWritten;
 
 	public BatchStreamsManager(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
@@ -94,11 +97,15 @@ public class BatchStreamsManager
 				// If we have a candidate then write it to the stream.
 				if (candidateNextRecord != null)
 				{
-					bytesWritten = +ProtostuffIOUtil.writeDelimitedTo(outputStream, candidateNextRecord.getCurrentMessage(), schema, linkedBuffer);
+					long messageBytes = ProtostuffIOUtil.writeDelimitedTo(outputStream, candidateNextRecord.getCurrentMessage(), schema, linkedBuffer);
 					processedMessages.add(candidateNextRecord.getCurrentMessage().getUuid());
 					candidateNextRecord.nextRecord();
 					recordsReceived++;
 					linkedBuffer.clear();
+
+					bytesWritten += messageBytes;
+					bytesWrittenStat.add(messageBytes);
+					messagesWrittenStat.increment();
 				}
 			}
 		}
@@ -127,4 +134,15 @@ public class BatchStreamsManager
 
 		return processedMessages.size();
 	}
+
+	public void setMessagesWrittenStat(CounterStatOverTime messagesWrittenStat)
+	{
+		this.messagesWrittenStat = messagesWrittenStat;
+	}
+
+	public void setBytesWrittenStat(CounterStatOverTime bytesWrittenStat)
+	{
+		this.bytesWrittenStat = bytesWrittenStat;
+	}
+
 }
