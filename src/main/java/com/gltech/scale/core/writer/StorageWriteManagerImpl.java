@@ -91,8 +91,8 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 								channelStat.activateCountStat(batchPeriodMapper.getChannelName() + ".Count", "batches");
 
 								// Get stats for message size and number
-								CounterStatOverTime messagesWritten = statsManager.createCounterStat(groupName, "MessagesWritten.Count", "messages");
-								CounterStatOverTime bytesWritten = statsManager.createCounterStat(groupName, "MessagesWritten.Size", "bytes");
+								CountStatOverTime messagesWritten = statsManager.createCounterStat(groupName, "MessagesWritten.Count", "messages");
+								CountStatOverTime bytesWritten = statsManager.createCounterStat(groupName, "MessagesWritten.Size", "bytes");
 
 								BatchWriter batchWriter = injector.getInstance(BatchWriter.class);
 								batchWriter.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());

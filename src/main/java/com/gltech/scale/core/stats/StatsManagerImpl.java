@@ -178,20 +178,20 @@ public class StatsManagerImpl implements StatsManager
 	}
 
 	@Override
-	public CounterStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure)
+	public CountStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure)
 	{
 		return createCounterStat(groupName, statName, unitOfMeasure, null);
 	}
 
 	@Override
-	public CounterStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure, StatCallBack statCallBack)
+	public CountStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure, StatCallBack statCallBack)
 	{
-		CounterStatOverTime counterStatOverTime = new CounterStatOverTime(statName, unitOfMeasure);
-		StatOverTime statOverTime = registerStat(groupName, statName, counterStatOverTime, statCallBack);
+		CountStatOverTime countStatOverTime = new CountStatOverTime(statName, unitOfMeasure);
+		StatOverTime statOverTime = registerStat(groupName, statName, countStatOverTime, statCallBack);
 
 		try
 		{
-			return (CounterStatOverTime) statOverTime;
+			return (CountStatOverTime) statOverTime;
 		}
 		catch (ClassCastException e)
 		{
@@ -257,33 +257,33 @@ public class StatsManagerImpl implements StatsManager
 
 					groupStats.getAvgStats().add(avgOverTime);
 
-					if (avgStatOverTime.getCounterStatOverTime().getName() != null)
+					if (avgStatOverTime.getCountStatOverTime().getName() != null)
 					{
 						OverTime<Long> countOverTime = new OverTime<>(
-								avgStatOverTime.getCounterStatOverTime().getName(),
-								avgStatOverTime.getCounterStatOverTime().getUnitOfMeasure(),
-								avgStatOverTime.getCounterStatOverTime().getCountOverSeconds(5),
-								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(1),
-								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(5),
-								avgStatOverTime.getCounterStatOverTime().getCountOverMinutes(30),
-								avgStatOverTime.getCounterStatOverTime().getCountOverHours(2)
+								avgStatOverTime.getCountStatOverTime().getName(),
+								avgStatOverTime.getCountStatOverTime().getUnitOfMeasure(),
+								avgStatOverTime.getCountStatOverTime().getCountOverSeconds(5),
+								avgStatOverTime.getCountStatOverTime().getCountOverMinutes(1),
+								avgStatOverTime.getCountStatOverTime().getCountOverMinutes(5),
+								avgStatOverTime.getCountStatOverTime().getCountOverMinutes(30),
+								avgStatOverTime.getCountStatOverTime().getCountOverHours(2)
 						);
 
 						groupStats.getCountStats().add(countOverTime);
 					}
 				}
-				if (statOverTime instanceof CounterStatOverTime)
+				if (statOverTime instanceof CountStatOverTime)
 				{
-					CounterStatOverTime counterStatOverTime = (CounterStatOverTime) statOverTime;
+					CountStatOverTime countStatOverTime = (CountStatOverTime) statOverTime;
 
 					OverTime<Long> countOverTime = new OverTime<>(
-							counterStatOverTime.getName(),
-							counterStatOverTime.getUnitOfMeasure(),
-							counterStatOverTime.getCountOverSeconds(5),
-							counterStatOverTime.getCountOverMinutes(1),
-							counterStatOverTime.getCountOverMinutes(5),
-							counterStatOverTime.getCountOverMinutes(30),
-							counterStatOverTime.getCountOverHours(2)
+							countStatOverTime.getName(),
+							countStatOverTime.getUnitOfMeasure(),
+							countStatOverTime.getCountOverSeconds(5),
+							countStatOverTime.getCountOverMinutes(1),
+							countStatOverTime.getCountOverMinutes(5),
+							countStatOverTime.getCountOverMinutes(30),
+							countStatOverTime.getCountOverHours(2)
 					);
 
 					groupStats.getCountStats().add(countOverTime);

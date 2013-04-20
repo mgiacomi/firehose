@@ -12,7 +12,7 @@ public class AvgStatOverTime implements StatOverTime
 {
 	private ConcurrentMap<DateTime, AtomicLong> totalsBy5SecPeriods = new ConcurrentHashMap<>();
 	private final ThreadLocal<Long> startTime = new ThreadLocal<>();
-	private final CounterStatOverTime counterStatOverTime;
+	private final CountStatOverTime countStatOverTime;
 	private String statName;
 	private String unitOfMeasure;
 
@@ -21,14 +21,14 @@ public class AvgStatOverTime implements StatOverTime
 	{
 		this.statName = statName;
 		this.unitOfMeasure = unitOfMeasure;
-		counterStatOverTime = new CounterStatOverTime(null, null);
+		countStatOverTime = new CountStatOverTime(null, null);
 	}
 
 	// Only allow classes in this package to create a stat.
 	public void activateCountStat(String countStatName, String unitOfMeasure)
 	{
-		counterStatOverTime.setStatName(countStatName);
-		counterStatOverTime.setUnitOfMeasure(unitOfMeasure);
+		countStatOverTime.setStatName(countStatName);
+		countStatOverTime.setUnitOfMeasure(unitOfMeasure);
 	}
 
 
@@ -65,7 +65,7 @@ public class AvgStatOverTime implements StatOverTime
 		}
 
 		atomicTotal.addAndGet(total);
-		counterStatOverTime.add(dateTime);
+		countStatOverTime.add(dateTime);
 	}
 
 	@Override
@@ -80,9 +80,9 @@ public class AvgStatOverTime implements StatOverTime
 		return unitOfMeasure;
 	}
 
-	public CounterStatOverTime getCounterStatOverTime()
+	public CountStatOverTime getCountStatOverTime()
 	{
-		return counterStatOverTime;
+		return countStatOverTime;
 	}
 
 	public AvgStat getAvgOverSeconds(int seconds)
@@ -122,7 +122,7 @@ public class AvgStatOverTime implements StatOverTime
 			period = period.minusSeconds(5);
 		}
 
-		long counter = counterStatOverTime.getTotalCount(loops);
+		long counter = countStatOverTime.getTotalCount(loops);
 		return new AvgStat(total, counter);
 	}
 
@@ -138,7 +138,7 @@ public class AvgStatOverTime implements StatOverTime
 			}
 		}
 
-		counterStatOverTime.cleanOldThanTwoHours();
+		countStatOverTime.cleanOldThanTwoHours();
 	}
 
 	public boolean equals(Object o)

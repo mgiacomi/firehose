@@ -5,7 +5,7 @@ import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.stats.AvgStatOverTime;
-import com.gltech.scale.core.stats.CounterStatOverTime;
+import com.gltech.scale.core.stats.CountStatOverTime;
 import com.gltech.scale.core.storage.StorageClient;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
@@ -33,8 +33,8 @@ public class BatchWriterImpl implements BatchWriter
 	private ChannelCoordinator channelCoordinator;
 	private String customerBatchPeriod;
 	private AvgStatOverTime channelStat;
-	private CounterStatOverTime messagesWrittenStat;
-	private CounterStatOverTime bytesWrittenStat;
+	private CountStatOverTime messagesWrittenStat;
+	private CountStatOverTime bytesWrittenStat;
 
 	@Inject
 	public BatchWriterImpl(AggregatorRestClient aggregatorRestClient, StorageClient storageClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
@@ -161,13 +161,13 @@ public class BatchWriterImpl implements BatchWriter
 	}
 
 	@Override
-	public void setMessagesWrittenStat(CounterStatOverTime messagesWrittenStat)
+	public void setMessagesWrittenStat(CountStatOverTime messagesWrittenStat)
 	{
 		this.messagesWrittenStat = messagesWrittenStat;
 	}
 
 	@Override
-	public void setBytesWrittenStat(CounterStatOverTime bytesWrittenStat)
+	public void setBytesWrittenStat(CountStatOverTime bytesWrittenStat)
 	{
 		this.bytesWrittenStat = bytesWrittenStat;
 	}

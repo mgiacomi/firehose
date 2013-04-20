@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class CounterStatOverTime implements StatOverTime
+public class CountStatOverTime implements StatOverTime
 {
 	private ConcurrentMap<DateTime, AtomicLong> countsBy5SecPeriods = new ConcurrentHashMap<>();
 	private final ThreadLocal<Long> startTime = new ThreadLocal<>();
@@ -15,7 +15,7 @@ public class CounterStatOverTime implements StatOverTime
 	private String unitOfMeasure;
 
 	// Only allow classes in this package to create a stat.
-	protected CounterStatOverTime(String statName, String unitOfMeasure)
+	protected CountStatOverTime(String statName, String unitOfMeasure)
 	{
 		this.statName = statName;
 		this.unitOfMeasure = unitOfMeasure;
@@ -146,7 +146,7 @@ public class CounterStatOverTime implements StatOverTime
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		CounterStatOverTime that = (CounterStatOverTime) o;
+		CountStatOverTime that = (CountStatOverTime) o;
 
 		if (statName != null ? !statName.equals(that.statName) : that.statName != null) return false;
 

@@ -7,7 +7,7 @@ import com.dyuproject.protostuff.runtime.RuntimeSchema;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.stats.CounterStatOverTime;
+import com.gltech.scale.core.stats.CountStatOverTime;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -26,8 +26,8 @@ public class BatchStreamsManager
 	private int totalStreams = 0;
 	private Set<String> processedMessages = new HashSet<>();
 	private String customerBatchPeriod;
-	private CounterStatOverTime messagesWrittenStat;
-	private CounterStatOverTime bytesWrittenStat;
+	private CountStatOverTime messagesWrittenStat;
+	private CountStatOverTime bytesWrittenStat;
 	private long bytesWritten;
 
 	public BatchStreamsManager(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
@@ -135,12 +135,12 @@ public class BatchStreamsManager
 		return processedMessages.size();
 	}
 
-	public void setMessagesWrittenStat(CounterStatOverTime messagesWrittenStat)
+	public void setMessagesWrittenStat(CountStatOverTime messagesWrittenStat)
 	{
 		this.messagesWrittenStat = messagesWrittenStat;
 	}
 
-	public void setBytesWrittenStat(CounterStatOverTime bytesWrittenStat)
+	public void setBytesWrittenStat(CountStatOverTime bytesWrittenStat)
 	{
 		this.bytesWrittenStat = bytesWrittenStat;
 	}

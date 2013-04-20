@@ -3,7 +3,7 @@ package com.gltech.scale.core.aggregator;
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.stats.AvgStatOverTime;
-import com.gltech.scale.core.stats.CounterStatOverTime;
+import com.gltech.scale.core.stats.CountStatOverTime;
 import com.gltech.scale.core.stats.StatCallBack;
 import com.gltech.scale.core.stats.StatsManager;
 import com.google.inject.Inject;
@@ -23,11 +23,11 @@ public class AggregatorStats implements Aggregator
 	private AvgStatOverTime addMessageTimeStat;
 	private AvgStatOverTime addBackupMessageSizeStat;
 	private AvgStatOverTime addBackupMessageTimeStat;
-	private CounterStatOverTime clearCountStat;
+	private CountStatOverTime clearCountStat;
 	private AvgStatOverTime messagesWrittenTimeStat;
-	private CounterStatOverTime messagesWrittenCountStat;
+	private CountStatOverTime messagesWrittenCountStat;
 	private AvgStatOverTime backupMessagesWrittenTimeStat;
-	private CounterStatOverTime backupMessagesWrittenCountStat;
+	private CountStatOverTime backupMessagesWrittenCountStat;
 
 	@Inject
 	public AggregatorStats(@Named(BASE) final Aggregator aggregator, StatsManager statsManager)

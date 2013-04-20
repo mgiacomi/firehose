@@ -3,15 +3,36 @@ function flotPercentFormatter(v, axis) {
 }
 
 function flotTotFormatter(v, axis) {
-    return v.toFixed(axis.tickDecimals) + "k";
+    var value = v.toFixed(axis.tickDecimals);
+
+    if(value < 1000) {
+        return value;
+    }
+    if(value < 1000000) {
+        return (value / 1000) + "k";
+    }
+    return (value / 1000000) + "m";
 }
 
 function flotByteFormatter(v, axis) {
-    return v.toFixed(axis.tickDecimals) + 'kb';
+    var value = v.toFixed(axis.tickDecimals);
+
+    if(value < 1000) {
+        return value + " b";
+    }
+    if(value < 1000000) {
+        return (value / 1000) + " kb";
+    }
+    return (value / 1000000) + " mb";
 }
 
 function flotAgeFormatter(v, axis) {
-    return v.toFixed(axis.tickDecimals) + 's';
+    var value = v.toFixed(axis.tickDecimals);
+
+    if(value < 60) {
+        return value + "s";
+    }
+    return (value / 60) + 'm';
 }
 
 
