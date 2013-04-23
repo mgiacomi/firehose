@@ -59,7 +59,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
     Views.Performance = Marionette.ItemView.extend({
         template:'dashboard_performance',
         inboundPlot:{},
-        inboundCpu:[],
+        inboundQue:[],
         inboundAvgMsgSize:[],
         inboundMsgPerSec:[],
 
@@ -91,7 +91,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                 that.inboundPlot = $.plot($("#inbound"), [
                     { data:that.updateDataArray(that.inboundMsgPerSec, 0) },
                     { data:that.updateDataArray(that.inboundAvgMsgSize, 0) },
-                    { data:that.updateDataArray(that.inboundCpu, 0) }
+                    { data:that.updateDataArray(that.inboundQue, 0) }
                 ], that.inboundOptions);
 
                 that.aggregatorPlot = $.plot($("#aggregator"), [
@@ -116,21 +116,22 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         },
 
         updateData:function () {
-//            this.inboundMsgPerSec = this.updateDataArray(this.inboundMsgPerSec, this.model.get("aggregateStats").inboundMsgPerSec);
+            var messagesPerSec = parseInt(this.model.get("aggregateStats").Inbound.AddMessage_Count.totalSec5) / 5;
+            this.inboundMsgPerSec = this.updateDataArray(this.inboundMsgPerSec, messagesPerSec);
             this.inboundAvgMsgSize = this.updateDataArray(this.inboundAvgMsgSize, this.model.get("aggregateStats").Inbound.AddMessage_Size.avgSec5.average);
-            this.inboundCpu = this.updateDataArray(this.inboundCpu, this.model.get("aggregateStats").role_Inbound.CPU.avgSec5.average);
+            this.inboundQue = this.updateDataArray(this.inboundQue, this.model.get("aggregateStats").role_Inbound.ActiveRequest_Count.totalSec5);
 
             this.inboundPlot.setData([
                 { data:this.toFlotArray(this.inboundMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
                 { data:this.toFlotArray(this.inboundAvgMsgSize), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
-                { data:this.toFlotArray(this.inboundCpu), color:"#ee7951", label:"JVM CPU%", yaxis:3 }
+                { data:this.toFlotArray(this.inboundQue), color:"#ee7951", label:"Request Queue", yaxis:3 }
             ]);
             this.inboundPlot.setupGrid();
             this.inboundPlot.draw();
 
-            this.aggregatorMsgInQue = this.updateDataArray(this.aggregatorMsgInQue, this.model.get("aggregateStats").aggregatorMsgInQue);
-            this.aggregatorQueSize = this.updateDataArray(this.aggregatorQueSize, this.model.get("aggregateStats").aggregatorQueSize);
-            this.aggregatorQueAge = this.updateDataArray(this.aggregatorQueAge, this.model.get("aggregateStats").aggregatorQueAge);
+            this.aggregatorMsgInQue = this.updateDataArray(this.aggregatorMsgInQue, this.model.get("aggregateStats").Aggregator.MessagesInQueue_Avg.totalSec5);
+            this.aggregatorQueSize = this.updateDataArray(this.aggregatorQueSize, this.model.get("aggregateStats").Aggregator.TotalQueueSize_Avg.totalSec5);
+            this.aggregatorQueAge = this.updateDataArray(this.aggregatorQueAge, this.model.get("aggregateStats").Aggregator.OldestInQueue_Avg.highSec5);
 
             this.aggregatorPlot.setData([
                 { data:this.toFlotArray(this.aggregatorMsgInQue), color:"#54cb4b", label:"Messages In Queue" },
@@ -140,9 +141,9 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
             this.aggregatorPlot.setupGrid();
             this.aggregatorPlot.draw();
 
-            this.storageWriterMsgPerSec = this.updateDataArray(this.storageWriterMsgPerSec, this.model.get("aggregateStats").storageWriterMsgPerSec);
-            this.storageWriterBytesPerSec = this.updateDataArray(this.storageWriterBytesPerSec, this.model.get("aggregateStats").storageWriterBytesPerSec);
-            this.storageWriterBatchesBeingWritten = this.updateDataArray(this.storageWriterBatchesBeingWritten, this.model.get("aggregateStats").storageWriterBatchesBeingWritten);
+            this.storageWriterMsgPerSec = this.updateDataArray(this.storageWriterMsgPerSec, this.model.get("aggregateStats").StorageWriter.MessagesWritten_Count.totalSec5 / 5);
+            this.storageWriterBytesPerSec = this.updateDataArray(this.storageWriterBytesPerSec, this.model.get("aggregateStats").StorageWriter.MessagesWritten_Size.totalSec5 / 5);
+            this.storageWriterBatchesBeingWritten = this.updateDataArray(this.storageWriterBatchesBeingWritten, this.model.get("aggregateStats").StorageWriter.WritingBatches_Avg.totalSec5);
 
             this.storageWriterPlot.setData([
                 { data:this.toFlotArray(this.storageWriterMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
@@ -181,7 +182,6 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                 },
                 {
                     min:0,
-                    max:100,
                     position:"right",
                     color:"#ee7951"
                 }

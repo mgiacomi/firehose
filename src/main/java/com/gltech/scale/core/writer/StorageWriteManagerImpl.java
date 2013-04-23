@@ -27,7 +27,7 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 	private ChannelCache channelCache;
 	private StatsManager statsManager;
 	private int activeStorageWriters;
-	private String groupName = "Storage Writer";
+	private String groupName = "StorageWriter";
 
 	@Inject
 	public StorageWriteManagerImpl(ClusterService clusterService, ChannelCache channelCache, StatsManager statsManager)
