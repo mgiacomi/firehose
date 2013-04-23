@@ -2,18 +2,23 @@ package com.gltech.scale.monitoring.model;
 
 import com.dyuproject.protostuff.Tag;
 
-import java.util.List;
+import java.util.*;
 
 public class ClusterStats
 {
 	@Tag(1)
-	private AggregateStats aggregateStats = new AggregateStats();
+	Map<String, Map<String, AggregateOverTime>> aggregateStats = new HashMap<>();
 	@Tag(2)
 	private List<ServerStats> stats;
 
-	public AggregateStats getAggregateStats()
+	public Map<String, Map<String, AggregateOverTime>> getAggregateStats()
 	{
 		return aggregateStats;
+	}
+
+	public void setAggregateStats(Map<String, Map<String, AggregateOverTime>> aggregateStats)
+	{
+		this.aggregateStats = aggregateStats;
 	}
 
 	public List<ServerStats> getStats()

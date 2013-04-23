@@ -3,6 +3,7 @@ package com.gltech.scale.monitoring.services;
 import com.gltech.scale.core.stats.results.AvgStat;
 import com.gltech.scale.core.stats.results.GroupStats;
 import com.gltech.scale.core.stats.results.OverTime;
+import com.gltech.scale.monitoring.model.AggregateOverTime;
 import com.gltech.scale.monitoring.model.ClusterStats;
 import com.gltech.scale.monitoring.model.ResultsIO;
 import com.gltech.scale.monitoring.model.ServerStats;
@@ -71,111 +72,258 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 
 	private ClusterStats getClusterStats(List<ServerStats> serverStatsList)
 	{
+		//Map<String, Map<String, AggregateOverTime>> aggregateStats = new HashMap<>();
+
 		ClusterStats clusterStats = new ClusterStats();
 		clusterStats.setStats(serverStatsList);
 
-		Averager inboundLoad = new Averager();
-		Averager inboundAvgMsgSize = new Averager();
-		int inboundMsgPerSec = 0;
-		int aggregatorMsgInQue = 0;
-		int aggregatorQueSize = 0;
-		int aggregatorQueAge = 0;
-		int storageWriterMsgPerSec = 0;
-		int storageWriterBytesPerSec = 0;
-		int storageWriterBatchesBeingWritten = 0;
-
-/*
-		int outboundMsgPerSec;
-		int outboundAvgMsgSize;
-		int outboundActiveQueries;
-*/
-
 		for (ServerStats serverStats : serverStatsList)
 		{
-			if (serverStats.getRoles().contains("Inbound"))
+			// Aggregrate stats by group and name
+			for (GroupStats groupStats : serverStats.getGroupStatsList())
 			{
-				OverTime<AvgStat> iLoadStat = getAvgStatByName("System", "LoadAvg", serverStats);
-				if (iLoadStat != null)
+				// If the group doesn't exist create it
+				if (!clusterStats.getAggregateStats().containsKey(groupStats.getName()))
 				{
-					inboundLoad.add(iLoadStat.getSec5().getAverage());
+					clusterStats.getAggregateStats().put(groupStats.getName(), new HashMap<String, AggregateOverTime>());
 				}
 
-				OverTime<AvgStat> iAvgMsgSize = getAvgStatByName("Inbound", "AddMessage.Size", serverStats);
-				if (iAvgMsgSize != null)
-				{
-					inboundAvgMsgSize.add(iAvgMsgSize.getSec5().getAverage());
-				}
+				Map<String, AggregateOverTime> aggregateOverTimeMap = clusterStats.getAggregateStats().get(groupStats.getName());
 
-				OverTime<Long> iMsgPerSec = getCountStatByName("Inbound", "AddMessage.Count", serverStats);
-				if (iMsgPerSec != null)
-				{
-					inboundMsgPerSec += iMsgPerSec.getSec5();
-				}
+				genAvgCountHighLow(groupStats, aggregateOverTimeMap);
+			}
 
-				OverTime<AvgStat> aQueSize = getAvgStatByName("Aggregator", "TotalQueueSize.Avg", serverStats);
-				if (aQueSize != null)
-				{
-					aggregatorQueSize += aQueSize.getSec5().getAverage();
-				}
+			GroupStats commonGroup = null;
 
-				OverTime<AvgStat> aMsgInQue = getAvgStatByName("Aggregator", "MessagesInQueue.Avg", serverStats);
-				if (aMsgInQue != null)
+			for (GroupStats groupStats : serverStats.getGroupStatsList())
+			{
+				if ("common".equalsIgnoreCase(groupStats.getName()))
 				{
-					aggregatorMsgInQue += aMsgInQue.getSec5().getAverage();
+					commonGroup = groupStats;
 				}
+			}
 
-				OverTime<AvgStat> aQueAge = getAvgStatByName("Aggregator", "OldestInQueue.Avg", serverStats);
-				if (aQueAge != null)
+
+			// If the role group doesn't exist create it
+			if (commonGroup != null)
+			{
+				for (String role : serverStats.getRoles())
 				{
-					if (aQueAge.getSec5().getAverage() > aggregatorQueAge)
+					String roleName = "role_" + role;
+					if (!clusterStats.getAggregateStats().containsKey(roleName))
 					{
-						aggregatorQueAge = Math.round(aQueAge.getSec5().getAverage());
+						clusterStats.getAggregateStats().put(roleName, new HashMap<String, AggregateOverTime>());
 					}
-				}
 
-				OverTime<Long> swMsgPerSec = getCountStatByName("Storage Writer", "MessagesWritten.Count", serverStats);
-				if (swMsgPerSec != null)
-				{
-					storageWriterMsgPerSec += swMsgPerSec.getSec5();
-				}
-				OverTime<Long> swBytesPerSec = getCountStatByName("Storage Writer", "MessagesWritten.Size", serverStats);
-				if (swBytesPerSec != null)
-				{
-					storageWriterBytesPerSec += swBytesPerSec.getSec5();
-				}
-				OverTime<AvgStat> swBatchesBeingWritten = getAvgStatByName("Storage Writer", "WritingBatches.Avg", serverStats);
-				if (swBatchesBeingWritten != null)
-				{
-					storageWriterBatchesBeingWritten += swBatchesBeingWritten.getSec5().getAverage();
+					Map<String, AggregateOverTime> aggregateOverTimeMap = clusterStats.getAggregateStats().get(roleName);
+
+					genAvgCountHighLow(commonGroup, aggregateOverTimeMap);
 				}
 			}
 		}
 
-		// Inbound
-		clusterStats.getAggregateStats().setInboundLoad(inboundLoad.getAvg());
-		clusterStats.getAggregateStats().setInboundAvgMsgSize(inboundAvgMsgSize.getAvg());
-		if (inboundMsgPerSec > 0)
-		{
-			clusterStats.getAggregateStats().setInboundMsgPerSec(inboundMsgPerSec / 5);
-		}
-
-		// Aggregator
-		clusterStats.getAggregateStats().setAggregatorMsgInQue(aggregatorMsgInQue);
-		clusterStats.getAggregateStats().setAggregatorQueAge(aggregatorQueAge);
-		clusterStats.getAggregateStats().setAggregatorQueSize(aggregatorQueSize);
-
-		// Storage Writer
-		clusterStats.getAggregateStats().setStorageWriterBatchesBeingWritten(storageWriterBatchesBeingWritten);
-		if (storageWriterBytesPerSec > 0)
-		{
-			clusterStats.getAggregateStats().setStorageWriterBytesPerSec(storageWriterBytesPerSec / 5);
-		}
-		if (storageWriterMsgPerSec > 0)
-		{
-			clusterStats.getAggregateStats().setStorageWriterMsgPerSec(storageWriterMsgPerSec / 5);
-		}
-
 		return clusterStats;
+	}
+
+	private void genAvgCountHighLow(GroupStats groupStats, Map<String, AggregateOverTime> aggregateOverTimeMap)
+	{
+		if (groupStats.getAvgStats() != null)
+		{
+			for (OverTime<AvgStat> overTime : groupStats.getAvgStats())
+			{
+				String statName = overTime.getName().replace(".", "_");
+
+				// If the stat doesn't exist create it.
+				if (!aggregateOverTimeMap.containsKey(statName))
+				{
+					AggregateOverTime aggregateOverTime = new AggregateOverTime();
+					aggregateOverTime.setName(statName);
+					aggregateOverTime.setUnitOfMeasure(overTime.getUnitOfMeasure());
+					aggregateOverTime.setAvgSec5(new AvgStat(overTime.getSec5().getTotal(), overTime.getSec5().getCount()));
+					aggregateOverTime.setAvgMin1(new AvgStat(overTime.getMin1().getTotal(), overTime.getMin1().getCount()));
+					aggregateOverTime.setAvgMin5(new AvgStat(overTime.getMin5().getTotal(), overTime.getMin5().getCount()));
+					aggregateOverTime.setAvgMin30(new AvgStat(overTime.getMin30().getTotal(), overTime.getMin30().getCount()));
+					aggregateOverTime.setAvgHour2(new AvgStat(overTime.getHour2().getTotal(), overTime.getHour2().getCount()));
+					aggregateOverTime.setTotalSec5(overTime.getSec5().getAverage());
+					aggregateOverTime.setTotalMin1(overTime.getMin1().getAverage());
+					aggregateOverTime.setTotalMin5(overTime.getMin5().getAverage());
+					aggregateOverTime.setTotalMin30(overTime.getMin30().getAverage());
+					aggregateOverTime.setTotalHour2(overTime.getHour2().getAverage());
+					aggregateOverTime.setHighSec5(overTime.getSec5().getAverage());
+					aggregateOverTime.setHighMin1(overTime.getMin1().getAverage());
+					aggregateOverTime.setHighMin5(overTime.getMin5().getAverage());
+					aggregateOverTime.setHighMin30(overTime.getMin30().getAverage());
+					aggregateOverTime.setHighHour2(overTime.getHour2().getAverage());
+					aggregateOverTime.setLowSec5(overTime.getSec5().getAverage());
+					aggregateOverTime.setLowMin1(overTime.getMin1().getAverage());
+					aggregateOverTime.setLowMin5(overTime.getMin5().getAverage());
+					aggregateOverTime.setLowMin30(overTime.getMin30().getAverage());
+					aggregateOverTime.setLowHour2(overTime.getHour2().getAverage());
+					aggregateOverTimeMap.put(statName, aggregateOverTime);
+				}
+				else
+				{
+					AggregateOverTime aggregateOverTime = aggregateOverTimeMap.get(statName);
+
+					// Update Averages
+					aggregateOverTime.setAvgSec5(new AvgStat(overTime.getSec5().getTotal() + aggregateOverTime.getAvgSec5().getTotal(), overTime.getSec5().getCount() + aggregateOverTime.getAvgSec5().getCount()));
+					aggregateOverTime.setAvgMin1(new AvgStat(overTime.getMin1().getTotal() + aggregateOverTime.getAvgMin1().getTotal(), overTime.getMin1().getCount() + aggregateOverTime.getAvgMin1().getCount()));
+					aggregateOverTime.setAvgMin5(new AvgStat(overTime.getMin5().getTotal() + aggregateOverTime.getAvgMin5().getTotal(), overTime.getMin5().getCount() + aggregateOverTime.getAvgMin5().getCount()));
+					aggregateOverTime.setAvgMin30(new AvgStat(overTime.getMin30().getTotal() + aggregateOverTime.getAvgMin30().getTotal(), overTime.getMin30().getCount() + aggregateOverTime.getAvgMin30().getCount()));
+					aggregateOverTime.setAvgHour2(new AvgStat(overTime.getHour2().getTotal() + aggregateOverTime.getAvgHour2().getTotal(), overTime.getHour2().getCount() + aggregateOverTime.getAvgHour2().getCount()));
+
+					// Update Totals
+					aggregateOverTime.setTotalSec5(overTime.getSec5().getAverage() + aggregateOverTime.getTotalSec5());
+					aggregateOverTime.setTotalMin1(overTime.getMin1().getAverage() + aggregateOverTime.getTotalMin1());
+					aggregateOverTime.setTotalMin5(overTime.getMin5().getAverage() + aggregateOverTime.getTotalMin5());
+					aggregateOverTime.setTotalMin30(overTime.getMin30().getAverage() + aggregateOverTime.getTotalMin30());
+					aggregateOverTime.setTotalHour2(overTime.getHour2().getAverage() + aggregateOverTime.getTotalHour2());
+
+					// Update Highs
+					if (overTime.getSec5().getAverage() > aggregateOverTime.getHighSec5())
+					{
+						aggregateOverTime.setHighSec5(overTime.getSec5().getAverage());
+					}
+					if (overTime.getMin1().getAverage() > aggregateOverTime.getHighMin1())
+					{
+						aggregateOverTime.setHighMin1(overTime.getMin1().getAverage());
+					}
+					if (overTime.getMin5().getAverage() > aggregateOverTime.getHighMin5())
+					{
+						aggregateOverTime.setHighMin5(overTime.getMin5().getAverage());
+					}
+					if (overTime.getMin30().getAverage() > aggregateOverTime.getHighMin30())
+					{
+						aggregateOverTime.setHighMin30(overTime.getMin30().getAverage());
+					}
+					if (overTime.getHour2().getAverage() > aggregateOverTime.getHighHour2())
+					{
+						aggregateOverTime.setHighHour2(overTime.getHour2().getAverage());
+					}
+
+					// Update Lows
+					if (overTime.getSec5().getAverage() < aggregateOverTime.getLowSec5())
+					{
+						aggregateOverTime.setLowSec5(overTime.getSec5().getAverage());
+					}
+					if (overTime.getMin1().getAverage() < aggregateOverTime.getLowMin1())
+					{
+						aggregateOverTime.setLowMin1(overTime.getMin1().getAverage());
+					}
+					if (overTime.getMin5().getAverage() < aggregateOverTime.getLowMin5())
+					{
+						aggregateOverTime.setLowMin5(overTime.getMin5().getAverage());
+					}
+					if (overTime.getMin30().getAverage() < aggregateOverTime.getLowMin30())
+					{
+						aggregateOverTime.setLowMin30(overTime.getMin30().getAverage());
+					}
+					if (overTime.getHour2().getAverage() < aggregateOverTime.getLowHour2())
+					{
+						aggregateOverTime.setLowHour2(overTime.getHour2().getAverage());
+					}
+				}
+			}
+		}
+
+		if (groupStats.getCountStats() != null)
+		{
+			for (OverTime<Long> overTime : groupStats.getCountStats())
+			{
+				String statName = overTime.getName().replace(".", "_");
+
+				// If the stat doesn't exist create it.
+				if (!aggregateOverTimeMap.containsKey(statName))
+				{
+					AggregateOverTime aggregateOverTime = new AggregateOverTime();
+					aggregateOverTime.setName(statName);
+					aggregateOverTime.setUnitOfMeasure(overTime.getUnitOfMeasure());
+					aggregateOverTime.setAvgSec5(new AvgStat(overTime.getSec5(), 1));
+					aggregateOverTime.setAvgMin1(new AvgStat(overTime.getMin1(), 1));
+					aggregateOverTime.setAvgMin5(new AvgStat(overTime.getMin5(), 1));
+					aggregateOverTime.setAvgMin30(new AvgStat(overTime.getMin30(), 1));
+					aggregateOverTime.setAvgHour2(new AvgStat(overTime.getHour2(), 1));
+					aggregateOverTime.setTotalSec5(overTime.getSec5());
+					aggregateOverTime.setTotalMin1(overTime.getMin1());
+					aggregateOverTime.setTotalMin5(overTime.getMin5());
+					aggregateOverTime.setTotalMin30(overTime.getMin30());
+					aggregateOverTime.setTotalHour2(overTime.getHour2());
+					aggregateOverTime.setHighSec5(overTime.getSec5());
+					aggregateOverTime.setHighMin1(overTime.getMin1());
+					aggregateOverTime.setHighMin5(overTime.getMin5());
+					aggregateOverTime.setHighMin30(overTime.getMin30());
+					aggregateOverTime.setHighHour2(overTime.getHour2());
+					aggregateOverTime.setLowSec5(overTime.getSec5());
+					aggregateOverTime.setLowMin1(overTime.getMin1());
+					aggregateOverTime.setLowMin5(overTime.getMin5());
+					aggregateOverTime.setLowMin30(overTime.getMin30());
+					aggregateOverTime.setLowHour2(overTime.getHour2());
+					aggregateOverTimeMap.put(statName, aggregateOverTime);
+				}
+				else
+				{
+					AggregateOverTime aggregateOverTime = aggregateOverTimeMap.get(statName);
+
+					// Update Averages
+					aggregateOverTime.setAvgSec5(new AvgStat(overTime.getSec5() + aggregateOverTime.getAvgSec5().getTotal(), aggregateOverTime.getAvgSec5().getCount() + 1));
+					aggregateOverTime.setAvgMin1(new AvgStat(overTime.getMin1() + aggregateOverTime.getAvgMin1().getTotal(), aggregateOverTime.getAvgMin1().getCount() + 1));
+					aggregateOverTime.setAvgMin5(new AvgStat(overTime.getMin5() + aggregateOverTime.getAvgMin5().getTotal(), aggregateOverTime.getAvgMin5().getCount() + 1));
+					aggregateOverTime.setAvgMin30(new AvgStat(overTime.getMin30() + aggregateOverTime.getAvgMin30().getTotal(), aggregateOverTime.getAvgMin30().getCount() + 1));
+					aggregateOverTime.setAvgHour2(new AvgStat(overTime.getHour2() + aggregateOverTime.getAvgHour2().getTotal(), aggregateOverTime.getAvgHour2().getCount() + 1));
+
+					// Update Totals
+					aggregateOverTime.setTotalSec5(overTime.getSec5() + aggregateOverTime.getTotalSec5());
+					aggregateOverTime.setTotalMin1(overTime.getMin1() + aggregateOverTime.getTotalMin1());
+					aggregateOverTime.setTotalMin5(overTime.getMin5() + aggregateOverTime.getTotalMin5());
+					aggregateOverTime.setTotalMin30(overTime.getMin30() + aggregateOverTime.getTotalMin30());
+					aggregateOverTime.setTotalHour2(overTime.getHour2() + aggregateOverTime.getTotalHour2());
+
+					// Update Highs
+					if (overTime.getSec5() > aggregateOverTime.getHighSec5())
+					{
+						aggregateOverTime.setHighSec5(overTime.getSec5());
+					}
+					if (overTime.getMin1() > aggregateOverTime.getHighMin1())
+					{
+						aggregateOverTime.setHighMin1(overTime.getMin1());
+					}
+					if (overTime.getMin5() > aggregateOverTime.getHighMin5())
+					{
+						aggregateOverTime.setHighMin5(overTime.getMin5());
+					}
+					if (overTime.getMin30() > aggregateOverTime.getHighMin30())
+					{
+						aggregateOverTime.setHighMin30(overTime.getMin30());
+					}
+					if (overTime.getHour2() > aggregateOverTime.getHighHour2())
+					{
+						aggregateOverTime.setHighHour2(overTime.getHour2());
+					}
+
+					// Update Lows
+					if (overTime.getSec5() < aggregateOverTime.getLowSec5())
+					{
+						aggregateOverTime.setLowSec5(overTime.getSec5());
+					}
+					if (overTime.getMin1() < aggregateOverTime.getLowMin1())
+					{
+						aggregateOverTime.setLowMin1(overTime.getMin1());
+					}
+					if (overTime.getMin5() < aggregateOverTime.getLowMin5())
+					{
+						aggregateOverTime.setLowMin5(overTime.getMin5());
+					}
+					if (overTime.getMin30() < aggregateOverTime.getLowMin30())
+					{
+						aggregateOverTime.setLowMin30(overTime.getMin30());
+					}
+					if (overTime.getHour2() < aggregateOverTime.getLowHour2())
+					{
+						aggregateOverTime.setLowHour2(overTime.getHour2());
+					}
+				}
+			}
+		}
 	}
 
 	private OverTime<AvgStat> getAvgStatByName(String groupName, String statName, ServerStats serverStats)
@@ -195,41 +343,5 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 		}
 
 		return null;
-	}
-
-	private OverTime<Long> getCountStatByName(String groupName, String statName, ServerStats serverStats)
-	{
-		for (GroupStats groupStats : serverStats.getGroupStatsList())
-		{
-			if (groupStats.getName().equalsIgnoreCase(groupName))
-			{
-				for (OverTime<Long> countStat : groupStats.getCountStats())
-				{
-					if (countStat.getName().equalsIgnoreCase(statName))
-					{
-						return countStat;
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-	private class Averager
-	{
-		private int count;
-		private float total;
-
-		public void add(float increment)
-		{
-			total += increment;
-			count++;
-		}
-
-		public int getAvg()
-		{
-			return Math.round(total / count);
-		}
 	}
 }

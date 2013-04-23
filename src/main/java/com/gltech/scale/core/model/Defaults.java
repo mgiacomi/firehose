@@ -4,7 +4,7 @@ import com.dyuproject.protostuff.runtime.ExplicitIdStrategy;
 import com.gltech.scale.core.stats.results.AvgStat;
 import com.gltech.scale.core.stats.results.GroupStats;
 import com.gltech.scale.core.stats.results.OverTime;
-import com.gltech.scale.monitoring.model.AggregateStats;
+import com.gltech.scale.monitoring.model.AggregateOverTime;
 import com.gltech.scale.monitoring.model.ClusterStats;
 import com.gltech.scale.monitoring.model.ServerStats;
 
@@ -39,7 +39,7 @@ public class Defaults
 		registry.registerPojo(AvgStat.class, 5);
 		registry.registerPojo(OverTime.class, 6);
 		registry.registerPojo(ServerStats.class, 7);
-		registry.registerPojo(AggregateStats.class, 8);
+		registry.registerPojo(AggregateOverTime.class, 8);
 		registry.registerPojo(ClusterStats.class, 9);
 	}
 }

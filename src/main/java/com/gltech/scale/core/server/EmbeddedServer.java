@@ -15,16 +15,21 @@ import com.gltech.scale.lifecycle.LifeCycleManager;
 import com.gltech.scale.core.aggregator.Aggregator;
 import com.gltech.scale.core.aggregator.WeightManager;
 import com.gltech.scale.util.Props;
+import com.sun.management.OperatingSystemMXBean;
+import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.management.*;
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.RuntimeMXBean;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class EmbeddedServer
@@ -56,11 +61,16 @@ public class EmbeddedServer
 		}
 		logger.info("starting server on port " + port);
 
+		MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
+
 		// Register ProtoStuff classes
 		Defaults.registerProtoClasses();
 
 		// Create the server.
 		server = new Server(port);
+		server.addBean(mbContainer);
+
+		StatisticsHandler statsHandler = new StatisticsHandler();
 
 		// servlet handler
 		ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
@@ -81,7 +91,7 @@ public class EmbeddedServer
 
 		// Bind all resources
 		HandlerCollection handlerList = new HandlerCollection();
-		handlerList.setHandlers(new Handler[]{servletContextHandler});
+		handlerList.setHandlers(new Handler[]{statsHandler, servletContextHandler});
 		server.setHandler(handlerList);
 
 		// Handle all non jersey services here
@@ -143,10 +153,55 @@ public class EmbeddedServer
 
 	private static void monitorSystemStats()
 	{
-		final OperatingSystemMXBean osStats = ManagementFactory.getOperatingSystemMXBean();
+		final OperatingSystemMXBean osStats = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+		final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+		final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 		StatsManager statsManager = injector.getInstance(StatsManager.class);
 
-		statsManager.createAvgStat("System", "LoadAvg", "LoadUnits", new StatCallBack()
+		statsManager.createAvgStat("Common", "Request.Count", "number", new StatCallBack()
+		{
+			int prevRequests = -1;
+			int result = -1;
+
+			public long getValue()
+			{
+				try
+				{
+					ObjectName objectName = new ObjectName("org.eclipse.jetty.server.handler:type=statisticshandler,id=0");
+					int requests = (Integer)server.getAttribute(objectName, "requests");
+
+					if(prevRequests > -1)
+					{
+						result = requests - prevRequests;
+					}
+					prevRequests = requests;
+				}
+				catch (Exception e)
+				{
+					logger.error("Failed to query JMX Atrributes.", e);
+				}
+				return result;
+			}
+		});
+
+		statsManager.createAvgStat("Common", "ActiveRequest.Count", "number", new StatCallBack()
+		{
+			public long getValue()
+			{
+				try
+				{
+					ObjectName objectName = new ObjectName("org.eclipse.jetty.server.handler:type=statisticshandler,id=0");
+					return (Integer)server.getAttribute(objectName, "requestsActive");
+				}
+				catch (Exception e)
+				{
+					logger.error("Failed to query JMX Atrributes.", e);
+				}
+				return -1;
+			}
+		});
+
+		statsManager.createAvgStat("Common", "LoadAvg", "LoadUnits", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -154,7 +209,40 @@ public class EmbeddedServer
 			}
 		});
 
+		statsManager.createAvgStat("Common", "Threads", "number", new StatCallBack()
+		{
+			public long getValue()
+			{
+				return Thread.activeCount();
+			}
+		});
 
+		statsManager.createAvgStat("Common", "CPU", "%", new StatCallBack()
+		{
+			long prevProcessCpuTime = -1;
+			long prevUpTime = 0;
+			long result = 0;
+
+			public long getValue()
+			{
+				long processCpuTime = osStats.getProcessCpuTime();
+				long upTime = runtimeMXBean.getUptime();
+
+				if (prevProcessCpuTime > -1)
+				{
+					long elapsedCpu = osStats.getProcessCpuTime() - prevProcessCpuTime;
+					long elapsedTime = upTime - prevUpTime;
+					// cpuUsage could go higher than 100% because elapsedTime
+					// and elapsedCpu are not fetched simultaneously. Limit to
+					// 99% to avoid Plotter showing a scale from 0% to 200%.
+					result = (long) Math.min(100L, elapsedCpu / (elapsedTime * 10000F * osStats.getAvailableProcessors()));
+				}
+				prevProcessCpuTime = processCpuTime;
+				prevUpTime = upTime;
+
+				return result;
+			}
+		});
 	}
 
 	public static synchronized void stop() throws Exception

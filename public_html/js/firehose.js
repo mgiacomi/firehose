@@ -11,7 +11,10 @@ function flotTotFormatter(v, axis) {
     if(value < 1000000) {
         return (value / 1000) + "k";
     }
-    return (value / 1000000) + "m";
+    if(value < 1000000000) {
+        return (value / 1000000) + "m";
+    }
+    return (value / 1000000000) + "bn";
 }
 
 function flotByteFormatter(v, axis) {
@@ -23,16 +26,22 @@ function flotByteFormatter(v, axis) {
     if(value < 1000000) {
         return (value / 1000) + " kb";
     }
-    return (value / 1000000) + " mb";
+    if(value < 1000000000) {
+        return (value / 1000000) + " mb";
+    }
+    return (value / 1000000000) + " gb";
 }
 
 function flotAgeFormatter(v, axis) {
     var value = v.toFixed(axis.tickDecimals);
 
     if(value < 60) {
-        return value + "s";
+        return value + "sec";
     }
-    return (value / 60) + 'm';
+    if(value < 3600) {
+        return (value / 60) + "min";
+    }
+    return (value / 3600) + 'hr';
 }
 
 

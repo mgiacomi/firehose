@@ -59,7 +59,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
     Views.Performance = Marionette.ItemView.extend({
         template:'dashboard_performance',
         inboundPlot:{},
-        inboundLoad:[],
+        inboundCpu:[],
         inboundAvgMsgSize:[],
         inboundMsgPerSec:[],
 
@@ -82,7 +82,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         },
 
         modelEvents:{
-            "change:stats":"updateData"
+            "change:aggregateStats":"updateData"
         },
 
         afterRender:function () {
@@ -91,7 +91,7 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
                 that.inboundPlot = $.plot($("#inbound"), [
                     { data:that.updateDataArray(that.inboundMsgPerSec, 0) },
                     { data:that.updateDataArray(that.inboundAvgMsgSize, 0) },
-                    { data:that.updateDataArray(that.inboundLoad, 0) }
+                    { data:that.updateDataArray(that.inboundCpu, 0) }
                 ], that.inboundOptions);
 
                 that.aggregatorPlot = $.plot($("#aggregator"), [
@@ -116,14 +116,14 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
         },
 
         updateData:function () {
-            this.inboundMsgPerSec = this.updateDataArray(this.inboundMsgPerSec, this.model.get("aggregateStats").inboundMsgPerSec);
-            this.inboundAvgMsgSize = this.updateDataArray(this.inboundAvgMsgSize, this.model.get("aggregateStats").inboundAvgMsgSize);
-            this.inboundLoad = this.updateDataArray(this.inboundLoad, this.model.get("aggregateStats").inboundLoad);
+//            this.inboundMsgPerSec = this.updateDataArray(this.inboundMsgPerSec, this.model.get("aggregateStats").inboundMsgPerSec);
+            this.inboundAvgMsgSize = this.updateDataArray(this.inboundAvgMsgSize, this.model.get("aggregateStats").Inbound.AddMessage_Size.avgSec5.average);
+            this.inboundCpu = this.updateDataArray(this.inboundCpu, this.model.get("aggregateStats").role_Inbound.CPU.avgSec5.average);
 
             this.inboundPlot.setData([
                 { data:this.toFlotArray(this.inboundMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
                 { data:this.toFlotArray(this.inboundAvgMsgSize), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
-                { data:this.toFlotArray(this.inboundLoad), color:"#ee7951", label:"Load Avg", yaxis:3 }
+                { data:this.toFlotArray(this.inboundCpu), color:"#ee7951", label:"JVM CPU%", yaxis:3 }
             ]);
             this.inboundPlot.setupGrid();
             this.inboundPlot.draw();
