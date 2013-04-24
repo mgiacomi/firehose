@@ -6,8 +6,6 @@
 
 <div class="title"><h5>Inbound <span style="margin-left:5px; margin-right:5px">&gt;</span> Live Stats</h5></div>
 
-blah blah blah
-
 <div class="widget" style="margin-top:10px;">
 	<div class="head">
 		<h5 class="iFrames">
@@ -21,29 +19,29 @@ blah blah blah
 			<thead>
 			<tr class="noborder">
 				<td width="50%"><strong>Statistic:</strong></td>
+				<td align="right"><strong>5s</strong></td>
 				<td align="right"><strong>1m</strong></td>
 				<td align="right"><strong>5m</strong></td>
-				<td align="right"><strong>30m</strong></td>
-				<td align="right"><strong>1h</strong></td>
-				<td align="right"><strong>24h</strong></td>
+				<td align="right"><strong>30h</strong></td>
+				<td align="right"><strong>2h</strong></td>
 			</tr>
 			</thead>
 			<tbody>
 			<tr>
-				<td><strong>Events Recv (per second):</strong></td>
-				<td align="right">100</td>
-				<td align="right">30</td>
-				<td align="right">10</td>
-				<td align="right">15</td>
-				<td align="right">25</td>
+				<td><strong>Messages Rate:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgHour2.average')) %></td>
 			</tr>
 			<tr>
-				<td><strong>Avg Event Size:</strong></td>
-				<td align="right">100b</td>
-				<td align="right">30b</td>
-				<td align="right">10kb</td>
-				<td align="right">15kb</td>
-				<td align="right">25kb</td>
+				<td><strong>Avg Messages Size:</strong></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Inbound.AddMessage_Size.avgSec5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Inbound.AddMessage_Size.avgMin1.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Inbound.AddMessage_Size.avgMin5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Inbound.AddMessage_Size.avgMin30.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Inbound.AddMessage_Size.avgHour2.average')) %></td>
 			</tr>
 			<tr>
 				<td><strong>Avg Process Time:</strong></td>

@@ -1,4 +1,43 @@
 var clusterStatsHelpers = {
+    getStat:function (obj, propString) {
+
+        if (!propString) return obj;
+
+        var prop, props = propString.split('.');
+
+        for (var i = 0, iLen = props.length - 1; i < iLen; i++) {
+            prop = props[i];
+
+            if (typeof obj == 'object' && obj !== null && prop in obj) {
+                obj = obj[prop];
+            } else {
+                break;
+            }
+        }
+        return obj[props[i]];
+    },
+
+    withCommas:function (x) {
+        if (x != null) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+    },
+
+    byteFormat:function (value) {
+        if (value != null) {
+            if (value < 1000) {
+                return value + " b";
+            }
+            if (value < 1000000) {
+                return (value / 1000) + " kb";
+            }
+            if (value < 1000000000) {
+                return (value / 1000000) + " mb";
+            }
+            return (value / 1000000000) + " gb";
+        }
+    },
+
     serversByRole:function (role) {
         var servers = [];
         $.each(this.stats, function (idx, server) {
