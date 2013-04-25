@@ -19,6 +19,10 @@ var clusterStatsHelpers = {
         return obj[props[i]];
     },
 
+    roundedWithCommas:function (x) {
+        return this.withCommas(Math.round(x));
+    },
+
     withCommas:function (x) {
         if (x != null) {
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

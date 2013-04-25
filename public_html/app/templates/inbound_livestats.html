@@ -26,12 +26,20 @@
 			</thead>
 			<tbody>
 			<tr>
-				<td><strong>Messages Rate:</strong></td>
+				<td><strong>Total Messages:</strong></td>
 				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalSec5')) %></td>
 				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin1')) %></td>
 				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin5')) %></td>
 				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin30')) %></td>
 				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalHour2')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalSec5') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin1') / 60) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin5') / 300) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin30') / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalHour2') / 6400) %></td>
 			</tr>
 			<tr>
 				<td><strong>Avg Messages Size:</strong></td>
@@ -58,12 +66,12 @@
 				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddOverSizedMessage_Count.avgHour2.average')) %></td>
 			</tr>
 			<tr>
-				<td><strong>HTTP Request Rate:</strong></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalSec5')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalMin1')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalMin5')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalMin30')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalHour2')) %></td>
+				<td><strong>HTTP Request Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalSec5') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalMin1') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalMin5') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalMin30') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalHour2') / 5) %></td>
 			</tr>
 			<tr>
 				<td><strong>HTTP Request Queue:</strong></td>
@@ -83,11 +91,11 @@
 			</tr>
 			<tr>
 				<td><strong>VM CPU:</strong></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgSec5.average')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgMin1.average')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgMin5.average')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgMin30.average')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgHour2.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgSec5.average')) %>%</td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgMin1.average')) %>%</td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgMin5.average')) %>%</td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgMin30.average')) %>%</td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgHour2.average')) %>%</td>
 			</tr>
 			<tr>
 				<td><strong>Load Avg:</strong></td>
@@ -124,12 +132,20 @@
 			</thead>
 			<tbody>
 			<tr>
-				<td><strong>Messages Rate:</strong></td>
+				<td><strong>Total Messages:</strong></td>
 				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.sec5) %></td>
 				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min1) %></td>
 				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min5) %></td>
 				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min30) %></td>
 				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.hour2) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.sec5 / 5) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min1 / 60) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min5 / 300) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min30 / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.hour2 / 6400) %></td>
 			</tr>
 			<tr>
 				<td><strong>Avg Messages Size:</strong></td>
@@ -156,12 +172,12 @@
 				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.hour2) %></td>
 			</tr>
 			<tr>
-				<td><strong>HTTP Request Rate:</strong></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.sec5.average) %></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.min1.average) %></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.min5.average) %></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.min30.average) %></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.hour2.average) %></td>
+				<td><strong>HTTP Request Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.sec5.average / 5) %></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.min1.average / 5) %></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.min5.average / 5) %></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.min30.average / 5) %></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.hour2.average / 5) %></td>
 			</tr>
 			<tr>
 				<td><strong>HTTP Request Queue:</strong></td>
@@ -181,11 +197,11 @@
 			</tr>
 			<tr>
 				<td><strong>VM CPU:</strong></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.CPU.sec5.average) %></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min1.average) %></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min5.average) %></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min30.average) %></td>
-				<td align="right"><%= withCommas(commonStat.avgStats.CPU.hour2.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.sec5.average) %>%</td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min1.average) %>%</td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min5.average) %>%</td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min30.average) %>%</td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.hour2.average) %>%</td>
 			</tr>
 			<tr>
 				<td><strong>Load Avg:</strong></td>

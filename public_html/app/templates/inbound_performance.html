@@ -1,3 +1,55 @@
-<div class="title"><h5>Inbound <span style="margin-left:5px; margin-right:5px">&gt;</span> Performance</h5></div>
+<script>
+	_.defer(function (caller) {
+		initGeneral();
+	}, this);
 
-blah blah blah
+
+</script>
+
+<div class="title"><h5>Inbound <span style="margin-left:5px; margin-right:5px">&gt;</span> Performance</h5></div>
+<br/>
+Each graph shows up to 3 minutes of performance data.
+
+<!-- Lines with fill -->
+<div class="widget" style="margin-top:20px;">
+	<div class="head"><h5 class="iArrowDown">Messages Per/Sec</h5></div>
+	<div class="body">
+		<div id="messagePerSec" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iInbox2">Avg Message Size</h5></div>
+	<div class="body">
+		<div id="messageSize" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iInbox2">Avg Process Time</h5></div>
+	<div class="body">
+		<div id="processTime" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iArrowUp">HTTP Request Queue</h5></div>
+	<div class="body">
+		<div id="requestQueue" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iArrowUp">VM CPU</h5></div>
+	<div class="body">
+		<div id="vmCpu" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iArrowUp">Load Avg</h5></div>
+	<div class="body">
+		<div id="loadAvg" class="autoUpdate"></div>
+	</div>
+</div>
+
