@@ -21,6 +21,10 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
         template:'inbound_performance',
         messagePerSecPlot:{},
         messagePerSecData:{workerData:{}},
+        messageSizePlot:{},
+        messageSizeData:{workerData:{}},
+        processTimePlot:{},
+        processTimeData:{workerData:{}},
         totalPoints:200,
 
         initialize:function () {
@@ -34,38 +38,77 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
         afterRender:function () {
             var that = this;
             _.defer(function (caller) {
-                that.messagePerSecPlot = $.plot($("#messagePerSec"), [], that.plotOptions);
+                that.messagePerSecPlot = $.plot($("#messagePerSec"), [], that.plotTotOptions);
+                that.messageSizePlot = $.plot($("#messageSize"), [], that.plotByteOptions);
+                that.processTimePlot = $.plot($("#processTime"), [], that.plotAgeMsOptions);
             }, this);
         },
 
         updateData:function () {
-            this.messagePerSecData.lastValueMap = {};
             var that = this;
+            this.messagePerSecData.lastValueMap = {};
+            this.messageSizeData.lastValueMap = {};
+            this.processTimeData.lastValueMap = {};
 
             $.each(this.model.get("stats"), function (idx, server) {
                 $.each(server.groupStatsList, function (idx2, groupStat) {
                     if (groupStat.name == "Inbound") {
                         var statValue = clusterStatsHelpers.roundedWithCommas(server.groupStatsList.Inbound.countStats.AddMessage_Count.sec5 / 5);
                         that.messagePerSecData.lastValueMap[server.workerId] = {hostname: server.hostname, statValue: statValue};
+
+                        statValue = server.groupStatsList.Inbound.avgStats.AddMessage_Size.sec5.average;
+                        that.messageSizeData.lastValueMap[server.workerId] = {hostname: server.hostname, statValue: statValue};
+
+                        statValue = server.groupStatsList.Inbound.avgStats.AddMessage_Time.sec5.average;
+                        that.processTimeData.lastValueMap[server.workerId] = {hostname: server.hostname, statValue: statValue};
                     }
                 });
             });
 
             this.updateObjectArray(this.messagePerSecData);
+            this.updateObjectArray(this.messageSizeData);
+            this.updateObjectArray(this.processTimeData);
 
             var messagePerSecDataArray = [];
             for(var workerId in this.messagePerSecData.workerData) {
                 messagePerSecDataArray.push(this.messagePerSecData.workerData[workerId].flotProperties);
             }
-
             this.messagePerSecPlot.setData(messagePerSecDataArray);
             this.messagePerSecPlot.setupGrid();
             this.messagePerSecPlot.draw();
+
+            var messageSizeDataArray = [];
+            for(workerId in this.messageSizeData.workerData) {
+                messageSizeDataArray.push(this.messageSizeData.workerData[workerId].flotProperties);
+            }
+            this.messageSizePlot.setData(messageSizeDataArray);
+            this.messageSizePlot.setupGrid();
+            this.messageSizePlot.draw();
+
+            var processTimeDataArray = [];
+            for(workerId in this.processTimeData.workerData) {
+                processTimeDataArray.push(this.processTimeData.workerData[workerId].flotProperties);
+            }
+            this.processTimePlot.setData(processTimeDataArray);
+            this.processTimePlot.setupGrid();
+            this.processTimePlot.draw();
         },
 
-        plotOptions:{
+        plotAgeMsOptions:{
             xaxis:{ ticks:false },
-            yaxes:[{ min:0, position:"right", Formatter:flotTotFormatter }],
+            yaxes:[{ min:0, position:"right", tickFormatter:flotAgeMsFormatter }],
+            series:{ lines:{ lineWidth:1 }}
+        },
+
+        plotTotOptions:{
+            xaxis:{ ticks:false },
+            yaxes:[{ min:0, position:"right", tickFormatter:flotTotFormatter }],
+            series:{ lines:{ lineWidth:1 }}
+        },
+
+        plotByteOptions:{
+            xaxis:{ ticks:false },
+            yaxes:[{ min:0, position:"right", tickFormatter:flotByteFormatter }],
             series:{ lines:{ lineWidth:1 }}
         },
 

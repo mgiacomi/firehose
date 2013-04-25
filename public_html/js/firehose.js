@@ -32,6 +32,21 @@ function flotByteFormatter(v, axis) {
     return (value / 1000000000) + " gb";
 }
 
+function flotAgeMsFormatter(v, axis) {
+    var value = v.toFixed(axis.tickDecimals);
+
+    if(value < 1000) {
+        return value + "ms";
+    }
+    if(value < 60000) {
+        return (value / 1000) + "sec";
+    }
+    if(value < 3600000) {
+        return (value / 60000) + "min";
+    }
+    return (value / 3600000) + 'hr';
+}
+
 function flotAgeFormatter(v, axis) {
     var value = v.toFixed(axis.tickDecimals);
 
@@ -43,7 +58,6 @@ function flotAgeFormatter(v, axis) {
     }
     return (value / 3600) + 'hr';
 }
-
 
 function initAccordion() {
     //===== Accordion =====//
