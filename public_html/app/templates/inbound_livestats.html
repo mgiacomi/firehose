@@ -9,6 +9,7 @@
 <div class="widget" style="margin-top:10px;">
 	<div class="head">
 		<h5 class="iFrames">All Inbound Servers</h5>
+
 		<div class="num"><span>[ 1m ago ]</span></div>
 	</div>
 	<div class="body" style="padding:0;">
@@ -56,64 +57,146 @@
 				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddOverSizedMessage_Count.avgMin30.average')) %></td>
 				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddOverSizedMessage_Count.avgHour2.average')) %></td>
 			</tr>
+			<tr>
+				<td><strong>HTTP Request Rate:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalSec5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalMin1')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalMin5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalMin30')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Request_Count.totalHour2')) %></td>
+			</tr>
+			<tr>
+				<td><strong>HTTP Request Queue:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.ActiveRequest_Count.totalSec5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.ActiveRequest_Count.totalMin1')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.ActiveRequest_Count.totalMin5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.ActiveRequest_Count.totalMin30')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.ActiveRequest_Count.totalHour2')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Threads:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Threads.totalSec5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Threads.totalMin1')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Threads.totalMin5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Threads.totalMin30')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.Threads.totalHour2')) %></td>
+			</tr>
+			<tr>
+				<td><strong>VM CPU:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.CPU.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Load Avg:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.LoadAvg.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.LoadAvg.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.LoadAvg.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.LoadAvg.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Inbound.LoadAvg.avgHour2.average')) %></td>
+			</tr>
 			</tbody>
 		</table>
 	</div>
 </div>
 
 <% _.each(serversByGroupStat("Inbound"), function(server, idx) { %>
-	<div class="widget">
-		<div class="head">
-			<h5 class="iFrames"><%= server.hostname %></h5>
-			<div class="num"><span><%= server.workerId %></span></div>
-		</div>
-		<div class="body" style="padding:0;">
-			<table cellpadding="0" cellspacing="0" width="100%" class="tableStatic">
-				<thead>
-				<tr class="noborder">
-					<td width="50%"><strong>Statistic:</strong></td>
-					<td align="right"><strong>5s</strong></td>
-					<td align="right"><strong>1m</strong></td>
-					<td align="right"><strong>5m</strong></td>
-					<td align="right"><strong>30h</strong></td>
-					<td align="right"><strong>2h</strong></td>
-				</tr>
-				</thead>
-				<tbody>
-				<tr>
-					<td><strong>Messages Rate:</strong></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.sec5) %></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min1) %></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min5) %></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min30) %></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.hour2) %></td>
-				</tr>
-				<tr>
-					<td><strong>Avg Messages Size:</strong></td>
-					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.sec5.average) %></td>
-					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min1.average) %></td>
-					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min5.average) %></td>
-					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min30.average) %></td>
-					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.hour2.average) %></td>
-				</tr>
-				<tr>
-					<td><strong>Avg Process Time (ms):</strong></td>
-					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.sec5.average) %></td>
-					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min1.average) %></td>
-					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min5.average) %></td>
-					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min30.average) %></td>
-					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.hour2.average) %></td>
-				</tr>
-				<tr>
-					<td><strong># Oversized Messages:</strong></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.sec5) %></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min1) %></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min5) %></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min30) %></td>
-					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.hour2) %></td>
-				</tr>
-				</tbody>
-			</table>
-		</div>
+<% var commonStat = commonStatByWorkerId(server.workerId); %>
+<div class="widget">
+	<div class="head">
+		<h5 class="iFrames"><%= server.hostname %></h5>
+
+		<div class="num"><span><%= server.workerId %></span></div>
 	</div>
+	<div class="body" style="padding:0;">
+		<table cellpadding="0" cellspacing="0" width="100%" class="tableStatic">
+			<thead>
+			<tr class="noborder">
+				<td width="50%"><strong>Statistic:</strong></td>
+				<td align="right"><strong>5s</strong></td>
+				<td align="right"><strong>1m</strong></td>
+				<td align="right"><strong>5m</strong></td>
+				<td align="right"><strong>30h</strong></td>
+				<td align="right"><strong>2h</strong></td>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td><strong>Messages Rate:</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.sec5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min1) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min30) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.hour2) %></td>
+			</tr>
+			<tr>
+				<td><strong>Avg Messages Size:</strong></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.sec5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min1.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min30.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Avg Process Time (ms):</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.sec5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min1.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min30.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong># Oversized Messages:</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.sec5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min1) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min30) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.hour2) %></td>
+			</tr>
+			<tr>
+				<td><strong>HTTP Request Rate:</strong></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.sec5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.min1.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.min5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.min30.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Request_Count.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>HTTP Request Queue:</strong></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.sec5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.min1.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.min5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.min30.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Threads:</strong></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.sec5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.min1.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.min5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.min30.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>VM CPU:</strong></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.sec5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min1.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min30.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Load Avg:</strong></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.sec5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.min1.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.min5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.min30.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.hour2.average) %></td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
 <% }); %>

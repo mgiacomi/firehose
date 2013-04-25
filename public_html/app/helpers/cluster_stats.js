@@ -1,7 +1,9 @@
 var clusterStatsHelpers = {
     getStat:function (obj, propString) {
 
-        if (!propString) return obj;
+        if (!propString) {
+            return obj;
+        }
 
         var prop, props = propString.split('.');
 
@@ -53,13 +55,30 @@ var clusterStatsHelpers = {
         var servers = [];
         $.each(this.stats, function (idx, server) {
             $.each(server.groupStatsList, function (idx2, groupStat) {
-                if(groupStat.name == groupName) {
-                    servers[idx] = {workerId:server.workerId, hostname:server.hostname, status:server.status, joinDate:server.joinDate, groupStat: groupStat};
+                if (groupStat.name == groupName) {
+                    servers[idx] = {workerId:server.workerId, hostname:server.hostname, status:server.status, joinDate:server.joinDate, groupStat:groupStat};
                 }
             });
         });
 
         return servers;
+    },
+
+    commonStatByWorkerId:function (workerId) {
+        var returnStat = {};
+        var count = 0;
+
+        $.each(this.stats, function (idx, server) {
+            if(server.workerId == workerId) {
+                $.each(server.groupStatsList, function (idx2, groupStat) {
+                    if (groupStat.name == "Common") {
+                        returnStat = groupStat;
+                    }
+                });
+            }
+        });
+
+        return returnStat;
     },
 
     colorByStatus:function (status) {
@@ -123,7 +142,9 @@ var clusterStatsHelpers = {
         ];
         //var time = ('' + date_str).replace(/-/g, "/").replace(/[TZ]/g, " ").replace(/^\s\s*/, '').replace(/\s\s*$/, '');
         var time = date_str;
-        if (time.substr(time.length - 4, 1) == ".") time = time.substr(0, time.length - 4);
+        if (time.substr(time.length - 4, 1) == ".") {
+            time = time.substr(0, time.length - 4);
+        }
         var seconds = (new Date - new Date(time)) / 1000;
         var token = 'ago', list_choice = 1;
         if (seconds < 0) {
@@ -134,10 +155,12 @@ var clusterStatsHelpers = {
         var i = 0, format;
         while (format = time_formats[i++])
             if (seconds < format[0]) {
-                if (typeof format[2] == 'string')
+                if (typeof format[2] == 'string') {
                     return format[list_choice];
-                else
+                }
+                else {
                     return Math.floor(seconds / format[2]) + ' ' + format[1] + ' ' + token;
+                }
             }
         return time;
     }

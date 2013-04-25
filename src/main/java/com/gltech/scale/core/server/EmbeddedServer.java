@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import javax.management.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class EmbeddedServer
