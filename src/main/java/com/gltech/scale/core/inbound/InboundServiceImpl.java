@@ -7,6 +7,8 @@ import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;
+import com.gltech.scale.core.stats.AvgStatOverTime;
+import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.storage.StorageClient;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
@@ -39,10 +41,11 @@ public class InboundServiceImpl implements InboundService
 	private AggregatorRestClient aggregatorRestClient;
 	private ChannelCache channelCache;
 	private TimePeriodUtils timePeriodUtils;
+	private AvgStatOverTime addOverSizedMessageTimeStat;
 	private Props props = Props.getProps();
 
 	@Inject
-	public InboundServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, StorageClient storageClient, AggregatorRestClient aggregatorRestClient, ChannelCache channelCache, TimePeriodUtils timePeriodUtils)
+	public InboundServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, StorageClient storageClient, AggregatorRestClient aggregatorRestClient, ChannelCache channelCache, TimePeriodUtils timePeriodUtils, StatsManager statsManager)
 	{
 		this.clusterService = clusterService;
 		this.channelCoordinator = channelCoordinator;
@@ -53,6 +56,10 @@ public class InboundServiceImpl implements InboundService
 
 		// Register the inbound service with the coordination service
 		clusterService.getRegistrationService().registerAsInboundService();
+
+		String groupName = "Inbound";
+		addOverSizedMessageTimeStat = statsManager.createAvgStat(groupName, "AddOverSizedMessage_Time", "milliseconds");
+		addOverSizedMessageTimeStat.activateCountStat("AddOverSizedMessage_Count", "message");
 	}
 
 	@Override
@@ -67,8 +74,10 @@ public class InboundServiceImpl implements InboundService
 		// and create and message object with no payload, which will flag it as stored.
 		if (payload.length > maxPayLoadSize)
 		{
+			addOverSizedMessageTimeStat.startTimer();
 			message = new Message(MediaType.APPLICATION_JSON_TYPE);
 			storageClient.putMessage(channelMetaData, message.getUuid(), payload);
+			addOverSizedMessageTimeStat.stopTimer();
 			logger.debug("Pre-storing message payload data to data store: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);
 		}
 

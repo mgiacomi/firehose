@@ -36,8 +36,8 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 		this.channelCache = channelCache;
 		this.statsManager = statsManager;
 
-		AvgStatOverTime batchesWrittenAvgTime = statsManager.createAvgStat(groupName, "BatchesWritten.AvgTime", "milliseconds");
-		batchesWrittenAvgTime.activateCountStat("BatchesWritten.Count", "batches");
+		AvgStatOverTime batchesWrittenAvgTime = statsManager.createAvgStat(groupName, "BatchesWritten_AvgTime", "milliseconds");
+		batchesWrittenAvgTime.activateCountStat("BatchesWritten_Count", "batches");
 
 		activeStorageWriters = props.get("storage_writer.active_collectors", Defaults.STORAGE_WRITER_ACTIVE_WRITERS);
 
@@ -45,7 +45,7 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 		threadPoolExecutor = new StatsThreadPoolExecutor(activeStorageWriters, activeStorageWriters, 1, TimeUnit.MINUTES, queue, new StorageWriterThreadFactory(), batchesWrittenAvgTime);
 		logger.info("ThreadPoolExecutor started with " + activeStorageWriters + " active collectors.");
 
-		statsManager.createAvgStat(groupName, "WritingBatches.Avg", "batches", new StatCallBack()
+		statsManager.createAvgStat(groupName, "WritingBatches_Avg", "batches", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -87,12 +87,12 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 								ChannelMetaData channelMetaData = channelCache.getChannelMetaData(batchPeriodMapper.getChannelName(), true);
 
 								// Get a stat based on channel name.
-								AvgStatOverTime channelStat = statsManager.createAvgStat(groupName, batchPeriodMapper.getChannelName() + ".AvgTime", "milliseconds");
-								channelStat.activateCountStat(batchPeriodMapper.getChannelName() + ".Count", "batches");
+								AvgStatOverTime channelStat = statsManager.createAvgStat(groupName, batchPeriodMapper.getChannelName() + "_AvgTime", "milliseconds");
+								channelStat.activateCountStat(batchPeriodMapper.getChannelName() + "_Count", "batches");
 
 								// Get stats for message size and number
-								CountStatOverTime messagesWritten = statsManager.createCounterStat(groupName, "MessagesWritten.Count", "messages");
-								CountStatOverTime bytesWritten = statsManager.createCounterStat(groupName, "MessagesWritten.Size", "bytes");
+								CountStatOverTime messagesWritten = statsManager.createCounterStat(groupName, "MessagesWritten_Count", "messages");
+								CountStatOverTime bytesWritten = statsManager.createCounterStat(groupName, "MessagesWritten_Size", "bytes");
 
 								BatchWriter batchWriter = injector.getInstance(BatchWriter.class);
 								batchWriter.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());

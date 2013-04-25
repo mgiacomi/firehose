@@ -3,16 +3,18 @@ package com.gltech.scale.core.stats.results;
 import com.dyuproject.protostuff.Tag;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GroupStats
 {
 	@Tag(1)
 	private String groupName;
 	@Tag(2)
-	private List<OverTime<AvgStat>> avgStats = new ArrayList<>();
+	private Map<String, OverTime<AvgStat>> avgStats = new HashMap<>();
 	@Tag(3)
-	private List<OverTime<Long>> countStats = new ArrayList<>();
+	private Map<String, OverTime<Long>> countStats = new HashMap<>();
 
 	public GroupStats(String groupName)
 	{
@@ -24,12 +26,12 @@ public class GroupStats
 		return groupName;
 	}
 
-	public List<OverTime<AvgStat>> getAvgStats()
+	public Map<String, OverTime<AvgStat>> getAvgStats()
 	{
 		return avgStats;
 	}
 
-	public List<OverTime<Long>> getCountStats()
+	public Map<String, OverTime<Long>> getCountStats()
 	{
 		return countStats;
 	}

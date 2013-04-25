@@ -158,7 +158,7 @@ public class EmbeddedServer
 		final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 		StatsManager statsManager = injector.getInstance(StatsManager.class);
 
-		statsManager.createAvgStat("Common", "Request.Count", "number", new StatCallBack()
+		statsManager.createAvgStat("Common", "Request_Count", "number", new StatCallBack()
 		{
 			int prevRequests = -1;
 			int result = -1;
@@ -184,7 +184,7 @@ public class EmbeddedServer
 			}
 		});
 
-		statsManager.createAvgStat("Common", "ActiveRequest.Count", "number", new StatCallBack()
+		statsManager.createAvgStat("Common", "ActiveRequest_Count", "number", new StatCallBack()
 		{
 			public long getValue()
 			{

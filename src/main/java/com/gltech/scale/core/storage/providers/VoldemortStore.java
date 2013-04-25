@@ -37,12 +37,12 @@ public class VoldemortStore implements Storage
 		this.channelClient = VoldemortClient.createFactory().getStoreClient("ChannelStore");
 
 		String groupName = "Storage";
-		keyWrittenTimeStat = statsManager.createAvgStat(groupName, "KeysWritten.AvgTime", "milliseconds");
-		keyWrittenTimeStat.activateCountStat("KeysWritten.Count", "keys");
-		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten.Size", "kb");
-		keyReadTimeStat = statsManager.createAvgStat(groupName, "KeysRead.AvgTime", "milliseconds");
-		keyReadTimeStat.activateCountStat("KeysRead.Count", "keys");
-		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead.Size", "kb");
+		keyWrittenTimeStat = statsManager.createAvgStat(groupName, "KeysWritten_AvgTime", "milliseconds");
+		keyWrittenTimeStat.activateCountStat("KeysWritten_Count", "keys");
+		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten_Size", "kb");
+		keyReadTimeStat = statsManager.createAvgStat(groupName, "KeysRead_AvgTime", "milliseconds");
+		keyReadTimeStat.activateCountStat("KeysRead_Count", "keys");
+		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead_Size", "kb");
 	}
 
 	@Override

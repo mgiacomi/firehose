@@ -3,7 +3,9 @@ package com.gltech.scale.monitoring.model;
 import com.dyuproject.protostuff.Tag;
 import com.gltech.scale.core.stats.results.GroupStats;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class ServerStats
@@ -19,7 +21,7 @@ public class ServerStats
 	@Tag(5)
 	private String status;
 	@Tag(6)
-	private Set<GroupStats> groupStatsList = new HashSet<>();
+	private Map<String, GroupStats> groupStatsList = new HashMap<>();
 
 	public String getWorkerId()
 	{
@@ -41,12 +43,12 @@ public class ServerStats
 		this.hostname = hostname;
 	}
 
-	public Set<GroupStats> getGroupStatsList()
+	public  Map<String, GroupStats> getGroupStatsList()
 	{
 		return groupStatsList;
 	}
 
-	public void setGroupStatsList(Set<GroupStats> groupStatsList)
+	public void setGroupStatsList(Map<String, GroupStats> groupStatsList)
 	{
 		this.groupStatsList = groupStatsList;
 	}

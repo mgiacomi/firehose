@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 public class StatsManagerImpl implements StatsManager
@@ -115,9 +115,9 @@ public class StatsManagerImpl implements StatsManager
 				int port = props.get("gangliaPort", 8649);
 				GMetric gMetric = new GMetric(ipAddress, port, GMetric.UDPAddressingMode.UNICAST, true);
 
-				for (GroupStats groupStats : getServerStats().getGroupStatsList())
+				for (GroupStats groupStats : getServerStats().getGroupStatsList().values())
 				{
-					for (OverTime<AvgStat> avgStat : groupStats.getAvgStats())
+					for (OverTime<AvgStat> avgStat : groupStats.getAvgStats().values())
 					{
 						try
 						{
@@ -129,7 +129,7 @@ public class StatsManagerImpl implements StatsManager
 							logger.warn("unable to publish GMetric: " + avgStat.getName(), e);
 						}
 					}
-					for (OverTime<Long> countStat : groupStats.getCountStats())
+					for (OverTime<Long> countStat : groupStats.getCountStats().values())
 					{
 						try
 						{
@@ -231,7 +231,7 @@ public class StatsManagerImpl implements StatsManager
 	@Override
 	public ServerStats getServerStats()
 	{
-		Set<GroupStats> groupStatsList = new HashSet<>();
+		Map<String, GroupStats> groupStatsList = new HashMap<>();
 
 		for (String groupName : stats.keySet())
 		{
@@ -255,7 +255,7 @@ public class StatsManagerImpl implements StatsManager
 							avgStatOverTime.getAvgOverHours(2)
 					);
 
-					groupStats.getAvgStats().add(avgOverTime);
+					groupStats.getAvgStats().put(avgOverTime.getName(), avgOverTime);
 
 					if (avgStatOverTime.getCountStatOverTime().getName() != null)
 					{
@@ -269,7 +269,7 @@ public class StatsManagerImpl implements StatsManager
 								avgStatOverTime.getCountStatOverTime().getCountOverHours(2)
 						);
 
-						groupStats.getCountStats().add(countOverTime);
+						groupStats.getCountStats().put(countOverTime.getName(), countOverTime);
 					}
 				}
 				if (statOverTime instanceof CountStatOverTime)
@@ -286,11 +286,11 @@ public class StatsManagerImpl implements StatsManager
 							countStatOverTime.getCountOverHours(2)
 					);
 
-					groupStats.getCountStats().add(countOverTime);
+					groupStats.getCountStats().put(countOverTime.getName(), countOverTime);
 				}
 			}
 
-			groupStatsList.add(groupStats);
+			groupStatsList.put(groupName, groupStats);
 		}
 
 		ServerStats serverStats = new ServerStats();

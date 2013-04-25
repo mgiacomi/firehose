@@ -8,10 +8,7 @@
 
 <div class="widget" style="margin-top:10px;">
 	<div class="head">
-		<h5 class="iFrames">
-			All Inbound Servers
-		</h5>
-
+		<h5 class="iFrames">All Inbound Servers</h5>
 		<div class="num"><span>[ 1m ago ]</span></div>
 	</div>
 	<div class="body" style="padding:0;">
@@ -29,11 +26,11 @@
 			<tbody>
 			<tr>
 				<td><strong>Messages Rate:</strong></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgSec5.average')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgMin1.average')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgMin5.average')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgMin30.average')) %></td>
-				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.avgHour2.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalSec5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin1')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin30')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalHour2')) %></td>
 			</tr>
 			<tr>
 				<td><strong>Avg Messages Size:</strong></td>
@@ -44,106 +41,79 @@
 				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Inbound.AddMessage_Size.avgHour2.average')) %></td>
 			</tr>
 			<tr>
-				<td><strong>Avg Process Time:</strong></td>
-				<td align="right">10ms</td>
-				<td align="right">100ms</td>
-				<td align="right">1ms</td>
-				<td align="right">2ms</td>
-				<td align="right">5ms</td>
+				<td><strong>Avg Process Time (ms):</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Time.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Time.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Time.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Time.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddMessage_Time.avgHour2.average')) %></td>
 			</tr>
 			<tr>
-				<td><strong># Oversized Prewritten Events:</strong></td>
-				<td align="right">0</td>
-				<td align="right">1</td>
-				<td align="right">1</td>
-				<td align="right">2</td>
-				<td align="right">5</td>
+				<td><strong># Oversized Messages:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddOverSizedMessage_Count.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddOverSizedMessage_Count.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddOverSizedMessage_Count.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddOverSizedMessage_Count.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Inbound.AddOverSizedMessage_Count.avgHour2.average')) %></td>
 			</tr>
 			</tbody>
 		</table>
 	</div>
 </div>
 
-<div class="widget" style="margin-top:10px;">
-	<div class="head closed normal" id="toggleOpened">
-		<h5>
-			<a style="margin-left:0; padding-top:0;" href="#" title="" class="userLink">worker0</a>
-		</h5>
-
-		<div class="num"><span>[ 1m ago ]</span></div>
+<% _.each(serversByGroupStat("Inbound"), function(server, idx) { %>
+	<div class="widget">
+		<div class="head">
+			<h5 class="iFrames"><%= server.hostname %></h5>
+			<div class="num"><span><%= server.workerId %></span></div>
+		</div>
+		<div class="body" style="padding:0;">
+			<table cellpadding="0" cellspacing="0" width="100%" class="tableStatic">
+				<thead>
+				<tr class="noborder">
+					<td width="50%"><strong>Statistic:</strong></td>
+					<td align="right"><strong>5s</strong></td>
+					<td align="right"><strong>1m</strong></td>
+					<td align="right"><strong>5m</strong></td>
+					<td align="right"><strong>30h</strong></td>
+					<td align="right"><strong>2h</strong></td>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td><strong>Messages Rate:</strong></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.sec5) %></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min1) %></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min5) %></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min30) %></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.hour2) %></td>
+				</tr>
+				<tr>
+					<td><strong>Avg Messages Size:</strong></td>
+					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.sec5.average) %></td>
+					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min1.average) %></td>
+					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min5.average) %></td>
+					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min30.average) %></td>
+					<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.hour2.average) %></td>
+				</tr>
+				<tr>
+					<td><strong>Avg Process Time (ms):</strong></td>
+					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.sec5.average) %></td>
+					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min1.average) %></td>
+					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min5.average) %></td>
+					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min30.average) %></td>
+					<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.hour2.average) %></td>
+				</tr>
+				<tr>
+					<td><strong># Oversized Messages:</strong></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.sec5) %></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min1) %></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min5) %></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min30) %></td>
+					<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.hour2) %></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
-	<div class="body" style="display: none; padding:0;">
-		<table cellpadding="0" cellspacing="0" width="100%" class="tableStatic">
-			<thead>
-			<tr class="noborder">
-				<td width="50%"><strong>Statistic:</strong></td>
-				<td align="right"><strong>1m</strong></td>
-				<td align="right"><strong>5m</strong></td>
-				<td align="right"><strong>30m</strong></td>
-				<td align="right"><strong>1h</strong></td>
-				<td align="right"><strong>24h</strong></td>
-			</tr>
-			</thead>
-			<tbody>
-			<tr>
-				<td><strong>Events Recv (per second):</strong></td>
-				<td align="right">100</td>
-				<td align="right">30</td>
-				<td align="right">10</td>
-				<td align="right">15</td>
-				<td align="right">25</td>
-			</tr>
-			<tr>
-				<td><strong>Avg Event Size:</strong></td>
-				<td align="right">100b</td>
-				<td align="right">30b</td>
-				<td align="right">10kb</td>
-				<td align="right">15kb</td>
-				<td align="right">25kb</td>
-			</tr>
-			<tr>
-				<td><strong>Avg Process Time:</strong></td>
-				<td align="right">10ms</td>
-				<td align="right">100ms</td>
-				<td align="right">1ms</td>
-				<td align="right">2ms</td>
-				<td align="right">5ms</td>
-			</tr>
-			<tr>
-				<td><strong># Oversized Prewritten Events:</strong></td>
-				<td align="right">0</td>
-				<td align="right">1</td>
-				<td align="right">1</td>
-				<td align="right">2</td>
-				<td align="right">5</td>
-			</tr>
-			</tbody>
-		</table>
-	</div>
-</div>
-
-<div class="widget" style="margin-top:10px;">
-	<div class="head closed normal">
-		<h5>
-			<a style="margin-left:0; padding-top:0;" href="#" title="" class="userLink">worker2</a>
-		</h5>
-
-		<div class="num"><span>[ 1s ago ]</span></div>
-	</div>
-	<div class="body" style="display: none;">This widget is opened by default. Works in case of adding id="opened" to
-		the widget head
-	</div>
-</div>
-
-<div class="widget" style="margin-top:10px;">
-	<div class="head closed normal">
-		<h5>
-			<a style="margin-left:0; padding-top:0;" href="#" title="" class="userLink">worker4</a>
-		</h5>
-
-		<div class="num"><span>[ 3s ago ]</span></div>
-	</div>
-	<div class="body" style="display: none;">This widget is opened by default. Works in case of adding id="opened" to
-		the widget head
-	</div>
-</div>
+<% }); %>

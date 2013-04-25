@@ -80,7 +80,7 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 		for (ServerStats serverStats : serverStatsList)
 		{
 			// Aggregrate stats by group and name
-			for (GroupStats groupStats : serverStats.getGroupStatsList())
+			for (GroupStats groupStats : serverStats.getGroupStatsList().values())
 			{
 				// If the group doesn't exist create it
 				if (!clusterStats.getAggregateStats().containsKey(groupStats.getName()))
@@ -95,7 +95,7 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 
 			GroupStats commonGroup = null;
 
-			for (GroupStats groupStats : serverStats.getGroupStatsList())
+			for (GroupStats groupStats : serverStats.getGroupStatsList().values())
 			{
 				if ("common".equalsIgnoreCase(groupStats.getName()))
 				{
@@ -129,15 +129,13 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 	{
 		if (groupStats.getAvgStats() != null)
 		{
-			for (OverTime<AvgStat> overTime : groupStats.getAvgStats())
+			for (OverTime<AvgStat> overTime : groupStats.getAvgStats().values())
 			{
-				String statName = overTime.getName().replace(".", "_");
-
 				// If the stat doesn't exist create it.
-				if (!aggregateOverTimeMap.containsKey(statName))
+				if (!aggregateOverTimeMap.containsKey(overTime.getName()))
 				{
 					AggregateOverTime aggregateOverTime = new AggregateOverTime();
-					aggregateOverTime.setName(statName);
+					aggregateOverTime.setName(overTime.getName());
 					aggregateOverTime.setUnitOfMeasure(overTime.getUnitOfMeasure());
 					aggregateOverTime.setAvgSec5(new AvgStat(overTime.getSec5().getTotal(), overTime.getSec5().getCount()));
 					aggregateOverTime.setAvgMin1(new AvgStat(overTime.getMin1().getTotal(), overTime.getMin1().getCount()));
@@ -159,11 +157,11 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 					aggregateOverTime.setLowMin5(overTime.getMin5().getAverage());
 					aggregateOverTime.setLowMin30(overTime.getMin30().getAverage());
 					aggregateOverTime.setLowHour2(overTime.getHour2().getAverage());
-					aggregateOverTimeMap.put(statName, aggregateOverTime);
+					aggregateOverTimeMap.put(overTime.getName(), aggregateOverTime);
 				}
 				else
 				{
-					AggregateOverTime aggregateOverTime = aggregateOverTimeMap.get(statName);
+					AggregateOverTime aggregateOverTime = aggregateOverTimeMap.get(overTime.getName());
 
 					// Update Averages
 					aggregateOverTime.setAvgSec5(new AvgStat(overTime.getSec5().getTotal() + aggregateOverTime.getAvgSec5().getTotal(), overTime.getSec5().getCount() + aggregateOverTime.getAvgSec5().getCount()));
@@ -228,15 +226,13 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 
 		if (groupStats.getCountStats() != null)
 		{
-			for (OverTime<Long> overTime : groupStats.getCountStats())
+			for (OverTime<Long> overTime : groupStats.getCountStats().values())
 			{
-				String statName = overTime.getName().replace(".", "_");
-
 				// If the stat doesn't exist create it.
-				if (!aggregateOverTimeMap.containsKey(statName))
+				if (!aggregateOverTimeMap.containsKey(overTime.getName()))
 				{
 					AggregateOverTime aggregateOverTime = new AggregateOverTime();
-					aggregateOverTime.setName(statName);
+					aggregateOverTime.setName(overTime.getName());
 					aggregateOverTime.setUnitOfMeasure(overTime.getUnitOfMeasure());
 					aggregateOverTime.setAvgSec5(new AvgStat(overTime.getSec5(), 1));
 					aggregateOverTime.setAvgMin1(new AvgStat(overTime.getMin1(), 1));
@@ -258,11 +254,11 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 					aggregateOverTime.setLowMin5(overTime.getMin5());
 					aggregateOverTime.setLowMin30(overTime.getMin30());
 					aggregateOverTime.setLowHour2(overTime.getHour2());
-					aggregateOverTimeMap.put(statName, aggregateOverTime);
+					aggregateOverTimeMap.put(overTime.getName(), aggregateOverTime);
 				}
 				else
 				{
-					AggregateOverTime aggregateOverTime = aggregateOverTimeMap.get(statName);
+					AggregateOverTime aggregateOverTime = aggregateOverTimeMap.get(overTime.getName());
 
 					// Update Averages
 					aggregateOverTime.setAvgSec5(new AvgStat(overTime.getSec5() + aggregateOverTime.getAvgSec5().getTotal(), aggregateOverTime.getAvgSec5().getCount() + 1));
@@ -328,11 +324,11 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 
 	private OverTime<AvgStat> getAvgStatByName(String groupName, String statName, ServerStats serverStats)
 	{
-		for (GroupStats groupStats : serverStats.getGroupStatsList())
+		for (GroupStats groupStats : serverStats.getGroupStatsList().values())
 		{
 			if (groupStats.getName().equalsIgnoreCase(groupName))
 			{
-				for (OverTime<AvgStat> avgStat : groupStats.getAvgStats())
+				for (OverTime<AvgStat> avgStat : groupStats.getAvgStats().values())
 				{
 					if (avgStat.getName().equalsIgnoreCase(statName))
 					{

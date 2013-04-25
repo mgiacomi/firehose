@@ -9,12 +9,12 @@
 
 				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('Inbound')) %>"><%= serversByRole('Inbound').length %> Servers</a></div>
 			</div>
-			<% _.each(serversByRole("Inbound"), function(stat, idx){ %>
+			<% _.each(serversByRole("Inbound"), function(server, idx){ %>
 			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
+					<span class="issueInfo"><a href="#" title=""><%= server.hostname %></a></span>
 					<span class="issueNum" style="margin-top:-1px;">
-						<a href="#" title="" style="font-size:.8em;">[ <%= stat.workerId %> ]</a>
+						<a href="#" title="" style="font-size:.8em;">[ <%= server.workerId %> ]</a>
 					</span>
 				</div>
 				<div class="issueSummary">
@@ -23,9 +23,9 @@
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= server.status %> ]</strong></li>
 							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(server.joinDate) %></li>
 						</ul>
 					</div>
 				</div>
@@ -40,12 +40,12 @@
 
 				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('StorageWriter')) %>"><%= serversByRole('StorageWriter').length %> Servers</a></div>
 			</div>
-			<% _.each(serversByRole("StorageWriter"), function(stat, idx){ %>
+			<% _.each(serversByRole("StorageWriter"), function(server, idx){ %>
 			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
+					<span class="issueInfo"><a href="#" title=""><%= server.hostname %></a></span>
 					<span class="issueNum" style="margin-top:-1px;">
-						<a href="#" title="" style="font-size:.8em;">[ <%= stat.workerId %> ]</a>
+						<a href="#" title="" style="font-size:.8em;">[ <%= server.workerId %> ]</a>
 					</span>
 				</div>
 				<div class="issueSummary">
@@ -54,9 +54,9 @@
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= server.status %> ]</strong></li>
 							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(server.joinDate) %></li>
 						</ul>
 					</div>
 				</div>
@@ -71,10 +71,10 @@
 
 				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('Storage')) %>"><%= serversByRole('Storage').length %> Servers</a></div>
 			</div>
-			<% _.each(serversByRole("Storage"), function(stat, idx){ %>
+			<% _.each(serversByRole("Storage"), function(server, idx){ %>
 			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
+					<span class="issueInfo"><a href="#" title=""><%= server.hostname %></a></span>
 				</div>
 				<div class="issueSummary">
 					<a href="#" title="" class="floatleft"><img src="images/computer.png" alt=""></a>
@@ -82,9 +82,9 @@
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= server.status %> ]</strong></li>
 							<li>Up Since:</li>
-							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(server.joinDate) %></li>
 						</ul>
 					</div>
 				</div>
@@ -101,12 +101,12 @@
 
 				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('Outbound')) %>"><%= serversByRole('Outbound').length %> Servers</a></div>
 			</div>
-			<% _.each(serversByRole("Outbound"), function(stat, idx){ %>
+			<% _.each(serversByRole("Outbound"), function(server, idx){ %>
 			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
+					<span class="issueInfo"><a href="#" title=""><%= server.hostname %></a></span>
 					<span class="issueNum" style="margin-top:-1px;">
-						<a href="#" title="" style="font-size:.8em;">[ <%= stat.workerId %> ]</a>
+						<a href="#" title="" style="font-size:.8em;">[ <%= server.workerId %> ]</a>
 					</span>
 				</div>
 				<div class="issueSummary">
@@ -115,9 +115,9 @@
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= server.status %> ]</strong></li>
 							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(server.joinDate) %></li>
 						</ul>
 					</div>
 				</div>
@@ -132,12 +132,12 @@
 
 				<div class="num"><a href="javascript:void(0)" class="<%= colorByServers(serversByRole('Aggregator')) %>"><%= serversByRole('Aggregator').length %> Servers</a></div>
 			</div>
-			<% _.each(serversByRole("Aggregator"), function(stat, idx){ %>
+			<% _.each(serversByRole("Aggregator"), function(server, idx){ %>
 			<div class="supTicket <% if(idx == 0) { %>nobg<% }; %>">
 				<div class="issueType">
-					<span class="issueInfo"><a href="#" title=""><%= stat.hostname %></a></span>
+					<span class="issueInfo"><a href="#" title=""><%= server.hostname %></a></span>
 					<span class="issueNum" style="margin-top:-1px;">
-						<a href="#" title="" style="font-size:.8em;">[ <%= stat.workerId %> ]</a>
+						<a href="#" title="" style="font-size:.8em;">[ <%= server.workerId %> ]</a>
 					</span>
 				</div>
 				<div class="issueSummary">
@@ -146,9 +146,9 @@
 					<div class="ticketInfo">
 						<ul>
 							<li>Status:</li>
-							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= stat.status %> ]</strong></li>
+							<li class="even"><strong class="<%= colorByStatus(stat.status) %>">[ <%= server.status %> ]</strong></li>
 							<li>Joined:</li>
-							<li style="color:#2b6893;" class="even"><%= prettyDate(stat.joinDate) %></li>
+							<li style="color:#2b6893;" class="even"><%= prettyDate(server.joinDate) %></li>
 						</ul>
 					</div>
 				</div>

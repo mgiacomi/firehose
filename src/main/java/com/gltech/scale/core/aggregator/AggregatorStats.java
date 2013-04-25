@@ -35,32 +35,32 @@ public class AggregatorStats implements Aggregator
 		this.aggregator = aggregator;
 
 		String groupName = "Aggregator";
-		this.addMessageSizeStat = statsManager.createAvgStat(groupName, "AddMessage.Size", "bytes");
-		this.addMessageSizeStat.activateCountStat("AddMessage.Count", "messages");
-		this.addMessageTimeStat = statsManager.createAvgStat(groupName, "AddMessage.Time", "milliseconds");
-		this.addBackupMessageSizeStat = statsManager.createAvgStat(groupName, "AddBackupMessage.Size", "bytes");
-		this.addBackupMessageSizeStat.activateCountStat("AddBackupMessage.Count", "messages");
-		this.addBackupMessageTimeStat = statsManager.createAvgStat(groupName, "AddBackupMessage.Time", "milliseconds");
-		this.messagesWrittenTimeStat = statsManager.createAvgStat(groupName, "MessagesWritten.Time", "milliseconds");
-		this.messagesWrittenCountStat = statsManager.createCounterStat(groupName, "MessagesWritten.Count", "messages");
-		this.backupMessagesWrittenTimeStat = statsManager.createAvgStat(groupName, "BackupMessagesWritten.Time", "milliseconds");
-		this.backupMessagesWrittenCountStat = statsManager.createCounterStat(groupName, "BackupMessagesWritten.Count", "messages");
-		this.clearCountStat = statsManager.createCounterStat(groupName, "Clear.Count", "calls");
-		statsManager.createAvgStat(groupName, "ActiveBatches.Avg", "batches", new StatCallBack()
+		this.addMessageSizeStat = statsManager.createAvgStat(groupName, "AddMessage_Size", "bytes");
+		this.addMessageSizeStat.activateCountStat("AddMessage_Count", "messages");
+		this.addMessageTimeStat = statsManager.createAvgStat(groupName, "AddMessage_Time", "milliseconds");
+		this.addBackupMessageSizeStat = statsManager.createAvgStat(groupName, "AddBackupMessage_Size", "bytes");
+		this.addBackupMessageSizeStat.activateCountStat("AddBackupMessage_Count", "messages");
+		this.addBackupMessageTimeStat = statsManager.createAvgStat(groupName, "AddBackupMessage_Time", "milliseconds");
+		this.messagesWrittenTimeStat = statsManager.createAvgStat(groupName, "MessagesWritten_Time", "milliseconds");
+		this.messagesWrittenCountStat = statsManager.createCounterStat(groupName, "MessagesWritten_Count", "messages");
+		this.backupMessagesWrittenTimeStat = statsManager.createAvgStat(groupName, "BackupMessagesWritten_Time", "milliseconds");
+		this.backupMessagesWrittenCountStat = statsManager.createCounterStat(groupName, "BackupMessagesWritten_Count", "messages");
+		this.clearCountStat = statsManager.createCounterStat(groupName, "Clear_Count", "calls");
+		statsManager.createAvgStat(groupName, "ActiveBatches_Avg", "batches", new StatCallBack()
 		{
 			public long getValue()
 			{
 				return aggregator.getActiveBatches().size();
 			}
 		});
-		statsManager.createAvgStat(groupName, "ActiveBackupBatches.Avg", "batches", new StatCallBack()
+		statsManager.createAvgStat(groupName, "ActiveBackupBatches_Avg", "batches", new StatCallBack()
 		{
 			public long getValue()
 			{
 				return aggregator.getActiveBackupBatches().size();
 			}
 		});
-		statsManager.createAvgStat(groupName, "TotalQueueSize.Avg", "bytes", new StatCallBack()
+		statsManager.createAvgStat(groupName, "TotalQueueSize_Avg", "bytes", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -72,7 +72,7 @@ public class AggregatorStats implements Aggregator
 				return total;
 			}
 		});
-		statsManager.createAvgStat(groupName, "MessagesInQueue.Avg", "messages", new StatCallBack()
+		statsManager.createAvgStat(groupName, "MessagesInQueue_Avg", "messages", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -84,7 +84,7 @@ public class AggregatorStats implements Aggregator
 				return total;
 			}
 		});
-		statsManager.createAvgStat(groupName, "OldestInQueue.Avg", "seconds", new StatCallBack()
+		statsManager.createAvgStat(groupName, "OldestInQueue_Avg", "seconds", new StatCallBack()
 		{
 			public long getValue()
 			{

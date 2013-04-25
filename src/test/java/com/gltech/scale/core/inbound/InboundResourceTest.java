@@ -4,6 +4,7 @@ import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
+import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.storage.ChannelCache;
 import com.gltech.scale.core.storage.StorageClient;
 import com.gltech.scale.core.model.ModelIO;
@@ -68,7 +69,7 @@ public class InboundResourceTest
 		channelCache = mock(ChannelCache.class);
 		storageClient = mock(StorageClient.class);
 		channelCoordinator = mock(ChannelCoordinator.class);
-		inboundService = new InboundServiceImpl(clusterService, channelCoordinator, storageClient, aggregatorRestClient, channelCache, new TimePeriodUtils());
+		inboundService = new InboundServiceImpl(clusterService, channelCoordinator, storageClient, aggregatorRestClient, channelCache, new TimePeriodUtils(), mock(StatsManager.class));
 
 		when(storageClient.getMessageStream(any(ChannelMetaData.class), anyString())).thenReturn(new ByteArrayInputStream("".getBytes()));
 	}

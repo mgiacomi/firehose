@@ -55,12 +55,12 @@ public class AwsS3Store implements Storage
 		int activeUploads = props.get("storage.s3.concurrent_writes", Defaults.CONCURRENT_STORE_WRITES);
 
 		String groupName = "Storage";
-		keyWrittenTimeStat = statsManager.createAvgStat(groupName, "KeysWritten.AvgTime", "milliseconds");
-		keyWrittenTimeStat.activateCountStat("KeysWritten.Count", "keys");
-		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten.Size", "kb");
-		keyReadTimeStat = statsManager.createAvgStat(groupName, "KeysRead.AvgTime", "milliseconds");
-		keyReadTimeStat.activateCountStat("KeysRead.Count", "keys");
-		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead.Size", "kb");
+		keyWrittenTimeStat = statsManager.createAvgStat(groupName, "KeysWritten_AvgTime", "milliseconds");
+		keyWrittenTimeStat.activateCountStat("KeysWritten_Count", "keys");
+		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten_Size", "kb");
+		keyReadTimeStat = statsManager.createAvgStat(groupName, "KeysRead_AvgTime", "milliseconds");
+		keyReadTimeStat.activateCountStat("KeysRead_Count", "keys");
+		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead_Size", "kb");
 
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
 		threadPoolExecutor = new StatsThreadPoolExecutor(activeUploads, activeUploads, 1, TimeUnit.MINUTES, queue, new S3UploadThreadFactory(), keyWrittenTimeStat);

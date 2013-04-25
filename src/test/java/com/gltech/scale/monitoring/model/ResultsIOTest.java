@@ -27,7 +27,7 @@ public class ResultsIOTest
 		when(registrationService.getLocalServerMetaData()).thenReturn(serviceMetaData);
 
 		StatsManager statsManager = new StatsManagerImpl(registrationService);
-		AvgStatOverTime testStat = statsManager.createAvgStat("testGroup", "Test.Size", "bytes");
+		AvgStatOverTime testStat = statsManager.createAvgStat("testGroup", "Test_Size", "bytes");
 		testStat.activateCountStat("Test.Count", "times");
 		testStat.add(1004);
 

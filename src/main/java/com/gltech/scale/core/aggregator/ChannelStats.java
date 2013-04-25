@@ -23,10 +23,10 @@ public class ChannelStats implements Channel
 		this.channel = channel;
 
 		String groupName = "Channel (" + channel.getChannelMetaData().getName() + ")";
-		this.addMessageSizeStat = statsManager.createAvgStat(groupName, "AddMessage.Size", "bytes");
-		this.addMessageSizeStat.activateCountStat("AddMessage.Count", "messages");
+		this.addMessageSizeStat = statsManager.createAvgStat(groupName, "AddMessage_Size", "bytes");
+		this.addMessageSizeStat.activateCountStat("AddMessage_Count", "messages");
 
-		statsManager.createAvgStat(groupName, "OldestMessage.Time", "seconds", new StatCallBack()
+		statsManager.createAvgStat(groupName, "OldestMessage_Time", "seconds", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -55,7 +55,7 @@ public class ChannelStats implements Channel
 			}
 		});
 
-		statsManager.createCounterStat(groupName, "ActiveBatches.Count", "batches", new StatCallBack()
+		statsManager.createCounterStat(groupName, "ActiveBatches_Count", "batches", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -63,7 +63,7 @@ public class ChannelStats implements Channel
 			}
 		});
 
-		statsManager.createCounterStat(groupName, "ActiveBatches.Size", "kb", new StatCallBack()
+		statsManager.createCounterStat(groupName, "ActiveBatches_Size", "kb", new StatCallBack()
 		{
 			public long getValue()
 			{
@@ -80,10 +80,10 @@ public class ChannelStats implements Channel
 
 		if (channel.getChannelMetaData().isRedundant())
 		{
-			this.addBackupMessageSizeStat = statsManager.createAvgStat(groupName, "AddBackupMessage.Size", "bytes");
-			this.addBackupMessageSizeStat.activateCountStat("AddBackupMessage.Count", "messages");
+			this.addBackupMessageSizeStat = statsManager.createAvgStat(groupName, "AddBackupMessage_Size", "bytes");
+			this.addBackupMessageSizeStat.activateCountStat("AddBackupMessage_Count", "messages");
 
-			statsManager.createCounterStat(groupName, "ActiveBackupBatches.Count", "batches", new StatCallBack()
+			statsManager.createCounterStat(groupName, "ActiveBackupBatches_Count", "batches", new StatCallBack()
 			{
 				public long getValue()
 				{
@@ -91,7 +91,7 @@ public class ChannelStats implements Channel
 				}
 			});
 
-			statsManager.createCounterStat(groupName, "ActiveBackupBatches.Size", "kb", new StatCallBack()
+			statsManager.createCounterStat(groupName, "ActiveBackupBatches_Size", "kb", new StatCallBack()
 			{
 				public long getValue()
 				{

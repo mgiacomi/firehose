@@ -39,10 +39,10 @@ public class StatsManagerTest
 		long avg = 0;
 		long count = 0;
 
-		for (GroupStats groupStats : serverStats.getGroupStatsList())
+		for (GroupStats groupStats : serverStats.getGroupStatsList().values())
 		{
 			groupName = groupStats.getName();
-			for (OverTime<AvgStat> stat : groupStats.getAvgStats())
+			for (OverTime<AvgStat> stat : groupStats.getAvgStats().values())
 			{
 				statName = stat.getName();
 				avg = stat.getMin1().getAverage();

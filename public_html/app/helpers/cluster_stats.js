@@ -49,6 +49,19 @@ var clusterStatsHelpers = {
         return servers;
     },
 
+    serversByGroupStat:function (groupName) {
+        var servers = [];
+        $.each(this.stats, function (idx, server) {
+            $.each(server.groupStatsList, function (idx2, groupStat) {
+                if(groupStat.name == groupName) {
+                    servers[idx] = {workerId:server.workerId, hostname:server.hostname, status:server.status, joinDate:server.joinDate, groupStat: groupStat};
+                }
+            });
+        });
+
+        return servers;
+    },
+
     colorByStatus:function (status) {
         if (status == 'Running') {
             return "green";
