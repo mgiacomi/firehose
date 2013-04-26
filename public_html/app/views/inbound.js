@@ -25,6 +25,12 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
         messageSizeData:{workerData:{}},
         processTimePlot:{},
         processTimeData:{workerData:{}},
+        requestQueuePlot:{},
+        requestQueueData:{workerData:{}},
+        vmCpuPlot:{},
+        vmCpuData:{workerData:{}},
+        loadAvgPlot:{},
+        loadAvgData:{workerData:{}},
         totalPoints:200,
 
         initialize:function () {
@@ -41,6 +47,9 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
                 that.messagePerSecPlot = $.plot($("#messagePerSec"), [], that.plotTotOptions);
                 that.messageSizePlot = $.plot($("#messageSize"), [], that.plotByteOptions);
                 that.processTimePlot = $.plot($("#processTime"), [], that.plotAgeMsOptions);
+                that.requestQueuePlot = $.plot($("#requestQueue"), [], that.plotTotOptions);
+                that.vmCpuPlot = $.plot($("#vmCpu"), [], that.plotPercentOptions);
+                that.loadAvgPlot = $.plot($("#loadAvg"), [], that.plotTotOptions);
             }, this);
         },
 
@@ -49,6 +58,9 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
             this.messagePerSecData.lastValueMap = {};
             this.messageSizeData.lastValueMap = {};
             this.processTimeData.lastValueMap = {};
+            this.requestQueueData.lastValueMap = {};
+            this.vmCpuData.lastValueMap = {};
+            this.loadAvgData.lastValueMap = {};
 
             $.each(this.model.get("stats"), function (idx, server) {
                 $.each(server.groupStatsList, function (idx2, groupStat) {
@@ -61,6 +73,15 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
 
                         statValue = server.groupStatsList.Inbound.avgStats.AddMessage_Time.sec5.average;
                         that.processTimeData.lastValueMap[server.workerId] = {hostname: server.hostname, statValue: statValue};
+
+                        statValue = clusterStatsHelpers.roundedWithCommas(server.groupStatsList.Common.avgStats.ActiveRequest_Count.sec5.average / 5);
+                        that.requestQueueData.lastValueMap[server.workerId] = {hostname: server.hostname, statValue: statValue};
+
+                        statValue = clusterStatsHelpers.roundedWithCommas(server.groupStatsList.Common.avgStats.CPU.sec5.average);
+                        that.vmCpuData.lastValueMap[server.workerId] = {hostname: server.hostname, statValue: statValue};
+
+                        statValue = clusterStatsHelpers.roundedWithCommas(server.groupStatsList.Common.avgStats.LoadAvg.sec5.average);
+                        that.loadAvgData.lastValueMap[server.workerId] = {hostname: server.hostname, statValue: statValue};
                     }
                 });
             });
@@ -68,6 +89,9 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
             this.updateObjectArray(this.messagePerSecData);
             this.updateObjectArray(this.messageSizeData);
             this.updateObjectArray(this.processTimeData);
+            this.updateObjectArray(this.requestQueueData);
+            this.updateObjectArray(this.vmCpuData);
+            this.updateObjectArray(this.loadAvgData);
 
             var messagePerSecDataArray = [];
             for(var workerId in this.messagePerSecData.workerData) {
@@ -92,6 +116,30 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
             this.processTimePlot.setData(processTimeDataArray);
             this.processTimePlot.setupGrid();
             this.processTimePlot.draw();
+
+            var requestQueueDataArray = [];
+            for(workerId in this.requestQueueData.workerData) {
+                requestQueueDataArray.push(this.requestQueueData.workerData[workerId].flotProperties);
+            }
+            this.requestQueuePlot.setData(requestQueueDataArray);
+            this.requestQueuePlot.setupGrid();
+            this.requestQueuePlot.draw();
+
+            var vmCpuDataArray = [];
+            for(workerId in this.vmCpuData.workerData) {
+                vmCpuDataArray.push(this.vmCpuData.workerData[workerId].flotProperties);
+            }
+            this.vmCpuPlot.setData(vmCpuDataArray);
+            this.vmCpuPlot.setupGrid();
+            this.vmCpuPlot.draw();
+
+            var loadAvgDataArray = [];
+            for(workerId in this.loadAvgData.workerData) {
+                loadAvgDataArray.push(this.loadAvgData.workerData[workerId].flotProperties);
+            }
+            this.loadAvgPlot.setData(loadAvgDataArray);
+            this.loadAvgPlot.setupGrid();
+            this.loadAvgPlot.draw();
         },
 
         plotAgeMsOptions:{
@@ -109,6 +157,12 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
         plotByteOptions:{
             xaxis:{ ticks:false },
             yaxes:[{ min:0, position:"right", tickFormatter:flotByteFormatter }],
+            series:{ lines:{ lineWidth:1 }}
+        },
+
+        plotPercentOptions:{
+            xaxis:{ ticks:false },
+            yaxes:[{ min:0, position:"right", tickFormatter:flotPercentFormatter }],
             series:{ lines:{ lineWidth:1 }}
         },
 
