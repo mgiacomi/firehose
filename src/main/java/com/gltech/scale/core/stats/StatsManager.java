@@ -11,7 +11,7 @@ public interface StatsManager extends LifeCycle
 
 	AvgStatOverTime createAvgStat(String groupName, String statName, String unitOfMeasure, StatCallBack statCallBack);
 
-	CountStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure);
+	CountStatOverTime createCountStat(String groupName, String statName, String unitOfMeasure);
 
 	CountStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure, StatCallBack statCallBack);
 

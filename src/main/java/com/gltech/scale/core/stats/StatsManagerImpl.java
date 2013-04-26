@@ -178,7 +178,7 @@ public class StatsManagerImpl implements StatsManager
 	}
 
 	@Override
-	public CountStatOverTime createCounterStat(String groupName, String statName, String unitOfMeasure)
+	public CountStatOverTime createCountStat(String groupName, String statName, String unitOfMeasure)
 	{
 		return createCounterStat(groupName, statName, unitOfMeasure, null);
 	}

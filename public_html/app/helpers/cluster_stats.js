@@ -32,17 +32,28 @@ var clusterStatsHelpers = {
     byteFormat:function (value) {
         if (value != null) {
             if (value < 1000) {
-                return value + " b";
+                return Math.round(value) + " b";
             }
             if (value < 1000000) {
-                return (value / 1000) + " kb";
+                return Math.round((value / 1000)) + " kb";
             }
             if (value < 1000000000) {
-                return (value / 1000000) + " mb";
+                return Math.round((value / 1000000)) + " mb";
             }
-            return (value / 1000000000) + " gb";
+            return (Math.round((value / 10000000)) / 100) + " gb";
         }
     },
+
+    ageFormat:function (value) {
+        if (value < 60) {
+            return value + "sec";
+        }
+        if (value < 3600) {
+            return (value / 60) + "min";
+        }
+        return (value / 3600) + 'hr';
+    },
+
 
     serversByRole:function (role) {
         var servers = [];
@@ -73,7 +84,7 @@ var clusterStatsHelpers = {
         var count = 0;
 
         $.each(this.stats, function (idx, server) {
-            if(server.workerId == workerId) {
+            if (server.workerId == workerId) {
                 $.each(server.groupStatsList, function (idx2, groupStat) {
                     if (groupStat.name == "Common") {
                         returnStat = groupStat;

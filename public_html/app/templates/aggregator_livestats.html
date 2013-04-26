@@ -1,3 +1,354 @@
+<script>
+	_.defer(function (caller) {
+		initGeneral();
+	}, this);
+</script>
+
 <div class="title"><h5>Aggregator <span style="margin-left:5px; margin-right:5px">&gt;</span> Live Stats</h5></div>
 
-blah blah blah
+<div class="widget" style="margin-top:10px;">
+	<div class="head">
+		<h5 class="iFrames">All Aggregators</h5>
+
+		<div class="num"><span>[ 1m ago ]</span></div>
+	</div>
+	<div class="body" style="padding:0;">
+		<table cellpadding="0" cellspacing="0" width="100%" class="tableStatic">
+			<thead>
+			<tr class="noborder">
+				<td width="50%"><strong>Statistic:</strong></td>
+				<td align="right"><strong>5s</strong></td>
+				<td align="right"><strong>1m</strong></td>
+				<td align="right"><strong>5m</strong></td>
+				<td align="right"><strong>30h</strong></td>
+				<td align="right"><strong>2h</strong></td>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td><strong>Total Messages:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalSec5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalMin1')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalMin5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalMin30')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalHour2')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Total Backup Messages:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalSec5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalMin1')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalMin5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalMin30')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalHour2')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalSec5') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalMin1') / 60) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalMin5') / 300) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalMin30') / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalHour2') / 6400) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Messages Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalSec5') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalMin1') / 60) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalMin5') / 300) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalMin30') / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalHour2') / 6400) %></td>
+			</tr>
+			<tr>
+				<td><strong>Avg Messages Size:</strong></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddMessage_Size.avgSec5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddMessage_Size.avgMin1.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddMessage_Size.avgMin5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddMessage_Size.avgMin30.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddMessage_Size.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Avg Backup Messages Size:</strong></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Size.avgSec5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Size.avgMin1.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Size.avgMin5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Size.avgMin30.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Size.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Avg Time Collecting Batch (ms):</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BatchCollect_Time.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BatchCollect_Time.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BatchCollect_Time.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BatchCollect_Time.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BatchCollect_Time.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Avg Time Collecting Backup Batch (ms):</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupBatchCollect_Time.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupBatchCollect_Time.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupBatchCollect_Time.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupBatchCollect_Time.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupBatchCollect_Time.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages Collected Per Batch:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Messages Collected Per Batch:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Total Messages Collected:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgSec5.total')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin1.total')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin5.total')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin30.total')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgHour2.total')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Total Backup Messages Collected:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgSec5.total')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin1.total')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin5.total')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin30.total')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgHour2.total')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages Collected Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgSec5.total') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin1.total') / 60) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin5.total') / 300) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin30.total') / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgHour2.total') / 6400) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Messages Collected Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgSec5.total') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin1.total') / 60) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin5.total') / 300) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin30.total') / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgHour2.total') / 6400) %></td>
+			</tr>
+			<tr>
+				<td><strong>Active Batches:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBatches_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBatches_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBatches_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBatches_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBatches_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Active Backup Batches:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBackupBatches_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBackupBatches_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBackupBatches_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBackupBatches_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.ActiveBackupBatches_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Queue Size:</strong></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalQueueSize_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalQueueSize_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalQueueSize_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalQueueSize_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalQueueSize_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Queue Size:</strong></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalBackupQueueSize_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalBackupQueueSize_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalBackupQueueSize_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalBackupQueueSize_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= byteFormat(getStat(aggregateStats, 'Aggregator.TotalBackupQueueSize_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages in Queue:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesInQueue_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesInQueue_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesInQueue_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesInQueue_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesInQueue_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Messages in Queue:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesInQueue_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesInQueue_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesInQueue_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesInQueue_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesInQueue_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Oldest Message in Queue:</strong></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestInQueue_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestInQueue_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestInQueue_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestInQueue_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestInQueue_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Oldest Backup Message in Queue:</strong></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestBackupInQueue_Avg.avgSec5.average')) %></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestBackupInQueue_Avg.avgMin1.average')) %></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestBackupInQueue_Avg.avgMin5.average')) %></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestBackupInQueue_Avg.avgMin30.average')) %></td>
+				<td align="right"><%= ageFormat(getStat(aggregateStats, 'Aggregator.OldestBackupInQueue_Avg.avgHour2.average')) %></td>
+			</tr>
+			<tr>
+				<td><strong>HTTP Request Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Aggregator.Request_Count.totalSec5') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Aggregator.Request_Count.totalMin1') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Aggregator.Request_Count.totalMin5') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Aggregator.Request_Count.totalMin30') / 5) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'role_Aggregator.Request_Count.totalHour2') / 5) %></td>
+			</tr>
+			<tr>
+				<td><strong>HTTP Request Queue:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.ActiveRequest_Count.totalSec5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.ActiveRequest_Count.totalMin1')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.ActiveRequest_Count.totalMin5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.ActiveRequest_Count.totalMin30')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.ActiveRequest_Count.totalHour2')) %></td>
+			</tr>
+			<tr>
+				<td><strong>Threads:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.Threads.totalSec5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.Threads.totalMin1')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.Threads.totalMin5')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.Threads.totalMin30')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.Threads.totalHour2')) %></td>
+			</tr>
+			<tr>
+				<td><strong>VM CPU:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.CPU.avgSec5.average')) %>%</td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.CPU.avgMin1.average')) %>%</td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.CPU.avgMin5.average')) %>%</td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.CPU.avgMin30.average')) %>%</td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.CPU.avgHour2.average')) %>%</td>
+			</tr>
+			<tr>
+				<td><strong>Load Avg:</strong></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.LoadAvg.avgSec5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.LoadAvg.avgMin1.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.LoadAvg.avgMin5.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.LoadAvg.avgMin30.average')) %></td>
+				<td align="right"><%= withCommas(getStat(aggregateStats, 'role_Aggregator.LoadAvg.avgHour2.average')) %></td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<% _.each(serversByGroupStat("Inbound"), function(server, idx) { %>
+<% var commonStat = commonStatByWorkerId(server.workerId); %>
+<div class="widget">
+	<div class="head">
+		<h5 class="iFrames"><%= server.hostname %></h5>
+
+		<div class="num"><span><%= server.workerId %></span></div>
+	</div>
+	<div class="body" style="padding:0;">
+		<table cellpadding="0" cellspacing="0" width="100%" class="tableStatic">
+			<thead>
+			<tr class="noborder">
+				<td width="50%"><strong>Statistic:</strong></td>
+				<td align="right"><strong>5s</strong></td>
+				<td align="right"><strong>1m</strong></td>
+				<td align="right"><strong>5m</strong></td>
+				<td align="right"><strong>30h</strong></td>
+				<td align="right"><strong>2h</strong></td>
+			</tr>
+			</thead>
+			<tbody>
+			<tr>
+				<td><strong>Total Messages:</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.sec5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min1) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.min30) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.hour2) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.sec5 / 5) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min1 / 60) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min5 / 300) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min30 / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.hour2 / 6400) %></td>
+			</tr>
+			<tr>
+				<td><strong>Avg Messages Size:</strong></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.sec5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min1.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.min30.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Avg Process Time (ms):</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.sec5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min1.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min30.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong># Oversized Messages:</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.sec5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min1) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min30) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.hour2) %></td>
+			</tr>
+			<tr>
+				<td><strong>HTTP Request Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.sec5.average / 5) %></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.min1.average / 5) %></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.min5.average / 5) %></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.min30.average / 5) %></td>
+				<td align="right"><%= roundedWithCommas(commonStat.avgStats.Request_Count.hour2.average / 5) %></td>
+			</tr>
+			<tr>
+				<td><strong>HTTP Request Queue:</strong></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.sec5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.min1.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.min5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.min30.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.ActiveRequest_Count.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Threads:</strong></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.sec5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.min1.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.min5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.min30.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.Threads.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>VM CPU:</strong></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.sec5.average) %>%</td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min1.average) %>%</td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min5.average) %>%</td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.min30.average) %>%</td>
+				<td align="right"><%= withCommas(commonStat.avgStats.CPU.hour2.average) %>%</td>
+			</tr>
+			<tr>
+				<td><strong>Load Avg:</strong></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.sec5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.min1.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.min5.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.min30.average) %></td>
+				<td align="right"><%= withCommas(commonStat.avgStats.LoadAvg.hour2.average) %></td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<% }); %>

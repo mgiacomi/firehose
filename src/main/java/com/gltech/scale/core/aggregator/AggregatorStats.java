@@ -24,10 +24,10 @@ public class AggregatorStats implements Aggregator
 	private AvgStatOverTime addBackupMessageSizeStat;
 	private AvgStatOverTime addBackupMessageTimeStat;
 	private CountStatOverTime clearCountStat;
-	private AvgStatOverTime messagesWrittenTimeStat;
-	private CountStatOverTime messagesWrittenCountStat;
-	private AvgStatOverTime backupMessagesWrittenTimeStat;
-	private CountStatOverTime backupMessagesWrittenCountStat;
+	private AvgStatOverTime batchCollectTimeStat;
+	private AvgStatOverTime messagesCollectedPerBatchStat;
+	private AvgStatOverTime backupBatchCollectTimeStat;
+	private AvgStatOverTime backupMessagesCollectedPerBatchStat;
 
 	@Inject
 	public AggregatorStats(@Named(BASE) final Aggregator aggregator, StatsManager statsManager)
@@ -41,11 +41,11 @@ public class AggregatorStats implements Aggregator
 		this.addBackupMessageSizeStat = statsManager.createAvgStat(groupName, "AddBackupMessage_Size", "bytes");
 		this.addBackupMessageSizeStat.activateCountStat("AddBackupMessage_Count", "messages");
 		this.addBackupMessageTimeStat = statsManager.createAvgStat(groupName, "AddBackupMessage_Time", "milliseconds");
-		this.messagesWrittenTimeStat = statsManager.createAvgStat(groupName, "MessagesWritten_Time", "milliseconds");
-		this.messagesWrittenCountStat = statsManager.createCounterStat(groupName, "MessagesWritten_Count", "messages");
-		this.backupMessagesWrittenTimeStat = statsManager.createAvgStat(groupName, "BackupMessagesWritten_Time", "milliseconds");
-		this.backupMessagesWrittenCountStat = statsManager.createCounterStat(groupName, "BackupMessagesWritten_Count", "messages");
-		this.clearCountStat = statsManager.createCounterStat(groupName, "Clear_Count", "calls");
+		this.batchCollectTimeStat = statsManager.createAvgStat(groupName, "BatchCollect_Time", "milliseconds");
+		this.messagesCollectedPerBatchStat = statsManager.createAvgStat(groupName, "MessagesCollectedPerBatch_Avg", "messages");
+		this.backupBatchCollectTimeStat = statsManager.createAvgStat(groupName, "BackupBatchCollect_Time", "milliseconds");
+		this.backupMessagesCollectedPerBatchStat = statsManager.createAvgStat(groupName, "BackupMessagesCollectedPerBatch_Avg", "messages");
+		this.clearCountStat = statsManager.createCountStat(groupName, "Clear_Count", "calls");
 		statsManager.createAvgStat(groupName, "ActiveBatches_Avg", "batches", new StatCallBack()
 		{
 			public long getValue()
@@ -72,6 +72,18 @@ public class AggregatorStats implements Aggregator
 				return total;
 			}
 		});
+		statsManager.createAvgStat(groupName, "TotalBackupQueueSize_Avg", "bytes", new StatCallBack()
+		{
+			public long getValue()
+			{
+				long total = 0;
+				for (Batch batch : aggregator.getActiveBackupBatches())
+				{
+					total += batch.getBytes();
+				}
+				return total;
+			}
+		});
 		statsManager.createAvgStat(groupName, "MessagesInQueue_Avg", "messages", new StatCallBack()
 		{
 			public long getValue()
@@ -84,12 +96,39 @@ public class AggregatorStats implements Aggregator
 				return total;
 			}
 		});
+		statsManager.createAvgStat(groupName, "BackupMessagesInQueue_Avg", "messages", new StatCallBack()
+		{
+			public long getValue()
+			{
+				long total = 0;
+				for (Batch batch : aggregator.getActiveBackupBatches())
+				{
+					total += batch.getMessages().size();
+				}
+				return total;
+			}
+		});
 		statsManager.createAvgStat(groupName, "OldestInQueue_Avg", "seconds", new StatCallBack()
 		{
 			public long getValue()
 			{
 				DateTime oldest = new DateTime();
 				for (Batch batch : aggregator.getActiveBatches())
+				{
+					if (batch.getFirstMessageTime().isBefore(oldest))
+					{
+						oldest = batch.getFirstMessageTime();
+					}
+				}
+				return Seconds.secondsBetween(oldest, new DateTime()).getSeconds();
+			}
+		});
+		statsManager.createAvgStat(groupName, "OldestBackupInQueue_Avg", "seconds", new StatCallBack()
+		{
+			public long getValue()
+			{
+				DateTime oldest = new DateTime();
+				for (Batch batch : aggregator.getActiveBackupBatches())
 				{
 					if (batch.getFirstMessageTime().isBefore(oldest))
 					{
@@ -137,19 +176,19 @@ public class AggregatorStats implements Aggregator
 
 	public long writeBatchMessages(OutputStream outputStream, String channelName, DateTime dateTime)
 	{
-		messagesWrittenTimeStat.startTimer();
+		batchCollectTimeStat.startTimer();
 		long processed = aggregator.writeBatchMessages(outputStream, channelName, dateTime);
-		messagesWrittenTimeStat.stopTimer();
-		messagesWrittenCountStat.add(processed);
+		batchCollectTimeStat.stopTimer();
+		messagesCollectedPerBatchStat.add(processed);
 		return processed;
 	}
 
 	public long writeBackupBatchMessages(OutputStream outputStream, String channelName, DateTime dateTime)
 	{
-		backupMessagesWrittenTimeStat.startTimer();
+		backupBatchCollectTimeStat.startTimer();
 		long processed = aggregator.writeBackupBatchMessages(outputStream, channelName, dateTime);
-		backupMessagesWrittenTimeStat.stopTimer();
-		backupMessagesWrittenCountStat.add(processed);
+		backupBatchCollectTimeStat.stopTimer();
+		backupMessagesCollectedPerBatchStat.add(processed);
 		return processed;
 	}
 
