@@ -51,12 +51,12 @@ function flotAgeFormatter(v, axis) {
     var value = v.toFixed(axis.tickDecimals);
 
     if(value < 60) {
-        return value + "sec";
+        return value + " sec";
     }
     if(value < 3600) {
-        return (value / 60) + "min";
+        return (value / 60) + " min";
     }
-    return (value / 3600) + 'hr';
+    return (value / 3600) + ' hr';
 }
 
 function initAccordion() {

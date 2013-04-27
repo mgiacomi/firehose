@@ -46,12 +46,12 @@ var clusterStatsHelpers = {
 
     ageFormat:function (value) {
         if (value < 60) {
-            return value + "sec";
+            return value + " sec";
         }
         if (value < 3600) {
-            return (value / 60) + "min";
+            return Math.round(value / 60) + " min";
         }
-        return (value / 3600) + 'hr';
+        return Math.round(value / 3600) + ' hr';
     },
 
 

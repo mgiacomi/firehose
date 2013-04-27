@@ -246,12 +246,11 @@
 	</div>
 </div>
 
-<% _.each(serversByGroupStat("Inbound"), function(server, idx) { %>
+<% _.each(serversByGroupStat("Aggregator"), function(server, idx) { %>
 <% var commonStat = commonStatByWorkerId(server.workerId); %>
 <div class="widget">
 	<div class="head">
 		<h5 class="iFrames"><%= server.hostname %></h5>
-
 		<div class="num"><span><%= server.workerId %></span></div>
 	</div>
 	<div class="body" style="padding:0;">
@@ -276,12 +275,28 @@
 				<td align="right"><%= withCommas(server.groupStat.countStats.AddMessage_Count.hour2) %></td>
 			</tr>
 			<tr>
+				<td><strong>Total Backup Messages:</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddBackupMessage_Count.sec5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddBackupMessage_Count.min1) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddBackupMessage_Count.min5) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddBackupMessage_Count.min30) %></td>
+				<td align="right"><%= withCommas(server.groupStat.countStats.AddBackupMessage_Count.hour2) %></td>
+			</tr>
+			<tr>
 				<td><strong>Messages Per/Sec:</strong></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.sec5 / 5) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min1 / 60) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min5 / 300) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min30 / 1800) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.hour2 / 6400) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Messages Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.sec5 / 5) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.min1 / 60) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.min5 / 300) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.min30 / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.hour2 / 6400) %></td>
 			</tr>
 			<tr>
 				<td><strong>Avg Messages Size:</strong></td>
@@ -292,20 +307,140 @@
 				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddMessage_Size.hour2.average) %></td>
 			</tr>
 			<tr>
-				<td><strong>Avg Process Time (ms):</strong></td>
-				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.sec5.average) %></td>
-				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min1.average) %></td>
-				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min5.average) %></td>
-				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.min30.average) %></td>
-				<td align="right"><%= withCommas(server.groupStat.avgStats.AddMessage_Time.hour2.average) %></td>
+				<td><strong>Avg Backup Messages Size:</strong></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddBackupMessage_Size.sec5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddBackupMessage_Size.min1.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddBackupMessage_Size.min5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddBackupMessage_Size.min30.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.AddBackupMessage_Size.hour2.average) %></td>
 			</tr>
 			<tr>
-				<td><strong># Oversized Messages:</strong></td>
-				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.sec5) %></td>
-				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min1) %></td>
-				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min5) %></td>
-				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.min30) %></td>
-				<td align="right"><%= withCommas(server.groupStat.countStats.AddOverSizedMessage_Count.hour2) %></td>
+				<td><strong>Avg Time Collecting Batch (ms):</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BatchCollect_Time.sec5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BatchCollect_Time.min1.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BatchCollect_Time.min5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BatchCollect_Time.min30.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BatchCollect_Time.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Avg Time Collecting Backup Batch (ms):</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupBatchCollect_Time.sec5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupBatchCollect_Time.min1.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupBatchCollect_Time.min5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupBatchCollect_Time.min30.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupBatchCollect_Time.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages Collected Per Batch:</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.sec5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min1.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min30.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Messages Collected Per Batch:</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.sec5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min1.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min5.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min30.average) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Total Messages Collected:</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.sec5.total) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min1.total) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min5.total) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min30.total) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.hour2.total) %></td>
+			</tr>
+			<tr>
+				<td><strong>Total Backup Messages Collected:</strong></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.sec5.total) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min1.total) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min5.total) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min30.total) %></td>
+				<td align="right"><%= withCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.hour2.total) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages Collected Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.sec5.total / 5) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min1.total / 60) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min5.total / 300) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min30.total / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.hour2.total / 6400) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Messages Collected Per/Sec:</strong></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.sec5.total / 5) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min1.total / 60) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min5.total / 300) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min30.total / 1800) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.hour2.total / 6400) %></td>
+			</tr>
+			<tr>
+				<td><strong>Active Batches:</strong></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBatches_Avg.sec5.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBatches_Avg.min1.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBatches_Avg.min5.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBatches_Avg.min30.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBatches_Avg.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Active Backup Batches:</strong></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBackupBatches_Avg.sec5.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBackupBatches_Avg.min1.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBackupBatches_Avg.min5.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBackupBatches_Avg.min30.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.ActiveBackupBatches_Avg.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Queue Size:</strong></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalQueueSize_Avg.sec5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalQueueSize_Avg.min1.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalQueueSize_Avg.min5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalQueueSize_Avg.min30.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalQueueSize_Avg.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Queue Size:</strong></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalBackupQueueSize_Avg.sec5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalBackupQueueSize_Avg.min1.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalBackupQueueSize_Avg.min5.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalBackupQueueSize_Avg.min30.average) %></td>
+				<td align="right"><%= byteFormat(server.groupStat.avgStats.TotalBackupQueueSize_Avg.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Messages in Queue:</strong></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesInQueue_Avg.sec5.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesInQueue_Avg.min1.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesInQueue_Avg.min5.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesInQueue_Avg.min30.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesInQueue_Avg.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Backup Messages in Queue:</strong></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesInQueue_Avg.sec5.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesInQueue_Avg.min1.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesInQueue_Avg.min5.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesInQueue_Avg.min30.average) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesInQueue_Avg.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Oldest Message in Queue:</strong></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestInQueue_Avg.sec5.average) %></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestInQueue_Avg.min1.average) %></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestInQueue_Avg.min5.average) %></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestInQueue_Avg.min30.average) %></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestInQueue_Avg.hour2.average) %></td>
+			</tr>
+			<tr>
+				<td><strong>Oldest Backup Message in Queue:</strong></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestBackupInQueue_Avg.sec5.average) %></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestBackupInQueue_Avg.min1.average) %></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestBackupInQueue_Avg.min5.average) %></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestBackupInQueue_Avg.min30.average) %></td>
+				<td align="right"><%= ageFormat(server.groupStat.avgStats.OldestBackupInQueue_Avg.hour2.average) %></td>
 			</tr>
 			<tr>
 				<td><strong>HTTP Request Per/Sec:</strong></td>
