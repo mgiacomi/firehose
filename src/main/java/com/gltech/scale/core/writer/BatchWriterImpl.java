@@ -134,10 +134,15 @@ public class BatchWriterImpl implements BatchWriter
 			clusterService.clearBatchMetaData(channelMetaData, nearestPeriodCeiling);
 
 			// Data has been written so remove it from all active aggregator.
-			for (ServiceMetaData aggregator : aggregators)
+			for (PrimaryBackupSet primaryBackupSet : aggregatorsByPeriod.getPrimaryBackupSets())
 			{
 				// Aggregator can now remove the batch
-				aggregatorRestClient.clearBatch(aggregator, channelName, nearestPeriodCeiling);
+				aggregatorRestClient.clearBatch(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
+
+				if(primaryBackupSet.getBackup() != null)
+				{
+					aggregatorRestClient.clearBatch(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
+				}
 			}
 
 			long completedIn = System.nanoTime() - start;
