@@ -1,3 +1,61 @@
 <div class="title"><h5>Aggregator <span style="margin-left:5px; margin-right:5px">&gt;</span> Performance</h5></div>
+<br/>
+Each graph shows up to 3 minutes of performance data.
 
-blah blah blah
+<!-- Lines with fill -->
+<div class="widget" style="margin-top:20px;">
+	<div class="head"><h5>Messages In Per/Sec (Primary & Backup)</h5></div>
+	<div class="body">
+		<div id="messageRecvPerSec" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5>Messages Collected Per/Sec</h5></div>
+	<div class="body">
+		<div id="messageCollectedPerSec" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5>Avg Time Collecting Batch (millis)</h5></div>
+	<div class="body">
+		<div id="timeCollectBatch" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5>Avg Messages Collected Per Batch</h5></div>
+	<div class="body">
+		<div id="messagesPerBatch" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5>Active Batches (Primary & Backup)</h5></div>
+	<div class="body">
+		<div id="activeBatches" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5>Queue Size (Primary & Backup</h5></div>
+	<div class="body">
+		<div id="queueSize" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5>Total Messages (Primary & Backup)</h5></div>
+	<div class="body">
+		<div id="totalMessages" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5>Oldest Message in Queue</h5></div>
+	<div class="body">
+		<div id="oldestMessage" class="autoUpdate"></div>
+	</div>
+</div>
+

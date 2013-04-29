@@ -106,7 +106,13 @@ public class CoreManualRegression
 	{
 		public static void main(String[] args) throws Exception
 		{
-			CreateBuckets.main(null);
+			try
+			{
+				CreateBuckets.main(null);
+			}
+			catch (Exception e)
+			{
+			}
 
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/props.properties");
