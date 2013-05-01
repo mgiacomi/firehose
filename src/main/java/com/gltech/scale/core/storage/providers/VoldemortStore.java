@@ -3,6 +3,7 @@ package com.gltech.scale.core.storage.providers;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.AvgStatOverTime;
+import com.gltech.scale.core.stats.CountStatOverTime;
 import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.storage.KeyAlreadyExistsException;
 import com.gltech.scale.core.storage.Storage;
@@ -16,9 +17,7 @@ import org.slf4j.LoggerFactory;
 import voldemort.client.StoreClient;
 import voldemort.versioning.Versioned;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class VoldemortStore implements Storage
 {
@@ -26,8 +25,10 @@ public class VoldemortStore implements Storage
 	private StoreClient<String, byte[]> channelClient;
 	private AvgStatOverTime keyReadTimeStat;
 	private AvgStatOverTime keyReadSizeStat;
+	private CountStatOverTime bytesReadStat;
 	private AvgStatOverTime keyWrittenTimeStat;
 	private AvgStatOverTime keyWrittenSizeStat;
+	private CountStatOverTime bytesWrittenStat;
 	private ModelIO modelIO;
 
 	@Inject
@@ -40,9 +41,11 @@ public class VoldemortStore implements Storage
 		keyWrittenTimeStat = statsManager.createAvgStat(groupName, "KeysWritten_AvgTime", "milliseconds");
 		keyWrittenTimeStat.activateCountStat("KeysWritten_Count", "keys");
 		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten_Size", "kb");
+		bytesWrittenStat = statsManager.createCountStat(groupName, "BytesWritten_Count", "bytes");
 		keyReadTimeStat = statsManager.createAvgStat(groupName, "KeysRead_AvgTime", "milliseconds");
 		keyReadTimeStat.activateCountStat("KeysRead_Count", "keys");
 		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead_Size", "kb");
+		bytesReadStat = statsManager.createCountStat(groupName, "BytesRead_Count", "bytes");
 	}
 
 	@Override
@@ -83,6 +86,7 @@ public class VoldemortStore implements Storage
 			messageClient.put(channelMetaData.getName() + "|" + id, bytes);
 			keyWrittenTimeStat.stopTimer();
 			keyWrittenSizeStat.add(bytes.length / Defaults.KBytes);
+			bytesWrittenStat.add(bytes.length);
 			logger.info("Wrote {} bytes for key {}", bytes.length, channelMetaData.getName() + "|" + id);
 		}
 		catch (IOException e)
@@ -105,6 +109,7 @@ public class VoldemortStore implements Storage
 			{
 				outputStream.write(versioned.getValue());
 				keyReadSizeStat.add(versioned.getValue().length / Defaults.KBytes);
+				bytesReadStat.add(versioned.getValue().length);
 			}
 			keyReadTimeStat.stopTimer();
 		}
@@ -117,21 +122,15 @@ public class VoldemortStore implements Storage
 	@Override
 	public void putBytes(ChannelMetaData channelMetaData, String id, byte[] data)
 	{
-		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
-		keyWrittenTimeStat.startTimer();
-		messageClient.put(channelMetaData.getName() + "|" + id, data);
-		keyWrittenTimeStat.stopTimer();
-		keyWrittenSizeStat.add(data.length / Defaults.KBytes);
+		ByteArrayInputStream bais = new ByteArrayInputStream(data);
+		putMessages(channelMetaData, id, bais);
 	}
 
 	@Override
 	public byte[] getBytes(ChannelMetaData channelMetaData, String id)
 	{
-		StoreClient<String, byte[]> messageClient = VoldemortClient.createFactory().getStoreClient(channelMetaData.getTtl() + "Store");
-		keyReadTimeStat.startTimer();
-		byte[] data = messageClient.get(channelMetaData.getName() + "|" + id).getValue();
-		keyReadTimeStat.stopTimer();
-		keyReadSizeStat.add(data.length / Defaults.KBytes);
-		return data;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		getMessages(channelMetaData, id, baos);
+		return baos.toByteArray();
 	}
 }

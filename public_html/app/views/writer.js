@@ -9,7 +9,12 @@ Firehose.module('Writer.Views', function (Views, App, Backbone, Marionette, $, _
     });
 
     Views.LiveStats = Marionette.ItemView.extend({
-        template:'writer_livestats'
+        template:'writer_livestats',
+        templateHelpers:clusterStatsHelpers,
+
+        modelEvents:{
+            "change:stats":"render"
+        }
     });
 
     Views.Performance = Marionette.ItemView.extend({

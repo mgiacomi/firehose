@@ -44,6 +44,20 @@ var clusterStatsHelpers = {
         }
     },
 
+    ageMsFormat:function (value) {
+        if(value < 1000) {
+            return value + " ms";
+        }
+        if(value < 60000) {
+            return Math.round(value / 1000) + " sec";
+        }
+        if(value < 3600000) {
+            return Math.round(value / 60000) + " min";
+        }
+        return Math.round(value / 3600000) + ' hr';
+    },
+
+
     ageFormat:function (value) {
         if (value < 60) {
             return value + " sec";

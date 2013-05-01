@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.AvgStatOverTime;
+import com.gltech.scale.core.stats.CountStatOverTime;
 import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.stats.StatsThreadPoolExecutor;
 import com.gltech.scale.core.storage.StreamSplitter;
@@ -37,8 +38,10 @@ public class AwsS3Store implements Storage
 	private String s3BucketName;
 	private AvgStatOverTime keyReadTimeStat;
 	private AvgStatOverTime keyReadSizeStat;
+	private CountStatOverTime bytesReadStat;
 	private AvgStatOverTime keyWrittenTimeStat;
 	private AvgStatOverTime keyWrittenSizeStat;
+	private CountStatOverTime bytesWrittenStat;
 	private final ThreadPoolExecutor threadPoolExecutor;
 	private final Semaphore semaphore;
 	private ModelIO modelIO;
@@ -58,9 +61,11 @@ public class AwsS3Store implements Storage
 		keyWrittenTimeStat = statsManager.createAvgStat(groupName, "KeysWritten_AvgTime", "milliseconds");
 		keyWrittenTimeStat.activateCountStat("KeysWritten_Count", "keys");
 		keyWrittenSizeStat = statsManager.createAvgStat(groupName, "KeysWritten_Size", "kb");
+		bytesWrittenStat = statsManager.createCountStat(groupName, "BytesWritten_Count", "bytes");
 		keyReadTimeStat = statsManager.createAvgStat(groupName, "KeysRead_AvgTime", "milliseconds");
 		keyReadTimeStat.activateCountStat("KeysRead_Count", "keys");
 		keyReadSizeStat = statsManager.createAvgStat(groupName, "KeyRead_Size", "kb");
+		bytesReadStat = statsManager.createCountStat(groupName, "BytesRead_Count", "bytes");
 
 		TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
 		threadPoolExecutor = new StatsThreadPoolExecutor(activeUploads, activeUploads, 1, TimeUnit.MINUTES, queue, new S3UploadThreadFactory(), keyWrittenTimeStat);
@@ -134,6 +139,7 @@ public class AwsS3Store implements Storage
 			int bytesWritten = IOUtils.copy(new LZFInputStream(s3Object.getObjectContent()), outputStream);
 			keyReadTimeStat.stopTimer();
 			keyReadSizeStat.add(bytesWritten / Defaults.KBytes);
+			bytesReadStat.add(bytesWritten);
 		}
 		catch (IOException e)
 		{
@@ -166,16 +172,15 @@ public class AwsS3Store implements Storage
 
 			while (streamSplitter.hasNext())
 			{
-				StreamSplitter.StreamPart streamPart = streamSplitter.next();
-
-				keyWrittenSizeStat.add(streamPart.getSize() / Defaults.KBytes);
-
 				semaphore.acquire();
+				StreamSplitter.StreamPart streamPart = streamSplitter.next();
 
 				try
 				{
 					Callable<PartETag> uploadPart = new PartUploader(streamPart, key, part, initResponse);
 					uploads.add(threadPoolExecutor.submit(uploadPart));
+					keyWrittenSizeStat.add(streamPart.getSize() / Defaults.KBytes);
+					bytesWrittenStat.add(streamPart.getSize());
 					part++;
 				}
 				finally
@@ -211,18 +216,17 @@ public class AwsS3Store implements Storage
 	@Override
 	public byte[] getBytes(ChannelMetaData channelMetaData, String id)
 	{
-		keyReadTimeStat.startTimer();
-		keyReadTimeStat.stopTimer();
-		keyReadSizeStat.add(0);
-		return new byte[0];
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		getMessages(channelMetaData, id, baos);
+		return baos.toByteArray();
 	}
 
 	@Override
 	public void putBytes(ChannelMetaData channelMetaData, String id, byte[] data)
 	{
-		keyWrittenTimeStat.startTimer();
-		keyWrittenTimeStat.stopTimer();
-		keyWrittenSizeStat.add(data.length / Defaults.KBytes);
+		ByteArrayInputStream bais = new ByteArrayInputStream(data);
+		putMessages(channelMetaData, id, bais);
+
 	}
 
 	private String keyNameWithUniquePrefix(String channelName, String id)
