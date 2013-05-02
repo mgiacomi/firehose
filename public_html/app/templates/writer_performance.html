@@ -1,3 +1,62 @@
-<div class="title"><h5>Storage Writer <span style="margin-left:5px; margin-right:5px">&gt;</span> Performance</h5></div>
+<script>
+	_.defer(function (caller) {
+		initGeneral();
+	}, this);
 
-blah blah blah
+
+</script>
+
+<div class="title"><h5>Storage Writer <span style="margin-left:5px; margin-right:5px">&gt;</span> Performance</h5></div>
+<br/>
+Each graph shows up to 3 minutes of performance data.
+
+<!-- Lines with fill -->
+<div class="widget" style="margin-top:20px;">
+	<div class="head"><h5 class="iArrowDown">Avg Time Writing Batch (ms)</h5></div>
+	<div class="body">
+		<div id="avgTimeWritingBatch" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iInbox2">Total Batches Written</h5></div>
+	<div class="body">
+		<div id="totalBatchesWritten" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iArrowUp">Currently Writing Batches</h5></div>
+	<div class="body">
+		<div id="currentlyWritingBatches" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iInbox2">Total Messages Written</h5></div>
+	<div class="body">
+		<div id="totalMessagesWritten" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iInbox2">Total Bytes Written</h5></div>
+	<div class="body">
+		<div id="totalBytesWritten" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iArrowUp">VM CPU</h5></div>
+	<div class="body">
+		<div id="vmCpu" class="autoUpdate"></div>
+	</div>
+</div>
+
+<div class="widget">
+	<div class="head"><h5 class="iArrowUp">Load Avg</h5></div>
+	<div class="body">
+		<div id="loadAvg" class="autoUpdate"></div>
+	</div>
+</div>
+
