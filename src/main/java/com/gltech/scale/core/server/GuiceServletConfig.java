@@ -62,14 +62,14 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					bind(StatsManager.class).to(StatsManagerImpl.class).in(Singleton.class);
 					bind(ChannelCache.class).to(ChannelCacheImpl.class).in(Singleton.class);
 
-					if (props.get("enable.inbound_service", true))
+					if (props.get("enable.inbound_service", false))
 					{
 						bind(InboundResource.class);
 						bind(InboundService.class).to(InboundServiceStats.class).in(Singleton.class);
 						bind(InboundService.class).annotatedWith(Names.named(InboundServiceStats.BASE)).to(InboundServiceImpl.class).in(Singleton.class);
 					}
 
-					if (props.get("enable.aggregator", true))
+					if (props.get("enable.aggregator", false))
 					{
 						bind(AggregatorResource.class);
 
@@ -78,7 +78,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 						bind(Aggregator.class).annotatedWith(Names.named(AggregatorStats.BASE)).to(AggregatorImpl.class).in(Singleton.class);
 					}
 
-					if (props.get("enable.storage_writer", true))
+					if (props.get("enable.storage_writer", false))
 					{
 						bind(StorageWriterResource.class);
 

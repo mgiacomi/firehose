@@ -1,5 +1,6 @@
 package com.gltech.scale.monitoring.server;
 
+import ch.qos.logback.classic.Level;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.lifecycle.LifeCycle;
@@ -30,7 +31,14 @@ public class EmbeddedServer
 
 	public static void main(String[] args) throws Exception
 	{
-		start(9090);
+		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+		root.setLevel(Level.INFO);
+
+		if(args.length > 0) {
+			props.loadFromFile(args[0]);
+		}
+
+		start(props.get("server_port", 8080));
 		server.join();
 	}
 

@@ -1,5 +1,6 @@
 package com.gltech.scale.core.server;
 
+import ch.qos.logback.classic.Level;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.StatCallBack;
@@ -40,7 +41,22 @@ public class EmbeddedServer
 
 	public static void main(String[] args) throws Exception
 	{
-		start(8080);
+		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+		root.setLevel(Level.INFO);
+
+		if(args.length > 0) {
+			props.loadFromFile(args[0]);
+		}
+		if(args.length > 1) {
+			props.set("server_host", args[1]);
+		}
+
+		if("localhost".equals(props.get("server_host", "localhost")))
+		{
+			throw new IllegalStateException("A 'server_host' needs to be specified either in the properties file or on the command line.");
+		}
+
+		start(props.get("server_port", 8080));
 		server.join();
 	}
 
@@ -116,14 +132,14 @@ public class EmbeddedServer
 		statsManager.start();
 		LifeCycleManager.getInstance().add(statsManager, LifeCycle.Priority.FINAL);
 
-		if (props.get("enable.inbound_service", true))
+		if (props.get("enable.inbound_service", false))
 		{
 			// Registered InboundService for shutdown
 			InboundService inboundService = injector.getInstance(InboundService.class);
 			LifeCycleManager.getInstance().add(inboundService, LifeCycle.Priority.INITIAL);
 		}
 
-		if (props.get("enable.aggregator", true))
+		if (props.get("enable.aggregator", false))
 		{
 			// Registered aggregator for shutdown
 			Aggregator aggregator = injector.getInstance(Aggregator.class);
@@ -135,7 +151,7 @@ public class EmbeddedServer
 			LifeCycleManager.getInstance().add(weightManager, LifeCycle.Priority.INITIAL);
 		}
 
-		if (props.get("enable.storage_writer", true))
+		if (props.get("enable.storage_writer", false))
 		{
 			// Start the CollectorManager and register it for shutdown
 			StorageWriteManager storageWriteManager = injector.getInstance(StorageWriteManager.class);
