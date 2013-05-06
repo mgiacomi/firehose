@@ -219,14 +219,30 @@ public class AggregatorImpl implements Aggregator
 	public BatchMetaData getBatchMetaData(String channelName, DateTime dateTime)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
-		return channels.get(channelMetaData).getBatch(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
+
+		try
+		{
+			return channels.get(channelMetaData).getBatch(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
+		}
+		catch (NullPointerException e)
+		{
+			return null;
+		}
 	}
 
 	@Override
 	public BatchMetaData getBatchBucketMetaData(String channelName, DateTime dateTime)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, false);
-		return channels.get(channelMetaData).getBackupBatch(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
+
+		try
+		{
+			return channels.get(channelMetaData).getBackupBatch(timePeriodUtils.nearestPeriodCeiling(dateTime)).getMetaData();
+		}
+		catch (NullPointerException e)
+		{
+			return null;
+		}
 	}
 
 	@Override

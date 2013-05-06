@@ -95,8 +95,6 @@ public class CoreManualRegression
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/props.properties");
 
 			ServiceMetaData inboundService = new ServiceMetaData();
-//			inboundService.setListenAddress("192.168.113.50");
-//			inboundService.setListenPort(8080);
 			inboundService.setListenAddress("localhost");
 			inboundService.setListenPort(9090);
 
@@ -129,11 +127,6 @@ public class CoreManualRegression
 			{
 				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "fast", String.valueOf(counter + "a"));
 				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "redundant", String.valueOf(counter + "b"));
-
-//				postEvent("http://192.168.113.50:8080", "fast", String.valueOf(counter + "a"));
-//				postEvent("http://192.168.113.50:8080", "redundant", String.valueOf(counter + "b"));
-//				postEvent("http://192.168.113.53:8080", "fast", String.valueOf(counter + "c"));
-//				postEvent("http://192.168.113.53:8080", "redundant", String.valueOf(counter + "d"));
 				Thread.sleep(5);
 				counter++;
 			}

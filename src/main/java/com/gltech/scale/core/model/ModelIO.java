@@ -20,40 +20,68 @@ public class ModelIO
 
 	public byte[] toBytes(Message message)
 	{
-		LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
-		return ProtostuffIOUtil.toByteArray(message, messageSchema, linkedBuffer);
+		if (message != null)
+		{
+			LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+			return ProtostuffIOUtil.toByteArray(message, messageSchema, linkedBuffer);
+		}
+		return new byte[0];
 	}
 
 	public byte[] toBytes(ChannelMetaData channelMetaData)
 	{
-		LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
-		return ProtostuffIOUtil.toByteArray(channelMetaData, channelMetaDataSchema, linkedBuffer);
+		if (channelMetaData != null)
+		{
+			LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+			return ProtostuffIOUtil.toByteArray(channelMetaData, channelMetaDataSchema, linkedBuffer);
+		}
+		return new byte[0];
 	}
 
 	public byte[] toBytes(BatchMetaData batchMetaData)
 	{
-		LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
-		return ProtostuffIOUtil.toByteArray(batchMetaData, batchMetadataSchema, linkedBuffer);
+		if (batchMetaData != null)
+		{
+			LinkedBuffer linkedBuffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+			return ProtostuffIOUtil.toByteArray(batchMetaData, batchMetadataSchema, linkedBuffer);
+		}
+		return new byte[0];
 	}
 
 	public String toJson(Message message)
 	{
-		return new String(JsonIOUtil.toByteArray(message, messageSchema, false));
+		if (message != null)
+		{
+			return new String(JsonIOUtil.toByteArray(message, messageSchema, false));
+		}
+		return "{}";
 	}
 
 	public byte[] toJsonBytes(ChannelMetaData channelMetaData)
 	{
-		return JsonIOUtil.toByteArray(channelMetaData, channelMetaDataSchema, false);
+		if (channelMetaData != null)
+		{
+			return JsonIOUtil.toByteArray(channelMetaData, channelMetaDataSchema, false);
+		}
+		return new byte[0];
 	}
 
 	public String toJson(ChannelMetaData channelMetaData)
 	{
-		return new String(JsonIOUtil.toByteArray(channelMetaData, channelMetaDataSchema, false));
+		if (channelMetaData != null)
+		{
+			return new String(JsonIOUtil.toByteArray(channelMetaData, channelMetaDataSchema, false));
+		}
+		return "{}";
 	}
 
 	public String toJson(BatchMetaData batchMetaData)
 	{
-		return new String(JsonIOUtil.toByteArray(batchMetaData, batchMetadataSchema, false));
+		if (batchMetaData != null)
+		{
+			return new String(JsonIOUtil.toByteArray(batchMetaData, batchMetadataSchema, false));
+		}
+		return "{}";
 	}
 
 	public Message toMessage(byte[] bytes)

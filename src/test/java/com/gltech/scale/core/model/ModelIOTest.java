@@ -23,4 +23,13 @@ public class ModelIOTest
 		after = modelIO.toMessage(messageBytes);
 		assertEquals(before, after);
 	}
+
+	@Test
+	public void testNullBatchMetaData()
+	{
+		ModelIO modelIO = new ModelIO();
+		ChannelMetaData channelMetaData = null;
+		modelIO.toBytes(channelMetaData);
+
+	}
 }
