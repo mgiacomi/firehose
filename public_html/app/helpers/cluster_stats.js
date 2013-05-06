@@ -83,10 +83,11 @@ var clusterStatsHelpers = {
 
     serversByGroupStat:function (groupName) {
         var servers = [];
+        var newIdx = 0;
         $.each(this.stats, function (idx, server) {
             $.each(server.groupStatsList, function (idx2, groupStat) {
                 if (groupStat.name == groupName) {
-                    servers[idx] = {workerId:server.workerId, hostname:server.hostname, status:server.status, joinDate:server.joinDate, groupStat:groupStat};
+                    servers[newIdx++] = {workerId:server.workerId, hostname:server.hostname, status:server.status, joinDate:server.joinDate, groupStat:groupStat};
                 }
             });
         });

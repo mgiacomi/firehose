@@ -33,6 +33,7 @@ public class CoreManualRegression
 		{
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/primary_server.properties");
+			props.set("server_host", "192.168.113.148");
 
 			TestingServer testingServer = new TestingServer(21818);
 			VoldemortTestUtil.start();
@@ -55,6 +56,7 @@ public class CoreManualRegression
 		{
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/second_server.properties");
+			props.set("server_host", "192.168.113.148");
 
 			EmbeddedServer.start(9091);
 
@@ -74,6 +76,7 @@ public class CoreManualRegression
 		{
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/monitoring.properties");
+			props.set("server_host", "192.168.113.148");
 
 			com.gltech.scale.monitoring.server.EmbeddedServer.start(9292);
 
@@ -92,8 +95,10 @@ public class CoreManualRegression
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/props.properties");
 
 			ServiceMetaData inboundService = new ServiceMetaData();
-			inboundService.setListenAddress("localhost");
-			inboundService.setListenPort(9090);
+			inboundService.setListenAddress("192.168.113.50");
+			inboundService.setListenPort(8080);
+//			inboundService.setListenAddress("localhost");
+//			inboundService.setListenPort(9090);
 
 			InboundRestClient inboundRestClient = new InboundRestClient(new ModelIO());
 
@@ -122,9 +127,13 @@ public class CoreManualRegression
 			int counter = 0;
 			while (true)
 			{
-//				postEvent("http://localhost:9090", "fast", String.valueOf(counter + "a"));
-				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "fast", String.valueOf(counter + "a"));
-				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "redundant", String.valueOf(counter + "b"));
+//				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "fast", String.valueOf(counter + "a"));
+//				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "redundant", String.valueOf(counter + "b"));
+
+				postEvent("http://192.168.113.50:8080", "fast", String.valueOf(counter + "a"));
+				postEvent("http://192.168.113.50:8080", "redundant", String.valueOf(counter + "b"));
+				postEvent("http://192.168.113.53:8080", "fast", String.valueOf(counter + "c"));
+				postEvent("http://192.168.113.53:8080", "redundant", String.valueOf(counter + "d"));
 				Thread.sleep(5);
 				counter++;
 			}

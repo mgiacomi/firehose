@@ -72,7 +72,7 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
 
             $.each(this.model.get("stats"), function (idx, server) {
                 $.each(server.groupStatsList, function (idx2, groupStat) {
-                    if (groupStat.name == "Inbound") {
+                    if (groupStat.name == "Aggregator") {
                         var totalMessages = server.groupStatsList.Aggregator.countStats.AddMessage_Count.sec5;
                         totalMessages += server.groupStatsList.Aggregator.countStats.AddBackupMessage_Count.sec5;
                         var statValue = Math.round(totalMessages / 5);
