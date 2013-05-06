@@ -62,6 +62,10 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 	{
 		int checkForWorkInterval = props.get("storage_writer.check_for_work_every_x_secs", Defaults.STORAGE_WRITER_CHECK_FOR_WORK_EVERY_X_SECS);
 
+		// Get stats for message size and number
+		final CountStatOverTime messagesWritten = statsManager.createCountStat(groupName, "MessagesWritten_Count", "messages");
+		final CountStatOverTime bytesWritten = statsManager.createCountStat(groupName, "MessagesWritten_Size", "bytes");
+
 		if (scheduledWriterService == null || scheduledWriterService.isShutdown())
 		{
 			scheduledWriterService = Executors.newScheduledThreadPool(1, new ThreadFactory()
@@ -89,10 +93,6 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 								// Get a stat based on channel name.
 								AvgStatOverTime channelStat = statsManager.createAvgStat(groupName, batchPeriodMapper.getChannelName() + "_AvgTime", "milliseconds");
 								channelStat.activateCountStat(batchPeriodMapper.getChannelName() + "_Count", "batches");
-
-								// Get stats for message size and number
-								CountStatOverTime messagesWritten = statsManager.createCountStat(groupName, "MessagesWritten_Count", "messages");
-								CountStatOverTime bytesWritten = statsManager.createCountStat(groupName, "MessagesWritten_Size", "bytes");
 
 								BatchWriter batchWriter = injector.getInstance(BatchWriter.class);
 								batchWriter.assign(channelMetaData, batchPeriodMapper.getNearestPeriodCeiling());

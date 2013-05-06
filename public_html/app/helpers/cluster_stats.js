@@ -71,9 +71,10 @@ var clusterStatsHelpers = {
 
     serversByRole:function (role) {
         var servers = [];
+        var newIdx = 0;
         $.each(this.stats, function (idx, server) {
             if (_.indexOf(server.roles, role) > -1) {
-                servers[idx] = {workerId:server.workerId, hostname:server.hostname, status:server.status, joinDate:server.joinDate};
+                servers[newIdx++] = {workerId:server.workerId, hostname:server.hostname, status:server.status, joinDate:server.joinDate};
             }
         });
 
@@ -139,7 +140,7 @@ var clusterStatsHelpers = {
 
     prettyDate:function (date_str) {
         var time_formats = [
-            [60, 'just now', 1],
+            [60, 'seconds', 1],
             // 60
             [120, '1 minute ago', '1 minute from now'],
             // 60*2
