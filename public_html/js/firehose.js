@@ -12,24 +12,24 @@ function flotTotFormatter(v, axis) {
         return (value / 1000) + "k";
     }
     if(value < 1000000000) {
-        return (value / 1000000) + "m";
+        return Math.round((value / 10000) / 100) + "m";
     }
-    return (value / 1000000000) + "bn";
+    return Math.round((value / 10000000) / 100) + "bn";
 }
 
 function flotByteFormatter(v, axis) {
     var value = v.toFixed(axis.tickDecimals);
 
-    if(value < 1000) {
-        return value + " b";
+    if (value < 1000) {
+        return Math.round(value) + " b";
     }
-    if(value < 1000000) {
-        return (value / 1000) + " kb";
+    if (value < 1000000) {
+        return Math.round((value / 1000)) + " kb";
     }
-    if(value < 1000000000) {
-        return (value / 1000000) + " mb";
+    if (value < 1000000000) {
+        return Math.round((value / 1000000)) + " mb";
     }
-    return (value / 1000000000) + " gb";
+    return (Math.round((value / 10000000)) / 100) + " gb";
 }
 
 function flotAgeMsFormatter(v, axis) {
@@ -39,12 +39,12 @@ function flotAgeMsFormatter(v, axis) {
         return value + "ms";
     }
     if(value < 60000) {
-        return (value / 1000) + "sec";
+        return Math.round(value / 1000) + "sec";
     }
     if(value < 3600000) {
-        return (value / 60000) + "min";
+        return Math.round(value / 60000) + "min";
     }
-    return (value / 3600000) + 'hr';
+    return Math.round(value / 3600000) + 'hr';
 }
 
 function flotAgeFormatter(v, axis) {
@@ -54,9 +54,9 @@ function flotAgeFormatter(v, axis) {
         return value + " sec";
     }
     if(value < 3600) {
-        return (value / 60) + " min";
+        return Math.round(value / 60) + " min";
     }
-    return (value / 3600) + ' hr';
+    return Math.round(value / 3600) + ' hr';
 }
 
 function initAccordion() {

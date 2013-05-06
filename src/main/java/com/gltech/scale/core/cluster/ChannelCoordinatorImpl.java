@@ -66,19 +66,19 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 			{
 				public void run()
 				{
-					DateTime now = DateTime.now().plusSeconds(3);
+					DateTime threeSecondsFromNow = DateTime.now().plusSeconds(3);
 
 					try
 					{
-						getAggregatorPeriodMatrix(now);
+						getAggregatorPeriodMatrix(threeSecondsFromNow);
 					}
 					catch (Exception e)
 					{
 						// May fail due to network/zookeeper issues.  If so, just try again next time.
-						logger.error("Failed to get AggregatorPeriodMatrix for period: " + now, e);
+						logger.error("Failed to get AggregatorPeriodMatrix for period: " + threeSecondsFromNow, e);
 					}
 				}
-			}, 0, 1, TimeUnit.SECONDS);
+			}, 0, 500, TimeUnit.MILLISECONDS);
 
 			logger.info("ChannelCoordinator has been started.");
 		}
@@ -186,10 +186,11 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	{
 		// You can't schedule anything more then one time period into the future.
 		int periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
+		int futurePeriodSeconds = 3;
 
-		if (nearestPeriodCeiling.isAfter(timePeriodUtils.nearestPeriodCeiling(DateTime.now()).plusSeconds(5)))
+		if (nearestPeriodCeiling.isAfter(timePeriodUtils.nearestPeriodCeiling(DateTime.now()).plusSeconds(futurePeriodSeconds)))
 		{
-			throw new ClusterException(" You can not schedule aggregator more then " + periodSeconds + " seconds into the future.");
+			throw new ClusterException(" You can not schedule aggregator more then " + futurePeriodSeconds + " seconds into the future.");
 		}
 
 		try

@@ -60,8 +60,6 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 	@Override
 	public synchronized void start()
 	{
-		int checkForWorkInterval = props.get("storage_writer.check_for_work_every_x_secs", Defaults.STORAGE_WRITER_CHECK_FOR_WORK_EVERY_X_SECS);
-
 		// Get stats for message size and number
 		final CountStatOverTime messagesWritten = statsManager.createCountStat(groupName, "MessagesWritten_Count", "messages");
 		final CountStatOverTime bytesWritten = statsManager.createCountStat(groupName, "MessagesWritten_Size", "bytes");
@@ -115,7 +113,7 @@ public class StorageWriteManagerImpl implements StorageWriteManager
 						logger.debug("Could not take on new work.  All threads busy. ActiveWriters={}", threadPoolExecutor.getActiveCount());
 					}
 				}
-			}, 0, checkForWorkInterval, TimeUnit.SECONDS);
+			}, 0, 500, TimeUnit.MILLISECONDS);
 
 			logger.info("StorageWriter service has been started.");
 		}
