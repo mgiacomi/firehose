@@ -8,10 +8,11 @@ import com.netflix.curator.x.discovery.ServiceCacheBuilder;
 import com.netflix.curator.x.discovery.ServiceDiscovery;
 import com.netflix.curator.x.discovery.ServiceDiscoveryBuilder;
 import com.netflix.curator.x.discovery.ServiceInstance;
-import com.netflix.curator.x.discovery.details.ServiceCache;
+import com.netflix.curator.x.discovery.ServiceCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public class ServiceAdvertiser
@@ -25,25 +26,20 @@ public class ServiceAdvertiser
 	private static final Logger logger = LoggerFactory.getLogger(ServiceAdvertiser.class);
 	private final String serviceName;
 	private final CuratorFramework client = ZkClientCreator.createCached();
+	private final ServiceDiscovery<ServiceMetaData> discovery;
 
 	ServiceAdvertiser(String serviceName)
 	{
 		this.serviceName = serviceName;
+		discovery = getDiscovery();
 	}
 
 	public ServiceCache<ServiceMetaData> getServiceCache()
 	{
 		try
 		{
-			ServiceDiscovery<ServiceMetaData> discovery = getDiscovery();
-			discovery.start();
-
 			ServiceCacheBuilder<ServiceMetaData> cacheBuilder = discovery.serviceCacheBuilder();
-			ServiceCache<ServiceMetaData> serviceCache = cacheBuilder.name(serviceName).build();
-
-			discovery.close();
-
-			return serviceCache;
+			return cacheBuilder.name(serviceName).build();
 		}
 		catch (Exception e)
 		{
@@ -55,10 +51,7 @@ public class ServiceAdvertiser
 	{
 		try
 		{
-			ServiceDiscovery<ServiceMetaData> discovery = getDiscovery();
-			discovery.start();
 			discovery.registerService(getInstance(serviceMetaData));
-			discovery.close();
 		}
 		catch (Exception e)
 		{
@@ -70,10 +63,7 @@ public class ServiceAdvertiser
 	{
 		try
 		{
-			ServiceDiscovery<ServiceMetaData> discovery = getDiscovery();
-			discovery.start();
 			discovery.unregisterService(getInstance(serviceMetaData));
-			discovery.close();
 		}
 		catch (IllegalStateException ise)
 		{
@@ -82,6 +72,18 @@ public class ServiceAdvertiser
 		catch (Exception e)
 		{
 			throw Throwables.propagate(e);
+		}
+	}
+
+	public void close()
+	{
+		try
+		{
+			discovery.close();
+		}
+		catch (IOException e)
+		{
+			logger.error("Failed to close ServiceDiscovery.", e);
 		}
 	}
 
@@ -96,7 +98,7 @@ public class ServiceAdvertiser
 				.build();
 	}
 
-	public ServiceDiscovery<ServiceMetaData> getDiscovery()
+	private ServiceDiscovery<ServiceMetaData> getDiscovery()
 	{
 		try
 		{

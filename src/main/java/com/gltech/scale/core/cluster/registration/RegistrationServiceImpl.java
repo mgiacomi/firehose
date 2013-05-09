@@ -7,7 +7,7 @@ import com.gltech.scale.util.Props;
 import com.netflix.curator.framework.CuratorFramework;
 import com.netflix.curator.framework.state.ConnectionState;
 import com.netflix.curator.x.discovery.ServiceInstance;
-import com.netflix.curator.x.discovery.details.ServiceCache;
+import com.netflix.curator.x.discovery.ServiceCache;
 import com.netflix.curator.x.discovery.details.ServiceCacheListener;
 import com.netflix.curator.x.discovery.strategies.RandomStrategy;
 import com.netflix.curator.x.discovery.strategies.RoundRobinStrategy;
@@ -288,16 +288,16 @@ public class RegistrationServiceImpl implements RegistrationService
 		{
 			unRegisterAsServer();
 
-			serverCache.close();
-			inboundServiceCache.close();
-			storageWriterCache.close();
-			aggregatorCache.close();
+			serverAdvertiser.close();
+			inboundServiceAdvertiser.close();
+			storageWriterAdvertiser.close();
+			aggregatorAdvertiser.close();
 
 			logger.info("Registration ServiceCache is shutdown.");
 		}
-		catch (IOException | IllegalStateException e)
+		catch (IllegalStateException e)
 		{
-			logger.error("Failed to close the Service Cache");
+			logger.error("Failed to close the Service Advertisers");
 		}
 	}
 
