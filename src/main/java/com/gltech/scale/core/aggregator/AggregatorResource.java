@@ -27,20 +27,24 @@ public class AggregatorResource
 	}
 
 	@POST
-	@Path("/message/{channelName}")
+	@Path("/message/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response postMessage(@PathParam("channelName") String channelName, byte[] data)
+	public Response postMessage(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month, @PathParam("day") int day,
+								@PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec, byte[] data)
 	{
-		aggregator.addMessage(channelName, data);
+		DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
+		aggregator.addMessage(channelName, data, dateTime);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 
 	@POST
-	@Path("/backup/message/{channelName}")
+	@Path("/backup/message/{channelName}/{year}/{month}/{day}/{hour}/{min}/{sec}")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public Response postBackupMessage(@PathParam("channelName") String channelName, byte[] data)
+	public Response postBackupMessage(@PathParam("channelName") String channelName, @PathParam("year") int year, @PathParam("month") int month, @PathParam("day") int day,
+									  @PathParam("hour") int hour, @PathParam("min") int min, @PathParam("sec") int sec, byte[] data)
 	{
-		aggregator.addBackupMessage(channelName, data);
+		DateTime dateTime = new DateTime(year, month, day, hour, min, sec);
+		aggregator.addBackupMessage(channelName, data, dateTime);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 

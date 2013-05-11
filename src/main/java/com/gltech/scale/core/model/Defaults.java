@@ -5,6 +5,7 @@ import com.gltech.scale.core.stats.results.AvgStat;
 import com.gltech.scale.core.stats.results.GroupStats;
 import com.gltech.scale.core.stats.results.OverTime;
 import com.gltech.scale.monitoring.model.AggregateOverTime;
+import com.gltech.scale.monitoring.model.BatchStatus;
 import com.gltech.scale.monitoring.model.ClusterStats;
 import com.gltech.scale.monitoring.model.ServerStats;
 
@@ -40,5 +41,6 @@ public class Defaults
 		registry.registerPojo(ServerStats.class, 7);
 		registry.registerPojo(AggregateOverTime.class, 8);
 		registry.registerPojo(ClusterStats.class, 9);
+		registry.registerPojo(BatchStatus.class, 10);
 	}
 }

@@ -11,9 +11,9 @@ import java.util.List;
 
 public interface Aggregator extends LifeCycle
 {
-	void addMessage(String channelName, byte[] bytes);
+	void addMessage(String channelName, byte[] bytes, DateTime nearestPeriodCeiling);
 
-	void addBackupMessage(String channelName, byte[] bytes);
+	void addBackupMessage(String channelName, byte[] bytes, DateTime nearestPeriodCeiling);
 
 	void clear(String channelName, DateTime dateTime);
 

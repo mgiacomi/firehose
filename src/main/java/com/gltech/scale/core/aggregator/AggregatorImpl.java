@@ -45,7 +45,7 @@ public class AggregatorImpl implements Aggregator
 	}
 
 	@Override
-	public void addMessage(String channelName, byte[] bytes)
+	public void addMessage(String channelName, byte[] bytes, DateTime nearestPeriodCeiling)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 		Channel channel = channels.get(channelMetaData);
@@ -61,11 +61,11 @@ public class AggregatorImpl implements Aggregator
 			}
 		}
 
-		channel.addMessage(bytes);
+		channel.addMessage(bytes, nearestPeriodCeiling);
 	}
 
 	@Override
-	public void addBackupMessage(String channelName, byte[] bytes)
+	public void addBackupMessage(String channelName, byte[] bytes, DateTime nearestPeriodCeiling)
 	{
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 
@@ -82,7 +82,7 @@ public class AggregatorImpl implements Aggregator
 			}
 		}
 
-		channel.addBackupMessage(bytes);
+		channel.addBackupMessage(bytes, nearestPeriodCeiling);
 	}
 
 	@Override

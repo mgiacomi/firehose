@@ -1,0 +1,50 @@
+<script>
+	_.defer(function (caller) {
+		initGeneral();
+	}, this);
+</script>
+
+<div class="title"><h5>Aggregator <span style="margin-left:5px; margin-right:5px">&gt;</span> Active Batches</h5></div>
+
+<div class="widget" style="margin-top:10px;">
+	<div class="head">
+		<h5 class="iFrames">All Batches</h5>
+
+		<div class="num"><span>[ 1m ago ]</span></div>
+	</div>
+	<div class="body" style="padding:0;">
+		<table cellpadding="0" cellspacing="0" width="100%" class="tableStatic">
+			<thead>
+			<tr class="noborder">
+				<td><strong>Batch</strong></td>
+				<td><strong>Registered</strong></td>
+				<td><strong>Server</strong></td>
+				<td><strong>Primary</strong></td>
+				<td><strong>Messages</strong></td>
+				<td><strong>Size</strong></td>
+			</tr>
+			</thead>
+			<tbody>
+			<% for (var key in activeBatches) {  %>
+				<% $.each(activeBatches[key], function (idx, server) {  %>
+					<tr>
+						<% var batchDate = Date.parseString(key, "MM/dd/yyyy HH:mm:ss"); %>
+						<% var secBetween = Math.round((new Date().getTime() - batchDate.getTime()) / 1000) %>
+						<% if(idx == 0) { %>
+							<td rowspan="<%= activeBatches[key].length %>">
+								<%= key %>
+								<!-- (<%= ageFormat(secBetween) %>) -->
+							</td>
+						<% } %>
+						<td><%= server.registered %></td>
+						<td><%= server.hostname %></td>
+						<td><%= server.primary %></td>
+						<td><%= server.batchMetaData.messagesAdded %></td>
+						<td><%= byteFormat(server.batchMetaData.bytes) %></td>
+					</tr>
+				<% }); %>
+			<% } %>
+			</tbody>
+		</table>
+	</div>
+</div>

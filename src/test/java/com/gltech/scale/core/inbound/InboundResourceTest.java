@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -33,6 +34,11 @@ public class InboundResourceTest
 	{
 		ClusterService clusterService = new ClusterService()
 		{
+			public List<BatchPeriodMapper> getOrderedActiveBucketList()
+			{
+				return null;
+			}
+
 			public DateTime nearestPeriodCeiling(DateTime dateTime)
 			{
 				return new TimePeriodUtils().nearestPeriodCeiling(dateTime);

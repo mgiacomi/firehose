@@ -9,7 +9,9 @@ public class ClusterStats
 	@Tag(1)
 	Map<String, Map<String, AggregateOverTime>> aggregateStats = new HashMap<>();
 	@Tag(2)
-	private List<ServerStats> stats;
+	private List<ServerStats> stats = new ArrayList<>();
+	@Tag(2)
+	private Map<String, List<BatchStatus>> activeBatches = new TreeMap<>();
 
 	public Map<String, Map<String, AggregateOverTime>> getAggregateStats()
 	{
@@ -29,5 +31,15 @@ public class ClusterStats
 	public void setStats(List<ServerStats> stats)
 	{
 		this.stats = stats;
+	}
+
+	public Map<String, List<BatchStatus>> getActiveBatches()
+	{
+		return activeBatches;
+	}
+
+	public void setActiveBatches(Map<String, List<BatchStatus>> activeBatches)
+	{
+		this.activeBatches = activeBatches;
 	}
 }

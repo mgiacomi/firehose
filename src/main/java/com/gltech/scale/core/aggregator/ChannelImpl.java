@@ -33,17 +33,9 @@ public class ChannelImpl implements Channel
 		this.timePeriodUtils = timePeriodUtils;
 	}
 
-	public void addMessage(byte[] bytes)
+	@Override
+	public void addMessage(byte[] bytes, DateTime nearestPeriodCeiling)
 	{
-		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(new DateTime());
-
-		// Using Received date for redundant insurances that primary and backup messages are collected together.
-		if (channelMetaData.isRedundant())
-		{
-			Message message = modelIO.toMessage(bytes);
-			nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
-		}
-
 		Batch batch = batches.get(nearestPeriodCeiling);
 
 		if (batch == null)
@@ -63,17 +55,9 @@ public class ChannelImpl implements Channel
 		batch.addMessage(bytes);
 	}
 
-	public void addBackupMessage(byte[] bytes)
+	@Override
+	public void addBackupMessage(byte[] bytes, DateTime nearestPeriodCeiling)
 	{
-		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(new DateTime());
-
-		// Using Received date for redundant insurances that primary and backup messages are collected together.
-		if (channelMetaData.isRedundant())
-		{
-			Message message = modelIO.toMessage(bytes);
-			nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
-		}
-
 		Batch batch = backupBatches.get(nearestPeriodCeiling);
 
 		if (batch == null)
@@ -94,41 +78,47 @@ public class ChannelImpl implements Channel
 		batch.addMessage(bytes);
 	}
 
+	@Override
 	public ChannelMetaData getChannelMetaData()
 	{
 		return channelMetaData;
 	}
 
+	@Override
 	public Collection<Batch> getBatches()
 	{
 		return Collections.unmodifiableCollection(batches.values());
 	}
 
+	@Override
 	public Collection<Batch> getBackupBatches()
 	{
 		return Collections.unmodifiableCollection(backupBatches.values());
 	}
 
+	@Override
 	public Batch getBatch(DateTime nearestPeriodCeiling)
 	{
 		return batches.get(nearestPeriodCeiling);
 	}
 
+	@Override
 	public Batch getBackupBatch(DateTime nearestPeriodCeiling)
 	{
 		return backupBatches.get(nearestPeriodCeiling);
 	}
 
+	@Override
 	public void clear(DateTime nearestPeriodCeiling)
 	{
 		batches.remove(nearestPeriodCeiling);
 		logger.info("Cleared Batch " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 	}
 
+	@Override
 	public void clearBackup(DateTime nearestPeriodCeiling)
 	{
 		backupBatches.remove(nearestPeriodCeiling);
 		logger.info("Cleared backup Batch " + channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
-
 	}
 }

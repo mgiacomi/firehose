@@ -8,6 +8,15 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
         template:'aggregator_overview'
     });
 
+    Views.ActiveBatches = Marionette.ItemView.extend({
+        template:'aggregator_activebatches',
+        templateHelpers:clusterStatsHelpers,
+
+        modelEvents:{
+            "change:stats":"render"
+        }
+    });
+
     Views.LiveStats = Marionette.ItemView.extend({
         template:'aggregator_livestats',
         templateHelpers:clusterStatsHelpers,
@@ -17,7 +26,7 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
         }
     });
 
-    Views.Performance = Marionette.ItemView.extend({
+     Views.Performance = Marionette.ItemView.extend({
         template:'aggregator_performance',
         messageRecvPerSecPlot:{},
         messageRecvPerSecData:{workerData:{}},

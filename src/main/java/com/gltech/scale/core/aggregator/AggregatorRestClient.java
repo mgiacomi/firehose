@@ -28,9 +28,9 @@ public class AggregatorRestClient
 		this.modelIO = modelIO;
 	}
 
-	public void postMessage(ServiceMetaData aggregator, String channelName, Message message)
+	public void postMessage(ServiceMetaData aggregator, String channelName, DateTime dateTime, Message message)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/message/" + channelName;
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/message/" + channelName + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss");
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, modelIO.toBytes(message));
 
@@ -40,9 +40,9 @@ public class AggregatorRestClient
 		}
 	}
 
-	public void postBackupMessage(ServiceMetaData aggregator, String channelName, Message message)
+	public void postBackupMessage(ServiceMetaData aggregator, String channelName, DateTime dateTime, Message message)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/backup/message/" + channelName;
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/backup/message/" + channelName + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss");
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, modelIO.toBytes(message));
 

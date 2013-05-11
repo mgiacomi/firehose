@@ -88,11 +88,11 @@ public class InboundServiceImpl implements InboundService
 		{
 			// This gets a primary and backup aggregator.  Each call with round robin though available sets.
 			PrimaryBackupSet primaryBackupSet = aggregatorsByPeriod.nextPrimaryBackupSet();
-			aggregatorRestClient.postMessage(primaryBackupSet.getPrimary(), channelName, message);
+			aggregatorRestClient.postMessage(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling, message);
 
 			if (primaryBackupSet.getBackup() != null)
 			{
-				aggregatorRestClient.postBackupMessage(primaryBackupSet.getBackup(), channelName, message);
+				aggregatorRestClient.postBackupMessage(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling, message);
 			}
 			else
 			{
@@ -101,9 +101,9 @@ public class InboundServiceImpl implements InboundService
 		}
 		else
 		{
-			// This gets a aggregator.  Each call with round robin though all (primary and backup) rope managers.
+			// This gets an aggregator.  Each call with round robin though all (primary and backup) rope managers.
 			ServiceMetaData aggregator = aggregatorsByPeriod.next();
-			aggregatorRestClient.postMessage(aggregator, channelName, message);
+			aggregatorRestClient.postMessage(aggregator, channelName, nearestPeriodCeiling, message);
 		}
 	}
 

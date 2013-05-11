@@ -11,9 +11,9 @@ public interface Channel
 {
 	ChannelMetaData getChannelMetaData();
 
-	void addMessage(byte[] bytes);
+	void addMessage(byte[] bytes, DateTime nearestPeriodCeiling);
 
-	void addBackupMessage(byte[] bytes);
+	void addBackupMessage(byte[] bytes, DateTime nearestPeriodCeiling);
 
 	Collection<Batch> getBatches();
 

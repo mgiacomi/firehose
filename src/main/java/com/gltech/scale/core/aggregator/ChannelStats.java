@@ -108,48 +108,57 @@ public class ChannelStats implements Channel
 		}
 	}
 
+	@Override
 	public ChannelMetaData getChannelMetaData()
 	{
 		return channel.getChannelMetaData();
 	}
 
-	public void addMessage(byte[] bytes)
+	@Override
+	public void addMessage(byte[] bytes, DateTime nearestPeriodCeiling)
 	{
-		channel.addMessage(bytes);
+		channel.addMessage(bytes, nearestPeriodCeiling);
 		addMessageSizeStat.add(bytes.length);
 	}
 
-	public void addBackupMessage(byte[] bytes)
+	@Override
+	public void addBackupMessage(byte[] bytes, DateTime nearestPeriodCeiling)
 	{
-		channel.addBackupMessage(bytes);
+		channel.addBackupMessage(bytes, nearestPeriodCeiling);
 		addBackupMessageSizeStat.add(bytes.length);
 	}
 
+	@Override
 	public Collection<Batch> getBatches()
 	{
 		return channel.getBatches();
 	}
 
+	@Override
 	public Collection<Batch> getBackupBatches()
 	{
 		return channel.getBackupBatches();
 	}
 
+	@Override
 	public Batch getBatch(DateTime nearestPeriodCeiling)
 	{
 		return channel.getBatch(nearestPeriodCeiling);
 	}
 
+	@Override
 	public Batch getBackupBatch(DateTime nearestPeriodCeiling)
 	{
 		return channel.getBackupBatch(nearestPeriodCeiling);
 	}
 
+	@Override
 	public void clear(DateTime nearestPeriodCeiling)
 	{
 		channel.clear(nearestPeriodCeiling);
 	}
 
+	@Override
 	public void clearBackup(DateTime nearestPeriodCeiling)
 	{
 		channel.clearBackup(nearestPeriodCeiling);

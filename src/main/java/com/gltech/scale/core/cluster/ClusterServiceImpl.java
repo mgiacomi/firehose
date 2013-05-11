@@ -135,7 +135,8 @@ public class ClusterServiceImpl implements ClusterService
 		}
 	}
 
-	List<BatchPeriodMapper> getOrderedActiveBucketList()
+	@Override
+	public List<BatchPeriodMapper> getOrderedActiveBucketList()
 	{
 		try
 		{

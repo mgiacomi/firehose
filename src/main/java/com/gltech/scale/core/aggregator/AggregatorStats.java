@@ -140,40 +140,46 @@ public class AggregatorStats implements Aggregator
 		});
 	}
 
-	public void addMessage(String channelName, byte[] bytes)
+	@Override
+	public void addMessage(String channelName, byte[] bytes, DateTime nearestPeriodCeiling)
 	{
 		addMessageTimeStat.startTimer();
-		aggregator.addMessage(channelName, bytes);
+		aggregator.addMessage(channelName, bytes, nearestPeriodCeiling);
 		addMessageTimeStat.stopTimer();
 
 		addMessageSizeStat.add(bytes.length);
 	}
 
-	public void addBackupMessage(String channelName, byte[] bytes)
+	@Override
+	public void addBackupMessage(String channelName, byte[] bytes, DateTime nearestPeriodCeiling)
 	{
 		addBackupMessageTimeStat.startTimer();
-		aggregator.addBackupMessage(channelName, bytes);
+		aggregator.addBackupMessage(channelName, bytes,nearestPeriodCeiling);
 		addBackupMessageTimeStat.stopTimer();
 
 		addBackupMessageSizeStat.add(bytes.length);
 	}
 
+	@Override
 	public void clear(String channelName, DateTime dateTime)
 	{
 		aggregator.clear(channelName, dateTime);
 		clearCountStat.increment();
 	}
 
+	@Override
 	public List<Batch> getActiveBatches()
 	{
 		return aggregator.getActiveBatches();
 	}
 
+	@Override
 	public List<Batch> getActiveBackupBatches()
 	{
 		return aggregator.getActiveBackupBatches();
 	}
 
+	@Override
 	public long writeBatchMessages(OutputStream outputStream, String channelName, DateTime dateTime)
 	{
 		batchCollectTimeStat.startTimer();
@@ -183,6 +189,7 @@ public class AggregatorStats implements Aggregator
 		return processed;
 	}
 
+	@Override
 	public long writeBackupBatchMessages(OutputStream outputStream, String channelName, DateTime dateTime)
 	{
 		backupBatchCollectTimeStat.startTimer();
@@ -192,16 +199,19 @@ public class AggregatorStats implements Aggregator
 		return processed;
 	}
 
+	@Override
 	public BatchMetaData getBatchMetaData(String channelName, DateTime dateTime)
 	{
 		return aggregator.getBatchMetaData(channelName, dateTime);
 	}
 
+	@Override
 	public BatchMetaData getBatchBucketMetaData(String channelName, DateTime dateTime)
 	{
 		return aggregator.getBatchBucketMetaData(channelName, dateTime);
 	}
 
+	@Override
 	public void shutdown()
 	{
 		aggregator.shutdown();

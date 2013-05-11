@@ -137,11 +137,25 @@ public class BatchWriterImpl implements BatchWriter
 			for (PrimaryBackupSet primaryBackupSet : aggregatorsByPeriod.getPrimaryBackupSets())
 			{
 				// Aggregator can now remove the batch
-				aggregatorRestClient.clearBatch(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
-
-				if(primaryBackupSet.getBackup() != null)
+				try
 				{
-					aggregatorRestClient.clearBatch(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
+					aggregatorRestClient.clearBatch(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
+				}
+				catch (Exception e)
+				{
+					logger.error("Failed to clear the batch from aggregator host={} port={}", primaryBackupSet.getPrimary().getListenAddress(), primaryBackupSet.getPrimary().getListenPort(), e);
+				}
+
+				if (primaryBackupSet.getBackup() != null)
+				{
+					try
+					{
+						aggregatorRestClient.clearBatch(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
+					}
+					catch (Exception e)
+					{
+						logger.error("Failed to clear the backup batch from aggregator host={} port={}", primaryBackupSet.getPrimary().getListenAddress(), primaryBackupSet.getPrimary().getListenPort(), e);
+					}
 				}
 			}
 

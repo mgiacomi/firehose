@@ -1,12 +1,10 @@
 package com.gltech.scale.monitoring.model;
 
 import com.dyuproject.protostuff.Tag;
+import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.stats.results.GroupStats;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ServerStats
 {
@@ -22,6 +20,10 @@ public class ServerStats
 	private String status;
 	@Tag(6)
 	private Map<String, GroupStats> groupStatsList = new HashMap<>();
+	@Tag(7)
+	private List<BatchMetaData> activeBatches = new ArrayList<>();
+	@Tag(8)
+	private List<BatchMetaData> activeBackupBatches = new ArrayList<>();
 
 	public String getWorkerId()
 	{
@@ -51,6 +53,26 @@ public class ServerStats
 	public void setGroupStatsList(Map<String, GroupStats> groupStatsList)
 	{
 		this.groupStatsList = groupStatsList;
+	}
+
+	public List<BatchMetaData> getActiveBatches()
+	{
+		return activeBatches;
+	}
+
+	public void setActiveBatches(List<BatchMetaData> activeBatches)
+	{
+		this.activeBatches = activeBatches;
+	}
+
+	public List<BatchMetaData> getActiveBackupBatches()
+	{
+		return activeBackupBatches;
+	}
+
+	public void setActiveBackupBatches(List<BatchMetaData> activeBackupBatches)
+	{
+		this.activeBackupBatches = activeBackupBatches;
 	}
 
 	public String getJoinDate()

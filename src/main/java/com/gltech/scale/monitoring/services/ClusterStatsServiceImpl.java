@@ -1,13 +1,14 @@
 package com.gltech.scale.monitoring.services;
 
+import com.gltech.scale.core.cluster.BatchPeriodMapper;
+import com.gltech.scale.core.cluster.ClusterService;
+import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.stats.results.AvgStat;
 import com.gltech.scale.core.stats.results.GroupStats;
 import com.gltech.scale.core.stats.results.OverTime;
-import com.gltech.scale.monitoring.model.AggregateOverTime;
-import com.gltech.scale.monitoring.model.ClusterStats;
-import com.gltech.scale.monitoring.model.ResultsIO;
-import com.gltech.scale.monitoring.model.ServerStats;
+import com.gltech.scale.monitoring.model.*;
 import com.google.inject.Inject;
+import org.joda.time.format.DateTimeFormat;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,11 +19,13 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 {
 	private ConcurrentMap<String, ServerStats> serverStatsMap = new ConcurrentHashMap<>();
 	private Set<ClusterStatsCallBack> callBacks = new CopyOnWriteArraySet<>();
+	private ClusterService clusterService;
 	private ResultsIO resultsIO;
 
 	@Inject
-	public ClusterStatsServiceImpl(ResultsIO resultsIO)
+	public ClusterStatsServiceImpl(ClusterService clusterService, ResultsIO resultsIO)
 	{
+		this.clusterService = clusterService;
 		this.resultsIO = resultsIO;
 	}
 
@@ -72,8 +75,6 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 
 	private ClusterStats getClusterStats(List<ServerStats> serverStatsList)
 	{
-		//Map<String, Map<String, AggregateOverTime>> aggregateStats = new HashMap<>();
-
 		ClusterStats clusterStats = new ClusterStats();
 		clusterStats.setStats(serverStatsList);
 
@@ -103,7 +104,6 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 				}
 			}
 
-
 			// If the role group doesn't exist create it
 			if (commonGroup != null)
 			{
@@ -120,9 +120,45 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 					genAvgCountHighLow(commonGroup, aggregateOverTimeMap);
 				}
 			}
+
+			// Aggregate BatchMetaData
+			List<BatchPeriodMapper> batchPeriodMappers = clusterService.getOrderedActiveBucketList();
+			aggregateBatches(true, serverStats.getActiveBatches(), clusterStats, serverStats, batchPeriodMappers);
+			aggregateBatches(false, serverStats.getActiveBackupBatches(), clusterStats, serverStats, batchPeriodMappers);
 		}
 
 		return clusterStats;
+	}
+
+	private void aggregateBatches(boolean primary, List<BatchMetaData> batchMetaDataList, ClusterStats clusterStats, ServerStats serverStats, List<BatchPeriodMapper> batchPeriodMappers)
+	{
+		for (BatchMetaData batchMetaData : batchMetaDataList)
+		{
+			BatchStatus batchStatus = new BatchStatus();
+			batchStatus.setBatchMetaData(batchMetaData);
+			batchStatus.setHostname(serverStats.getHostname());
+			batchStatus.setWorkerId(serverStats.getWorkerId());
+			batchStatus.setPrimary(primary);
+
+			// Determine whether the batch is registered with the cluster service.
+			for (BatchPeriodMapper batchPeriodMapper : batchPeriodMappers)
+			{
+				if (batchPeriodMapper.getChannelName().equals(batchMetaData.getChannelMetaData().getName()) &&
+						batchPeriodMapper.getNearestPeriodCeiling().equals(batchMetaData.getNearestPeriodCeiling()))
+				{
+					batchStatus.setRegistered(true);
+				}
+			}
+
+			String key = batchMetaData.getNearestPeriodCeiling().toString(DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss"));
+
+			if (!clusterStats.getActiveBatches().containsKey(key))
+			{
+				clusterStats.getActiveBatches().put(key, new ArrayList<BatchStatus>());
+			}
+
+			clusterStats.getActiveBatches().get(key).add(batchStatus);
+		}
 	}
 
 	private void genAvgCountHighLow(GroupStats groupStats, Map<String, AggregateOverTime> aggregateOverTimeMap)
