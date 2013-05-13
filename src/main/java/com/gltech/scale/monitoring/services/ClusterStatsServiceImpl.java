@@ -1,6 +1,10 @@
 package com.gltech.scale.monitoring.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.gltech.scale.core.aggregator.AggregatorsByPeriod;
 import com.gltech.scale.core.cluster.BatchPeriodMapper;
+import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.model.BatchMetaData;
 import com.gltech.scale.core.stats.results.AvgStat;
@@ -9,7 +13,10 @@ import com.gltech.scale.core.stats.results.OverTime;
 import com.gltech.scale.monitoring.model.*;
 import com.google.inject.Inject;
 import org.joda.time.format.DateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -17,16 +24,22 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 public class ClusterStatsServiceImpl implements ClusterStatsService
 {
+	private static final Logger logger = LoggerFactory.getLogger(ClusterStatsServiceImpl.class);
 	private ConcurrentMap<String, ServerStats> serverStatsMap = new ConcurrentHashMap<>();
 	private Set<ClusterStatsCallBack> callBacks = new CopyOnWriteArraySet<>();
 	private ClusterService clusterService;
+	private ChannelCoordinator channelCoordinator;
 	private ResultsIO resultsIO;
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	@Inject
-	public ClusterStatsServiceImpl(ClusterService clusterService, ResultsIO resultsIO)
+	public ClusterStatsServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, ResultsIO resultsIO)
 	{
 		this.clusterService = clusterService;
+		this.channelCoordinator = channelCoordinator;
 		this.resultsIO = resultsIO;
+
+		mapper.registerModule(new JodaModule());
 	}
 
 	@Override
@@ -125,6 +138,17 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 			List<BatchPeriodMapper> batchPeriodMappers = clusterService.getOrderedActiveBucketList();
 			aggregateBatches(true, serverStats.getActiveBatches(), clusterStats, serverStats, batchPeriodMappers);
 			aggregateBatches(false, serverStats.getActiveBackupBatches(), clusterStats, serverStats, batchPeriodMappers);
+
+			// Bring in AggregatorsByPeriod
+			List<AggregatorsByPeriod> aggregatorsByPeriods = channelCoordinator.getAggregatorsByPeriods();
+
+			for (AggregatorsByPeriod aggregatorsByPeriod : aggregatorsByPeriods)
+			{
+				PeriodStatus periodStatus = new PeriodStatus();
+				periodStatus.setPeriod(aggregatorsByPeriod.getPeriod().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+				periodStatus.setPrimaryBackupSets(aggregatorsByPeriod.getPrimaryBackupSets());
+				clusterStats.getPeriodStatuses().add(periodStatus);
+			}
 		}
 
 		return clusterStats;

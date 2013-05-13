@@ -1,0 +1,46 @@
+<script>
+	_.defer(function (caller) {
+		initGeneral();
+	}, this);
+</script>
+
+<div class="title"><h5>Aggregator <span style="margin-left:5px; margin-right:5px">&gt;</span> Period History</h5></div>
+
+<div class="widget" style="margin-top:10px;">
+	<div class="head">
+		<h5 class="iFrames">Recent Periods</h5>
+
+		<div class="num"><span>[ 1m ago ]</span></div>
+	</div>
+	<div class="body" style="padding:0;">
+		<table cellpadding="0" cellspacing="0" width="100%" class="tableStatic">
+			<thead>
+			<tr class="noborder">
+				<td><strong>Period</strong></td>
+				<td><strong>(P) Server</strong></td>
+				<td><strong>(B) Server</strong></td>
+			</tr>
+			</thead>
+			<tbody>
+				<% $.each(periodStatuses, function (idx, periodStatus) {  %>
+					<% $.each(periodStatus.primaryBackupSets, function (idx, primaryBackupSet) {  %>
+						<tr>
+						<% var batchDate = Date.parseString(periodStatus.period, "yyyyMMddHHmmss"); %>
+						<% if(idx == 0) { %>
+							<td rowspan="<%= periodStatus.primaryBackupSets.length %>">
+								<%= batchDate %>
+							</td>
+						<% } %>
+						<td><%= primaryBackupSet.primary.listenAddress %>:<%= primaryBackupSet.primary.listenPort %></td>
+						<td>
+							<% if(primaryBackupSet.backup != null) { %>
+								<%= primaryBackupSet.backup.listenAddress %>:<%= primaryBackupSet.backup.listenPort %>
+							<% } %>
+						</td>
+					</tr>
+					<% }); %>
+				<% }); %>
+			</tbody>
+		</table>
+	</div>
+</div>

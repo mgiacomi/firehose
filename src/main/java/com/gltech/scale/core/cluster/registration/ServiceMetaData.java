@@ -1,5 +1,6 @@
 package com.gltech.scale.core.cluster.registration;
 
+import com.dyuproject.protostuff.Tag;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,12 +8,15 @@ import java.util.UUID;
 
 public class ServiceMetaData
 {
+	@Tag(1)
 	@JsonProperty("workerId")
 	private UUID workerId;
 
+	@Tag(2)
 	@JsonProperty("listenAddress")
 	private String listenAddress;
 
+	@Tag(3)
 	@JsonProperty("listenPort")
 	private int listenPort;
 

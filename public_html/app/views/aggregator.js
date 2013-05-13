@@ -8,6 +8,15 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
         template:'aggregator_overview'
     });
 
+    Views.Periods = Marionette.ItemView.extend({
+        template:'aggregator_periods',
+        templateHelpers:clusterStatsHelpers,
+
+        modelEvents:{
+            "change:stats":"render"
+        }
+    });
+
     Views.ActiveBatches = Marionette.ItemView.extend({
         template:'aggregator_activebatches',
         templateHelpers:clusterStatsHelpers,

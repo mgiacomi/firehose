@@ -2,7 +2,8 @@ var ClusterStats = Backbone.Model.extend({
     defaults:{
         stats:{},
         aggregateStats:{},
-        activeBatches:{}
+        activeBatches:{},
+        periodStatuses:{}
     },
 
     update:function (data) {
@@ -10,6 +11,7 @@ var ClusterStats = Backbone.Model.extend({
         this.set("stats", json.stats);
         this.set("aggregateStats", json.aggregateStats);
         this.set("activeBatches", json.activeBatches);
+        this.set("periodStatuses", json.periodStatuses)
     }
 });
 var clusterStats = new ClusterStats();

@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AggregatorsByPeriod
+public class AggregatorsByPeriod implements Comparable<AggregatorsByPeriod>
 {
 	private final DateTime period;
 	private final List<PrimaryBackupSet> primaryBackupSets;
@@ -61,5 +61,10 @@ public class AggregatorsByPeriod
 
 		int thisIndex = Math.abs(setIndex.getAndIncrement());
 		return primaryBackupSets.get(thisIndex % primaryBackupSets.size());
+	}
+
+	public int compareTo(AggregatorsByPeriod o)
+	{
+		return period.compareTo(o.getPeriod());
 	}
 }

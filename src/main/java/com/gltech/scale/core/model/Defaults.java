@@ -1,13 +1,12 @@
 package com.gltech.scale.core.model;
 
 import com.dyuproject.protostuff.runtime.ExplicitIdStrategy;
+import com.gltech.scale.core.aggregator.PrimaryBackupSet;
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.stats.results.AvgStat;
 import com.gltech.scale.core.stats.results.GroupStats;
 import com.gltech.scale.core.stats.results.OverTime;
-import com.gltech.scale.monitoring.model.AggregateOverTime;
-import com.gltech.scale.monitoring.model.BatchStatus;
-import com.gltech.scale.monitoring.model.ClusterStats;
-import com.gltech.scale.monitoring.model.ServerStats;
+import com.gltech.scale.monitoring.model.*;
 
 public class Defaults
 {
@@ -42,5 +41,8 @@ public class Defaults
 		registry.registerPojo(AggregateOverTime.class, 8);
 		registry.registerPojo(ClusterStats.class, 9);
 		registry.registerPojo(BatchStatus.class, 10);
+		registry.registerPojo(ServiceMetaData.class, 11);
+		registry.registerPojo(PrimaryBackupSet.class, 12);
+		registry.registerPojo(PeriodStatus.class, 13);
 	}
 }

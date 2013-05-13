@@ -4,6 +4,7 @@ Firehose.module('Aggregator', function (Aggregator, App, Backbone, Marionette, $
     Aggregator.Router = Marionette.AppRouter.extend({
         appRoutes:{
             'aggregator/overview':'overview',
+            'aggregator/periods':'periods',
             'aggregator/active/batches':'active_batches',
             'aggregator/live/stats':'live_stats',
             'aggregator/performance':'performance'
@@ -19,6 +20,11 @@ Firehose.module('Aggregator', function (Aggregator, App, Backbone, Marionette, $
         overview:function () {
             App.middlenav.show(new Aggregator.Views.Nav());
             App.content.show(new Aggregator.Views.Overview({model:clusterStats}));
+        },
+
+        periods:function () {
+            App.middlenav.show(new Aggregator.Views.Nav());
+            App.content.show(new Aggregator.Views.Periods({model:clusterStats}));
         },
 
         active_batches:function () {

@@ -515,6 +515,7 @@ box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
 .middleNav li.iImageList a span { background: url(../images/icons/middlenav/imagesList.png) no-repeat 50% 10px; }
 .middleNav li.iOverview a span { background: url(../images/icons/middlenav/clipboard.png) no-repeat 50% 10px; }
 .middleNav li.iFiles a span { background: url(../images/icons/middlenav/zipFiles.png) no-repeat 50% 10px; }
+.middleNav li.iClock a span { background: url(../images/icons/middlenav/clock.png) no-repeat 50% 10px; }
 .middleNav li.iDiagnostics a span { background: url(../images/icons/middlenav/medicalCase.png) no-repeat 50% 10px; }
 .middleNav li.iComputer a span { background: url(../images/icons/middlenav/computer.png) no-repeat 50% 10px; }
 .middleNav li.iUser a span { background: url(../images/icons/middlenav/users.png) no-repeat 50% 10px; }

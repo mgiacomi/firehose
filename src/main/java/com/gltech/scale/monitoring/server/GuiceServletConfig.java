@@ -1,5 +1,7 @@
 package com.gltech.scale.monitoring.server;
 
+import com.gltech.scale.core.cluster.ChannelCoordinator;
+import com.gltech.scale.core.cluster.ChannelCoordinatorImpl;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.ClusterServiceImpl;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
@@ -45,6 +47,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					// Global injector settings
 					bind(MonitoringResource.class);
 					bind(ClusterService.class).to(ClusterServiceImpl.class).in(Singleton.class);
+					bind(ChannelCoordinator.class).to(ChannelCoordinatorImpl.class).in(Singleton.class);
 					bind(RegistrationService.class).to(RegistrationServiceImpl.class).in(Singleton.class);
 
 					// Monitoring Specific

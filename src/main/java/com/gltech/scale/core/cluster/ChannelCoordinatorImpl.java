@@ -21,10 +21,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class ChannelCoordinatorImpl implements ChannelCoordinator
@@ -38,6 +35,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	private List<Integer> registeredSetsHist = new CopyOnWriteArrayList<>();
 	private ConcurrentMap<DateTime, AggregatorsByPeriod> aggregatorPeriodMatricesCache = new ConcurrentHashMap<>();
 	private static ScheduledExecutorService scheduledChannelCoordinatorService;
+	private static ScheduledExecutorService scheduledPeriodCleanUpService;
 
 	@Inject
 	public ChannelCoordinatorImpl(RegistrationService registrationService, TimePeriodUtils timePeriodUtils)
@@ -82,6 +80,44 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 
 			logger.info("ChannelCoordinator has been started.");
 		}
+
+		if (scheduledPeriodCleanUpService == null || scheduledPeriodCleanUpService.isShutdown())
+		{
+			scheduledPeriodCleanUpService = Executors.newScheduledThreadPool(1, new ThreadFactory()
+			{
+				public Thread newThread(Runnable runnable)
+				{
+					return new Thread(runnable, "PeriodCleanUpService");
+				}
+			});
+
+			scheduledPeriodCleanUpService.scheduleAtFixedRate(new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						if (client.checkExists().forPath("/aggregator/periods") != null)
+						{
+							for (String period : client.getChildren().forPath("/aggregator/periods"))
+							{
+								DateTime periodCeiling = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(period);
+
+								if(periodCeiling.isBefore(DateTime.now().minusMinutes(1))) {
+									client.delete().forPath("/aggregator/periods/" + period);
+								}
+							}
+						}
+					}
+					catch (Exception e)
+					{
+						throw new ClusterException("Failed to clean up aggregators by periods.", e);
+					}
+				}
+			}, 1, 1, TimeUnit.SECONDS);
+
+			logger.info("PeriodCleanUpService has been started.");
+		}
 	}
 
 	@Override
@@ -91,6 +127,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		logger.info("ChannelCoordinator has been shutdown.");
 	}
 
+	@Override
 	public void registerWeight(boolean active, int primaries, int backups, int restedfor)
 	{
 		long weight = WeightBreakdown.toWeight(active, primaries, backups, restedfor);
@@ -134,6 +171,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		}
 	}
 
+	@Override
 	public AggregatorsByPeriod getAggregatorPeriodMatrix(DateTime nearestPeriodCeiling)
 	{
 		nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(nearestPeriodCeiling);
@@ -161,6 +199,32 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		}
 
 		return aggregatorsByPeriod;
+	}
+
+	@Override
+	public List<AggregatorsByPeriod> getAggregatorsByPeriods()
+	{
+		List<AggregatorsByPeriod> aggregatorsByPeriods = new ArrayList<>();
+
+		try
+		{
+			if (client.checkExists().forPath("/aggregator/periods") != null)
+			{
+				for (String period : client.getChildren().forPath("/aggregator/periods"))
+				{
+					byte[] data = client.getData().forPath("/aggregator/periods/" + period);
+					aggregatorsByPeriods.add(mapper.readValue(new String(data), AggregatorsByPeriod.class));
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			throw new ClusterException("Failed to get aggregators by periods.", e);
+		}
+
+		Collections.sort(aggregatorsByPeriods, Collections.reverseOrder());
+
+		return aggregatorsByPeriods;
 	}
 
 	AggregatorsByPeriod readAggregatorsByPeriod(DateTime nearestPeriodCeiling)
@@ -286,7 +350,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 					String period = nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss"));
 					AggregatorsByPeriod aggregatorsByPeriod = new AggregatorsByPeriod(nearestPeriodCeiling, primaryBackupSets);
 
-					client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath("/aggregator/periods/" + period, mapper.writeValueAsString(aggregatorsByPeriod).getBytes());
+					client.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath("/aggregator/periods/" + period, mapper.writeValueAsString(aggregatorsByPeriod).getBytes());
 					logger.info("Registering " + primaryBackupSets.size() + " Aggregator set(s) for period: " + period);
 
 					// Add assign set count to the history, but only keep history of the last three
