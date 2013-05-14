@@ -138,18 +138,20 @@ public class ClusterStatsServiceImpl implements ClusterStatsService
 			List<BatchPeriodMapper> batchPeriodMappers = clusterService.getOrderedActiveBucketList();
 			aggregateBatches(true, serverStats.getActiveBatches(), clusterStats, serverStats, batchPeriodMappers);
 			aggregateBatches(false, serverStats.getActiveBackupBatches(), clusterStats, serverStats, batchPeriodMappers);
-
-			// Bring in AggregatorsByPeriod
-			List<AggregatorsByPeriod> aggregatorsByPeriods = channelCoordinator.getAggregatorsByPeriods();
-
-			for (AggregatorsByPeriod aggregatorsByPeriod : aggregatorsByPeriods)
-			{
-				PeriodStatus periodStatus = new PeriodStatus();
-				periodStatus.setPeriod(aggregatorsByPeriod.getPeriod().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
-				periodStatus.setPrimaryBackupSets(aggregatorsByPeriod.getPrimaryBackupSets());
-				clusterStats.getPeriodStatuses().add(periodStatus);
-			}
 		}
+
+		// Bring in AggregatorsByPeriod
+		List<AggregatorsByPeriod> aggregatorsByPeriods = channelCoordinator.getAggregatorsByPeriods();
+
+		for (AggregatorsByPeriod aggregatorsByPeriod : aggregatorsByPeriods)
+		{
+			PeriodStatus periodStatus = new PeriodStatus();
+			periodStatus.setPeriod(aggregatorsByPeriod.getPeriod().toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
+			periodStatus.setPrimaryBackupSets(aggregatorsByPeriod.getPrimaryBackupSets());
+			clusterStats.getPeriodStatuses().add(periodStatus);
+		}
+
+		Collections.sort(clusterStats.getPeriodStatuses(), Collections.reverseOrder());
 
 		return clusterStats;
 	}

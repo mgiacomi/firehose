@@ -6,7 +6,7 @@ import com.gltech.scale.core.aggregator.PrimaryBackupSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PeriodStatus
+public class PeriodStatus implements Comparable<PeriodStatus>
 {
 	@Tag(1)
 	private String period;
@@ -31,5 +31,10 @@ public class PeriodStatus
 	public void setPrimaryBackupSets(List<PrimaryBackupSet> primaryBackupSets)
 	{
 		this.primaryBackupSets = primaryBackupSets;
+	}
+
+	public int compareTo(PeriodStatus o)
+	{
+		return period.compareTo(o.getPeriod());
 	}
 }

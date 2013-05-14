@@ -37,6 +37,8 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
 
      Views.Performance = Marionette.ItemView.extend({
         template:'aggregator_performance',
+        numAggregatorsPlot:{},
+        numAggregatorsData:{workerData:{}},
         messageRecvPerSecPlot:{},
         messageRecvPerSecData:{workerData:{}},
         messageCollectedPerSecPlot:{},
@@ -66,6 +68,7 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
         afterRender:function () {
             var that = this;
             _.defer(function (caller) {
+                that.numAggregatorsPlot = $.plot($("#numAggregators"), [], that.plotTotOptions);
                 that.messageRecvPerSecPlot = $.plot($("#messageRecvPerSec"), [], that.plotTotOptions);
                 that.messageCollectedPerSecPlot = $.plot($("#messageCollectedPerSec"), [], that.plotTotOptions);
                 that.timeCollectBatchPlot = $.plot($("#timeCollectBatch"), [], that.plotTotOptions);
@@ -79,6 +82,7 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
 
         updateData:function () {
             var that = this;
+            this.numAggregatorsData.lastValueMap = {};
             this.messageRecvPerSecData.lastValueMap = {};
             this.messageCollectedPerSecData.lastValueMap = {};
             this.timeCollectBatchData.lastValueMap = {};
@@ -87,6 +91,30 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
             this.queueSizeData.lastValueMap = {};
             this.totalMessagesData.lastValueMap = {};
             this.oldestMessageData.lastValueMap = {};
+
+            // Deal with PeriodStatus outside of main server loop
+            var periodStatus = this.model.get("periodStatuses")[0];
+
+            if(periodStatus != null) {
+                var primaries = 0;
+                var backups = 0;
+
+                $.each(periodStatus.primaryBackupSets, function (idx, primaryBackupSet) {
+                    if(primaryBackupSet.primary != null) {
+                        primaries++;
+                    }
+                    if(primaryBackupSet.backup != null) {
+                        backups++;
+                    }
+                });
+
+                this.numAggregatorsData.lastValueMap["Primaries"] = {hostname: "Primaries", statValue: primaries};
+                this.numAggregatorsData.lastValueMap["Backups"] = {hostname: "Backups", statValue: backups};
+            }
+            else {
+                this.numAggregatorsData.lastValueMap["Primaries"] = {hostname: "Primaries", statValue: 0};
+                this.numAggregatorsData.lastValueMap["Backups"] = {hostname: "Backups", statValue: 0};
+            }
 
             $.each(this.model.get("stats"), function (idx, server) {
                 $.each(server.groupStatsList, function (idx2, groupStat) {
@@ -130,6 +158,7 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
                 });
             });
 
+            this.updateObjectArray(this.numAggregatorsData);
             this.updateObjectArray(this.messageRecvPerSecData);
             this.updateObjectArray(this.messageCollectedPerSecData);
             this.updateObjectArray(this.timeCollectBatchData);
@@ -138,6 +167,14 @@ Firehose.module('Aggregator.Views', function (Views, App, Backbone, Marionette, 
             this.updateObjectArray(this.queueSizeData);
             this.updateObjectArray(this.totalMessagesData);
             this.updateObjectArray(this.oldestMessageData);
+
+            var numAggregatorsDataArray = [];
+            for(var workerId in this.numAggregatorsData.workerData) {
+                numAggregatorsDataArray.push(this.numAggregatorsData.workerData[workerId].flotProperties);
+            }
+            this.numAggregatorsPlot.setData(numAggregatorsDataArray);
+            this.numAggregatorsPlot.setupGrid();
+            this.numAggregatorsPlot.draw();
 
             var messageRecvPerSecDataArray = [];
             for(var workerId in this.messageRecvPerSecData.workerData) {

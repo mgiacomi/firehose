@@ -22,8 +22,8 @@
 			</tr>
 			</thead>
 			<tbody>
-				<% $.each(periodStatuses, function (idx, periodStatus) {  %>
-					<% $.each(periodStatus.primaryBackupSets, function (idx, primaryBackupSet) {  %>
+				<% $.each(periodStatuses, function (idx, periodStatus) { %>
+					<% $.each(periodStatus.primaryBackupSets, function (idx, primaryBackupSet) { %>
 						<tr>
 						<% var batchDate = Date.parseString(periodStatus.period, "yyyyMMddHHmmss"); %>
 						<% if(idx == 0) { %>
