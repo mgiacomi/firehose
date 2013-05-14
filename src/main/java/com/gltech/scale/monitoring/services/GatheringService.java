@@ -12,15 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class GatheringService implements LifeCycle
 {
 	private static final Logger logger = LoggerFactory.getLogger(GatheringService.class);
+	private static ThreadPoolExecutor serverCollectorExecutor;
 	private static ScheduledExecutorService scheduledGatherService;
 	private RegistrationService registrationService;
 	private ClusterStatsService clusterStatsService;
@@ -37,6 +36,20 @@ public class GatheringService implements LifeCycle
 
 	public synchronized void start()
 	{
+		if (serverCollectorExecutor == null || serverCollectorExecutor.isShutdown())
+		{
+			TransferQueue<Runnable> queue = new LinkedTransferQueue<>();
+			serverCollectorExecutor = new ThreadPoolExecutor(100, 100, 1, TimeUnit.HOURS, queue, new ThreadFactory()
+			{
+				public Thread newThread(Runnable r)
+				{
+					return new Thread(r, "ServerCollectorExecutor");
+				}
+			});
+
+			logger.info("ServerCollectorExecutor has been started.");
+		}
+
 		if (scheduledGatherService == null || scheduledGatherService.isShutdown())
 		{
 			scheduledGatherService = Executors.newScheduledThreadPool(1, new ThreadFactory()
@@ -53,24 +66,44 @@ public class GatheringService implements LifeCycle
 			{
 				public void run()
 				{
-					List<ServiceMetaData> servers = registrationService.getRegisteredServers();
-					List<ServerStats> serverStatsList = new ArrayList<>();
+					List<Callable<ServerStats>> callables = new ArrayList<>();
 
-					for (ServiceMetaData serviceMetaData : servers)
+					for (final ServiceMetaData serviceMetaData : registrationService.getRegisteredServers())
 					{
-						try
+						callables.add(new Callable<ServerStats>()
 						{
-							serverStatsList.add(statsRestClient.getServerStats(serviceMetaData));
-						}
-						catch (Exception e)
-						{
-							logger.error("Failed to gather stats for server {}", serviceMetaData, e);
-						}
+							public ServerStats call() throws Exception
+							{
+								return statsRestClient.getServerStats(serviceMetaData);
+							}
+						});
 					}
 
-					clusterStatsService.updateGroupStats(serverStatsList);
+					try
+					{
+						Collection<Future<ServerStats>> futures = serverCollectorExecutor.invokeAll(callables);
 
-					logger.debug("Stats have been updated for {} servers", servers.size());
+						List<ServerStats> serverStatsList = new ArrayList<>();
+
+						for (Future<ServerStats> future : futures)
+						{
+							try
+							{
+								serverStatsList.add(future.get());
+							}
+							catch (Exception e)
+							{
+								logger.error("Failed to gather stats for server.", e);
+							}
+						}
+						clusterStatsService.updateGroupStats(serverStatsList);
+
+						logger.debug("Stats have been updated for {} of {} servers", serverStatsList.size(), futures.size());
+					}
+					catch (InterruptedException e)
+					{
+						logger.error("ServerCollectorExecutor was interrupted.", e);
+					}
 				}
 			}, runEveryXSeconds, runEveryXSeconds, TimeUnit.SECONDS);
 
@@ -81,7 +114,8 @@ public class GatheringService implements LifeCycle
 	@Override
 	public void shutdown()
 	{
-		scheduledGatherService.shutdown();
+		serverCollectorExecutor.shutdownNow();
+		scheduledGatherService.shutdownNow();
 		logger.info("StatsManager has been shutdown.");
 	}
 

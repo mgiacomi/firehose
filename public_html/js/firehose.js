@@ -59,6 +59,54 @@ function flotAgeFormatter(v, axis) {
     return Math.round(value / 3600) + ' hr';
 }
 
+function updateObjectArray(object) {
+    for(var workerId in object.workerData) {
+        if(object.lastValueMap[workerId] != null) {
+            var newValue = 0;
+            var hostname = object.lastValueMap[workerId].hostname;
+            if(workerId in object.lastValueMap) {
+                newValue = object.lastValueMap[workerId].statValue;
+            }
+            object.workerData[workerId].data = this.updateDataArray(object.workerData[workerId].data, newValue);
+            object.workerData[workerId].flotProperties = { data:this.toFlotArray(object.workerData[workerId].data), label:hostname };
+        }
+    }
+
+    for(var workerId in object.lastValueMap) {
+        if(!(workerId in object.workerData)) {
+            var newValue = object.lastValueMap[workerId].statValue;
+            var hostname = object.lastValueMap[workerId].hostname;
+            object.workerData[workerId] = {};
+            object.workerData[workerId].data = [];
+            object.workerData[workerId].data = this.updateDataArray(object.workerData[workerId].data, newValue);
+            var flotData = this.toFlotArray(object.workerData[workerId].data);
+            object.workerData[workerId].flotProperties = { data:flotData, label:hostname };
+        }
+    }
+
+    return object;
+}
+
+function updateDataArray(data, value) {
+    // Remove oldest
+    if (data.length > 0 && data.length > this.totalPoints) {
+        data = data.slice(1);
+    }
+
+    // Add newest
+    data.push(value);
+
+    return data;
+}
+
+function toFlotArray(data) {
+    var res = [];
+    for (var i = 0; i < data.length; ++i) {
+        res.push([i, data[i]])
+    }
+    return res;
+}
+
 function initAccordion() {
     //===== Accordion =====//
     $('div.menu_body:eq(0)').show();

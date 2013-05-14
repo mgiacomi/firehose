@@ -86,12 +86,12 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
                 });
             });
 
-            this.updateObjectArray(this.messagePerSecData);
-            this.updateObjectArray(this.messageSizeData);
-            this.updateObjectArray(this.processTimeData);
-            this.updateObjectArray(this.requestQueueData);
-            this.updateObjectArray(this.vmCpuData);
-            this.updateObjectArray(this.loadAvgData);
+            updateObjectArray(this.messagePerSecData);
+            updateObjectArray(this.messageSizeData);
+            updateObjectArray(this.processTimeData);
+            updateObjectArray(this.requestQueueData);
+            updateObjectArray(this.vmCpuData);
+            updateObjectArray(this.loadAvgData);
 
             var messagePerSecDataArray = [];
             for(var workerId in this.messagePerSecData.workerData) {
@@ -164,54 +164,6 @@ Firehose.module('Inbound.Views', function (Views, App, Backbone, Marionette, $, 
             xaxis:{ ticks:false },
             yaxes:[{ min:0, position:"right", tickFormatter:flotPercentFormatter }],
             series:{ lines:{ lineWidth:1 }}
-        },
-
-        updateObjectArray:function(object) {
-
-            for(var workerId in object.workerData) {
-                var newValue = 0;
-                var hostname = object.lastValueMap[workerId].hostname;
-                if(workerId in object.lastValueMap) {
-                    newValue = object.lastValueMap[workerId].statValue;
-                }
-                object.workerData[workerId].data = this.updateDataArray(object.workerData[workerId].data, newValue);
-                object.workerData[workerId].flotProperties = { data:this.toFlotArray(object.workerData[workerId].data), label:hostname };
-
-            }
-
-            for(var workerId in object.lastValueMap) {
-                if(!(workerId in object.workerData)) {
-                    var newValue = object.lastValueMap[workerId].statValue;
-                    var hostname = object.lastValueMap[workerId].hostname;
-                    object.workerData[workerId] = {};
-                    object.workerData[workerId].data = [];
-                    object.workerData[workerId].data = this.updateDataArray(object.workerData[workerId].data, newValue);
-                    var flotData = this.toFlotArray(object.workerData[workerId].data);
-                    object.workerData[workerId].flotProperties = { data:flotData, label:hostname };
-                }
-            }
-
-            return object;
-        },
-
-        updateDataArray:function (data, value) {
-            // Remove oldest
-            if (data.length > 0 && data.length > this.totalPoints) {
-                data = data.slice(1);
-            }
-
-            // Add newest
-            data.push(value);
-
-            return data;
-        },
-
-        toFlotArray:function (data) {
-            var res = [];
-            for (var i = 0; i < data.length; ++i) {
-                res.push([i, data[i]])
-            }
-            return res;
         }
     });
 });

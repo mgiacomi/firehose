@@ -89,21 +89,21 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
             var that = this;
             _.defer(function (caller) {
                 that.inboundPlot = $.plot($("#inbound"), [
-                    { data:that.updateDataArray(that.inboundMsgPerSec, 0) },
-                    { data:that.updateDataArray(that.inboundAvgMsgSize, 0) },
-                    { data:that.updateDataArray(that.inboundQue, 0) }
+                    { data:updateDataArray(that.inboundMsgPerSec, 0) },
+                    { data:updateDataArray(that.inboundAvgMsgSize, 0) },
+                    { data:updateDataArray(that.inboundQue, 0) }
                 ], that.inboundOptions);
 
                 that.aggregatorPlot = $.plot($("#aggregator"), [
-                    { data:that.updateDataArray(that.aggregatorMsgInQue, 0) },
-                    { data:that.updateDataArray(that.aggregatorQueSize, 0) },
-                    { data:that.updateDataArray(that.aggregatorQueAge, 0) }
+                    { data:updateDataArray(that.aggregatorMsgInQue, 0) },
+                    { data:updateDataArray(that.aggregatorQueSize, 0) },
+                    { data:updateDataArray(that.aggregatorQueAge, 0) }
                 ], that.aggregatorOptions);
 
                 that.storageWriterPlot = $.plot($("#storageWriter"), [
-                    { data:that.updateDataArray(that.storageWriterMsgPerSec, 0) },
-                    { data:that.updateDataArray(that.storageWriterBytesPerSec, 0) },
-                    { data:that.updateDataArray(that.storageWriterBatchesBeingWritten, 0) }
+                    { data:updateDataArray(that.storageWriterMsgPerSec, 0) },
+                    { data:updateDataArray(that.storageWriterBytesPerSec, 0) },
+                    { data:updateDataArray(that.storageWriterBatchesBeingWritten, 0) }
                 ], that.storageWriterOptions);
 
                 /*
@@ -117,38 +117,38 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
 
         updateData:function () {
             var messagesPerSec = parseInt(this.model.get("aggregateStats").Inbound.AddMessage_Count.totalSec5) / 5;
-            this.inboundMsgPerSec = this.updateDataArray(this.inboundMsgPerSec, messagesPerSec);
-            this.inboundAvgMsgSize = this.updateDataArray(this.inboundAvgMsgSize, this.model.get("aggregateStats").Inbound.AddMessage_Size.avgSec5.average);
-            this.inboundQue = this.updateDataArray(this.inboundQue, this.model.get("aggregateStats").role_Inbound.ActiveRequest_Count.totalSec5);
+            this.inboundMsgPerSec = updateDataArray(this.inboundMsgPerSec, messagesPerSec);
+            this.inboundAvgMsgSize = updateDataArray(this.inboundAvgMsgSize, this.model.get("aggregateStats").Inbound.AddMessage_Size.avgSec5.average);
+            this.inboundQue = updateDataArray(this.inboundQue, this.model.get("aggregateStats").role_Inbound.ActiveRequest_Count.totalSec5);
 
             this.inboundPlot.setData([
-                { data:this.toFlotArray(this.inboundMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
-                { data:this.toFlotArray(this.inboundAvgMsgSize), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
-                { data:this.toFlotArray(this.inboundQue), color:"#ee7951", label:"Request Queue", yaxis:3 }
+                { data:toFlotArray(this.inboundMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
+                { data:toFlotArray(this.inboundAvgMsgSize), color:"#6db6ee", label:"Avg Message Size", yaxis:2 },
+                { data:toFlotArray(this.inboundQue), color:"#ee7951", label:"Request Queue", yaxis:3 }
             ]);
             this.inboundPlot.setupGrid();
             this.inboundPlot.draw();
 
-            this.aggregatorMsgInQue = this.updateDataArray(this.aggregatorMsgInQue, this.model.get("aggregateStats").Aggregator.MessagesInQueue_Avg.totalSec5);
-            this.aggregatorQueSize = this.updateDataArray(this.aggregatorQueSize, this.model.get("aggregateStats").Aggregator.TotalQueueSize_Avg.totalSec5);
-            this.aggregatorQueAge = this.updateDataArray(this.aggregatorQueAge, this.model.get("aggregateStats").Aggregator.OldestInQueue_Avg.highSec5);
+            this.aggregatorMsgInQue = updateDataArray(this.aggregatorMsgInQue, this.model.get("aggregateStats").Aggregator.MessagesInQueue_Avg.totalSec5);
+            this.aggregatorQueSize = updateDataArray(this.aggregatorQueSize, this.model.get("aggregateStats").Aggregator.TotalQueueSize_Avg.totalSec5);
+            this.aggregatorQueAge = updateDataArray(this.aggregatorQueAge, this.model.get("aggregateStats").Aggregator.OldestInQueue_Avg.highSec5);
 
             this.aggregatorPlot.setData([
-                { data:this.toFlotArray(this.aggregatorMsgInQue), color:"#54cb4b", label:"Messages In Queue" },
-                { data:this.toFlotArray(this.aggregatorQueSize), color:"#6db6ee", label:"Queue Size", yaxis:2 },
-                { data:this.toFlotArray(this.aggregatorQueAge), color:"#ee7951", label:"Queue Age (seconds)", yaxis:3 }
+                { data:toFlotArray(this.aggregatorMsgInQue), color:"#54cb4b", label:"Messages In Queue" },
+                { data:toFlotArray(this.aggregatorQueSize), color:"#6db6ee", label:"Queue Size", yaxis:2 },
+                { data:toFlotArray(this.aggregatorQueAge), color:"#ee7951", label:"Queue Age (seconds)", yaxis:3 }
             ]);
             this.aggregatorPlot.setupGrid();
             this.aggregatorPlot.draw();
 
-            this.storageWriterMsgPerSec = this.updateDataArray(this.storageWriterMsgPerSec, this.model.get("aggregateStats").StorageWriter.MessagesWritten_Count.totalSec5 / 5);
-            this.storageWriterBytesPerSec = this.updateDataArray(this.storageWriterBytesPerSec, this.model.get("aggregateStats").StorageWriter.MessagesWritten_Size.totalSec5 / 5);
-            this.storageWriterBatchesBeingWritten = this.updateDataArray(this.storageWriterBatchesBeingWritten, this.model.get("aggregateStats").StorageWriter.WritingBatches_Avg.totalSec5);
+            this.storageWriterMsgPerSec = updateDataArray(this.storageWriterMsgPerSec, this.model.get("aggregateStats").StorageWriter.MessagesWritten_Count.totalSec5 / 5);
+            this.storageWriterBytesPerSec = updateDataArray(this.storageWriterBytesPerSec, this.model.get("aggregateStats").StorageWriter.MessagesWritten_Size.totalSec5 / 5);
+            this.storageWriterBatchesBeingWritten = updateDataArray(this.storageWriterBatchesBeingWritten, this.model.get("aggregateStats").StorageWriter.WritingBatches_Avg.totalSec5);
 
             this.storageWriterPlot.setData([
-                { data:this.toFlotArray(this.storageWriterMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
-                { data:this.toFlotArray(this.storageWriterBytesPerSec), color:"#6db6ee", label:"Bytes Per/Sec", yaxis:2 },
-                { data:this.toFlotArray(this.storageWriterBatchesBeingWritten), color:"#ee7951", label:"Batches Being Written", yaxis:3 }
+                { data:toFlotArray(this.storageWriterMsgPerSec), color:"#54cb4b", label:"Messages Per/Sec" },
+                { data:toFlotArray(this.storageWriterBytesPerSec), color:"#6db6ee", label:"Bytes Per/Sec", yaxis:2 },
+                { data:toFlotArray(this.storageWriterBatchesBeingWritten), color:"#ee7951", label:"Batches Being Written", yaxis:3 }
             ]);
             this.storageWriterPlot.setupGrid();
             this.storageWriterPlot.draw();
@@ -272,26 +272,6 @@ Firehose.module('Dashboard.Views', function (Views, App, Backbone, Marionette, $
             series:{
                 lines:{ lineWidth:1 }
             }
-        },
-
-        updateDataArray:function (data, value) {
-            // Remove oldest
-            if (data.length > 0 && data.length > this.totalPoints) {
-                data = data.slice(1);
-            }
-
-            // Add newest
-            data.push(value);
-
-            return data;
-        },
-
-        toFlotArray:function (data) {
-            var res = [];
-            for (var i = 0; i < data.length; ++i) {
-                res.push([i, data[i]])
-            }
-            return res;
         }
     });
 
