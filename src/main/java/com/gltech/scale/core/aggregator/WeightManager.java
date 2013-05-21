@@ -46,16 +46,16 @@ public class WeightManager implements LifeCycle
 					boolean active = true;
 					int primaries = aggregator.getActiveBatches().size();
 					int backups = aggregator.getActiveBackupBatches().size();
-					int rested = 999;
+					int atRest = 999;
 
 					if (primaries == 0 && backups == 0)
 					{
 						active = false;
-						rested--;
+						atRest--;
 					}
 
-					channelCoordinator.registerWeight(active, primaries, backups, rested);
-					logger.trace("Registering weight with ChannelCoordinator. active={}, primaries={}, backups={}, rested={}", active, primaries, backups, rested);
+					channelCoordinator.registerWeight(active, primaries, backups, atRest);
+					logger.trace("Registering weight with ChannelCoordinator. active={}, primaries={}, backups={}, atRest={}", active, primaries, backups, atRest);
 				}
 			}, 0, runEveryXMillis, TimeUnit.MILLISECONDS);
 

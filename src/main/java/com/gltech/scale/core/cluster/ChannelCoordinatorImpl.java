@@ -21,6 +21,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -128,9 +129,9 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	}
 
 	@Override
-	public void registerWeight(boolean active, int primaries, int backups, int restedfor)
+	public void registerWeight(boolean active, int primaries, int backups, int atRest)
 	{
-		long weight = WeightBreakdown.toWeight(active, primaries, backups, restedfor);
+		long weight = new WeightBreakdown(active, primaries, backups, atRest).toWeight();
 		ServiceMetaData aggregator = registrationService.getLocalServerMetaData();
 		if (aggregator != null)
 		{
@@ -246,10 +247,37 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		}
 	}
 
+	List<AggregatorsByPeriod> getFuturePeriods(DateTime nearestPeriodCeiling)
+	{
+		List<AggregatorsByPeriod> aggregatorsByPeriods = new ArrayList<>();
+
+		try
+		{
+			if (client.checkExists().forPath("/aggregator/periods") != null)
+			{
+				for (String periodStr : client.getChildren().forPath("/aggregator/periods"))
+				{
+					DateTime period = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(periodStr);
+
+					if(period.isAfter(nearestPeriodCeiling))
+					{
+						byte[] data = client.getData().forPath("/aggregator/periods/" + periodStr);
+						aggregatorsByPeriods.add(mapper.readValue(new String(data), AggregatorsByPeriod.class));
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			throw new ClusterException("Failed to get future aggregators.", e);
+		}
+
+		return aggregatorsByPeriods;
+	}
+
 	AggregatorsByPeriod writeAggregatorByPeriod(DateTime nearestPeriodCeiling)
 	{
 		// You can't schedule anything more then one time period into the future.
-		int periodSeconds = props.get("period_seconds", Defaults.PERIOD_SECONDS);
 		int futurePeriodSeconds = 3;
 
 		if (nearestPeriodCeiling.isAfter(timePeriodUtils.nearestPeriodCeiling(DateTime.now()).plusSeconds(futurePeriodSeconds)))
@@ -261,12 +289,36 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		{
 			if (client.checkExists().forPath("/aggregator/weights") != null)
 			{
+				List<AggregatorsByPeriod> futurePeriods = getFuturePeriods(nearestPeriodCeiling);
 				SortedMap<Long, String> weightsToIds = new TreeMap<>();
 
 				for (String weightToId : client.getChildren().forPath("/aggregator/weights"))
 				{
 					String[] nodeParts = weightToId.split("\\|");
 					long weight = Long.valueOf(nodeParts[0]);
+					String workerId = nodeParts[1];
+
+					// Add weights to aggregators assigned to future periods
+					for(AggregatorsByPeriod aggregatorsByPeriod : futurePeriods)
+					{
+						for(PrimaryBackupSet primaryBackupSet : aggregatorsByPeriod.getPrimaryBackupSets())
+						{
+							if(workerId.equals(primaryBackupSet.getPrimary().getWorkerId().toString()))
+							{
+								WeightBreakdown weightBreakdown = new WeightBreakdown(weight);
+								weightBreakdown.incrementPrimary();
+System.out.println("primary: "+ primaryBackupSet.getPrimary().getListenPort() +" : "+ weight +" : "+ weightBreakdown.toWeight());
+								weight = weightBreakdown.toWeight();
+							}
+							if(workerId.equals(primaryBackupSet.getBackup().getWorkerId().toString()))
+							{
+								WeightBreakdown weightBreakdown = new WeightBreakdown(weight);
+								weightBreakdown.incrementBackup();
+System.out.println("backup: "+ primaryBackupSet.getBackup().getListenPort() +" : "+ weight +" : "+ weightBreakdown.toWeight());
+								weight = weightBreakdown.toWeight();
+							}
+						}
+					}
 
 					while (true)
 					{
@@ -280,20 +332,10 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 						}
 					}
 
-					weightsToIds.put(weight, nodeParts[1]);
+					weightsToIds.put(weight, workerId);
 				}
 
-				int totalAggregators = 0;
-				int restingAggregators = 0;
-
-				for (long weight : weightsToIds.keySet())
-				{
-					if (!new WeightBreakdown(weight).isActive())
-					{
-						restingAggregators++;
-					}
-					totalAggregators++;
-				}
+				int totalAggregators = weightsToIds.size();
 
 				List<PrimaryBackupSet> primaryBackupSets = new ArrayList<>();
 
@@ -314,23 +356,15 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 				{
 					List<String> sortedIds = new ArrayList<>(weightsToIds.values());
 
-					int assignSets = 1;
-
-					if (restingAggregators > 3)
-					{
-						assignSets = restingAggregators / 2;
-
-						// Check on past assignments and don't go any higher +1 over recent history
-						for (Integer pastSets : registeredSetsHist)
-						{
-							if (pastSets + 1 < assignSets)
-							{
-								assignSets = pastSets + 1;
-							}
-						}
-					}
-
 					int index = 0;
+					BigDecimal totalAvailableSets = (BigDecimal.valueOf(totalAggregators).divide(BigDecimal.valueOf(2), 0, BigDecimal.ROUND_DOWN));
+					BigDecimal percentToAssign = new BigDecimal(Defaults.AGGREGATOR_RESOURCES_PER_PERIOD_PERCENT).divide(BigDecimal.valueOf(100));
+					int assignSets = totalAvailableSets.multiply(percentToAssign).setScale(0, BigDecimal.ROUND_DOWN).intValue();
+
+					// We need to have at least one set that we assign.
+					if(assignSets < 1) {
+						assignSets = 1;
+					}
 
 					while (assignSets > 0)
 					{
@@ -340,7 +374,6 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 						ServiceMetaData secondaryAggregator = registrationService.getAggregatorMetaDataById(secondaryId);
 						PrimaryBackupSet primaryBackupSet = new PrimaryBackupSet(primaryAggregator, secondaryAggregator);
 						primaryBackupSets.add(primaryBackupSet);
-
 						assignSets--;
 					}
 				}
@@ -376,67 +409,5 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		}
 
 		throw new ClusterException("Failed to write aggregator by period.");
-	}
-}
-
-class WeightBreakdown
-{
-	private boolean active;
-	private int primaries;
-	private int backups;
-	private int restedfor;
-
-	public WeightBreakdown(long weight)
-	{
-		String weightStr = String.valueOf(weight);
-
-		if (weightStr.substring(0, 1).equals("2"))
-		{
-			active = true;
-		}
-
-		primaries = Integer.valueOf(weightStr.substring(1, 4));
-		backups = Integer.valueOf(weightStr.substring(4, 7));
-		restedfor = Integer.valueOf(weightStr.substring(7, 10));
-	}
-
-	static long toWeight(boolean active, int primaries, int backups, int restedfor)
-	{
-		StringBuilder weight = new StringBuilder();
-
-		if (active)
-		{
-			weight.append(2);
-		}
-		else
-		{
-			weight.append(1);
-		}
-
-		weight.append(String.format("%03d", primaries));
-		weight.append(String.format("%03d", backups));
-		weight.append(String.format("%03d", restedfor));
-
-		return Long.valueOf(weight.toString());
-	}
-
-	public boolean isActive()
-	{
-		return active;
-	}
-
-	public int getPrimaries()
-	{
-		return primaries;
-	}
-
-	public int getBackups()
-	{
-		return backups;
-	}
-
-	public int getRestedfor()
-	{
-		return restedfor;
 	}
 }
