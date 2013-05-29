@@ -154,7 +154,7 @@ public class AggregatorStats implements Aggregator
 	public void addBackupMessage(String channelName, byte[] bytes, DateTime nearestPeriodCeiling)
 	{
 		addBackupMessageTimeStat.startTimer();
-		aggregator.addBackupMessage(channelName, bytes,nearestPeriodCeiling);
+		aggregator.addBackupMessage(channelName, bytes, nearestPeriodCeiling);
 		addBackupMessageTimeStat.stopTimer();
 
 		addBackupMessageSizeStat.add(bytes.length);

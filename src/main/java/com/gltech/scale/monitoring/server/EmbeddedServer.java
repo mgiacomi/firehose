@@ -34,7 +34,8 @@ public class EmbeddedServer
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.INFO);
 
-		if(args.length > 0) {
+		if (args.length > 0)
+		{
 			props.loadFromFile(args[0]);
 		}
 

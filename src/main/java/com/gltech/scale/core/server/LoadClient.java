@@ -16,13 +16,12 @@ public class LoadClient
 		int counter = 0;
 		while (true)
 		{
-			postEvent("http://192.168.113.50:8080", "fast", String.valueOf(counter + "a"));
-			postEvent("http://192.168.113.50:8080", "redundant", String.valueOf(counter + "b"));
-			postEvent("http://192.168.113.51:8080", "fast", String.valueOf(counter + "c"));
-			postEvent("http://192.168.113.51:8080", "redundant", String.valueOf(counter + "d"));
+			postEvent("http://localhost:" + args[0], "fast", String.valueOf(counter + "a"));
+			postEvent("http://localhost:" + args[0], "redundant", String.valueOf(counter + "b"));
 			counter++;
 		}
 	}
+
 	static private void postEvent(String url, String channelName, String json)
 	{
 		WebResource webResource = client.resource(url + "/inbound/" + channelName);

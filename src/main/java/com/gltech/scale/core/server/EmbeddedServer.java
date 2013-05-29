@@ -44,14 +44,16 @@ public class EmbeddedServer
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
 		root.setLevel(Level.INFO);
 
-		if(args.length > 0) {
+		if (args.length > 0)
+		{
 			props.loadFromFile(args[0]);
 		}
-		if(args.length > 1) {
+		if (args.length > 1)
+		{
 			props.set("server_host", args[1]);
 		}
 
-		if("localhost".equals(props.get("server_host", "localhost")))
+		if ("exception".equals(props.get("server_host", "exception")))
 		{
 			throw new IllegalStateException("A 'server_host' needs to be specified either in the properties file or on the command line.");
 		}
@@ -183,9 +185,9 @@ public class EmbeddedServer
 				try
 				{
 					ObjectName objectName = new ObjectName("org.eclipse.jetty.server.handler:type=statisticshandler,id=0");
-					int requests = (Integer)server.getAttribute(objectName, "requests");
+					int requests = (Integer) server.getAttribute(objectName, "requests");
 
-					if(prevRequests > -1)
+					if (prevRequests > -1)
 					{
 						result = requests - prevRequests;
 					}
@@ -206,7 +208,7 @@ public class EmbeddedServer
 				try
 				{
 					ObjectName objectName = new ObjectName("org.eclipse.jetty.server.handler:type=statisticshandler,id=0");
-					return (Integer)server.getAttribute(objectName, "requestsActive");
+					return (Integer) server.getAttribute(objectName, "requestsActive");
 				}
 				catch (Exception e)
 				{

@@ -45,7 +45,7 @@ public class ServerStats
 		this.hostname = hostname;
 	}
 
-	public  Map<String, GroupStats> getGroupStatsList()
+	public Map<String, GroupStats> getGroupStatsList()
 	{
 		return groupStatsList;
 	}

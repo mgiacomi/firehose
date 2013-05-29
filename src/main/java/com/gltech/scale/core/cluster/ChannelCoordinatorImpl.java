@@ -104,7 +104,8 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 							{
 								DateTime periodCeiling = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(period);
 
-								if(periodCeiling.isBefore(DateTime.now().minusMinutes(1))) {
+								if (periodCeiling.isBefore(DateTime.now().minusMinutes(1)))
+								{
 									client.delete().forPath("/aggregator/periods/" + period);
 								}
 							}
@@ -247,7 +248,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		}
 	}
 
-	List<AggregatorsByPeriod> getFuturePeriods(DateTime nearestPeriodCeiling)
+	List<AggregatorsByPeriod> getFuturePeriods()
 	{
 		List<AggregatorsByPeriod> aggregatorsByPeriods = new ArrayList<>();
 
@@ -259,7 +260,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 				{
 					DateTime period = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(periodStr);
 
-					if(period.isAfter(nearestPeriodCeiling))
+					if (period.isAfter(DateTime.now()))
 					{
 						byte[] data = client.getData().forPath("/aggregator/periods/" + periodStr);
 						aggregatorsByPeriods.add(mapper.readValue(new String(data), AggregatorsByPeriod.class));
@@ -289,7 +290,7 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 		{
 			if (client.checkExists().forPath("/aggregator/weights") != null)
 			{
-				List<AggregatorsByPeriod> futurePeriods = getFuturePeriods(nearestPeriodCeiling);
+				List<AggregatorsByPeriod> futurePeriods = getFuturePeriods();
 				SortedMap<Long, String> weightsToIds = new TreeMap<>();
 
 				for (String weightToId : client.getChildren().forPath("/aggregator/weights"))
@@ -299,22 +300,20 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 					String workerId = nodeParts[1];
 
 					// Add weights to aggregators assigned to future periods
-					for(AggregatorsByPeriod aggregatorsByPeriod : futurePeriods)
+					for (AggregatorsByPeriod aggregatorsByPeriod : futurePeriods)
 					{
-						for(PrimaryBackupSet primaryBackupSet : aggregatorsByPeriod.getPrimaryBackupSets())
+						for (PrimaryBackupSet primaryBackupSet : aggregatorsByPeriod.getPrimaryBackupSets())
 						{
-							if(workerId.equals(primaryBackupSet.getPrimary().getWorkerId().toString()))
+							if (workerId.equals(primaryBackupSet.getPrimary().getWorkerId().toString()))
 							{
 								WeightBreakdown weightBreakdown = new WeightBreakdown(weight);
 								weightBreakdown.incrementPrimary();
-System.out.println("primary: "+ primaryBackupSet.getPrimary().getListenPort() +" : "+ weight +" : "+ weightBreakdown.toWeight());
 								weight = weightBreakdown.toWeight();
 							}
-							if(workerId.equals(primaryBackupSet.getBackup().getWorkerId().toString()))
+							if (primaryBackupSet.getBackup() != null && workerId.equals(primaryBackupSet.getBackup().getWorkerId().toString()))
 							{
 								WeightBreakdown weightBreakdown = new WeightBreakdown(weight);
 								weightBreakdown.incrementBackup();
-System.out.println("backup: "+ primaryBackupSet.getBackup().getListenPort() +" : "+ weight +" : "+ weightBreakdown.toWeight());
 								weight = weightBreakdown.toWeight();
 							}
 						}
@@ -362,7 +361,8 @@ System.out.println("backup: "+ primaryBackupSet.getBackup().getListenPort() +" :
 					int assignSets = totalAvailableSets.multiply(percentToAssign).setScale(0, BigDecimal.ROUND_DOWN).intValue();
 
 					// We need to have at least one set that we assign.
-					if(assignSets < 1) {
+					if (assignSets < 1)
+					{
 						assignSets = 1;
 					}
 

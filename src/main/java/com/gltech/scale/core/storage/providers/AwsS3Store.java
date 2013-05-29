@@ -50,7 +50,7 @@ public class AwsS3Store implements Storage
 	public AwsS3Store(ModelIO modelIO, StatsManager statsManager)
 	{
 		this.modelIO = modelIO;
-		s3BucketName = props.get("s3BucketName", "gltech");
+		s3BucketName = props.get("s3BucketName", "gltech-east");
 		String accessKey = props.get("accessKey", "AKIAIMCO3L5X25HGADAQ");
 		String secretKey = props.get("secretKey", "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");
 		s3Client = new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey));
@@ -170,6 +170,7 @@ public class AwsS3Store implements Storage
 			int part = 1;
 			List<Future<PartETag>> uploads = new ArrayList<>();
 
+			keyWrittenTimeStat.startTimer();
 			while (streamSplitter.hasNext())
 			{
 				semaphore.acquire();
@@ -204,6 +205,7 @@ public class AwsS3Store implements Storage
 					partETags);
 
 			s3Client.completeMultipartUpload(compRequest);
+			keyWrittenTimeStat.stopTimer();
 		}
 		catch (Exception e)
 		{
