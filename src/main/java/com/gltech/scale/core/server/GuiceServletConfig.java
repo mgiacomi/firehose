@@ -6,6 +6,8 @@ import com.gltech.scale.core.inbound.InboundServiceStats;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.StatsResource;
 import com.gltech.scale.core.storage.providers.AwsS3Store;
+import com.gltech.scale.core.storage.providers.MemoryStore;
+import com.gltech.scale.core.storage.providers.ThrowAwayStore;
 import com.gltech.scale.core.storage.providers.VoldemortStore;
 import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.stats.StatsManagerImpl;
@@ -97,6 +99,14 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					else if ("s3".equalsIgnoreCase(storageServiceStore))
 					{
 						bind(Storage.class).to(AwsS3Store.class).in(Singleton.class);
+					}
+					else if ("memory".equalsIgnoreCase(storageServiceStore))
+					{
+						bind(Storage.class).to(MemoryStore.class).in(Singleton.class);
+					}
+					else if ("throwaway".equalsIgnoreCase(storageServiceStore))
+					{
+						bind(Storage.class).to(ThrowAwayStore.class).in(Singleton.class);
 					}
 					else
 					{
