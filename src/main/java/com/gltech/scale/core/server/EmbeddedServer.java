@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import javax.management.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 public class EmbeddedServer
@@ -51,6 +53,18 @@ public class EmbeddedServer
 		if (args.length > 1)
 		{
 			props.set("server_host", args[1]);
+		}
+		else
+		{
+			try
+			{
+				InetAddress inetAddress = InetAddress.getLocalHost();
+				props.set("server_host", inetAddress.getHostAddress());
+			}
+			catch (UnknownHostException e)
+			{
+				// Don't worry we will just rely on the server_host properties entry.
+			}
 		}
 
 		if ("exception".equals(props.get("server_host", "exception")))
@@ -76,7 +90,7 @@ public class EmbeddedServer
 			logger.info("server already started");
 			return;
 		}
-		logger.info("starting server on port " + port);
+		logger.info("starting server port {}", port);
 
 		MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
 
