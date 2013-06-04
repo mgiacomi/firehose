@@ -49,7 +49,7 @@ public class InboundResource
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postMessage(@PathParam("channelName") String channelName, byte[] payload)
 	{
-		inboundService.addMessage(channelName, httpHeaders.getMediaType(), payload);
+		inboundService.addMessage(channelName, httpHeaders.getMediaType(), uriInfo.getRequestUri().getQuery(), payload);
 		return Response.status(Response.Status.ACCEPTED).build();
 	}
 

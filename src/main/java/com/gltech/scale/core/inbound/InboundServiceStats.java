@@ -27,20 +27,23 @@ public class InboundServiceStats implements InboundService
 		this.addMessageTimeStat = statsManager.createAvgStat(groupName, "AddMessage_Time", "milliseconds");
 	}
 
-	public void addMessage(String channelName, MediaType mediaTypes, byte[] payload)
+	@Override
+	public void addMessage(String channelName, MediaType mediaTypes, String queryString, byte[] payload)
 	{
 		addMessageTimeStat.startTimer();
-		inboundService.addMessage(channelName, mediaTypes, payload);
+		inboundService.addMessage(channelName, mediaTypes, queryString, payload);
 		addMessageTimeStat.stopTimer();
 
 		addMessageSizeStat.add(payload.length);
 	}
 
+	@Override
 	public int writeMessagesToOutputStream(String channelName, DateTime dateTime, OutputStream outputStream, int recordsWritten)
 	{
 		return inboundService.writeMessagesToOutputStream(channelName, dateTime, outputStream, recordsWritten);
 	}
 
+	@Override
 	public void shutdown()
 	{
 		inboundService.shutdown();

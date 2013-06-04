@@ -63,10 +63,10 @@ public class InboundServiceImpl implements InboundService
 	}
 
 	@Override
-	public void addMessage(String channelName, MediaType mediaTypes, byte[] payload)
+	public void addMessage(String channelName, MediaType mediaTypes, String queryString, byte[] payload)
 	{
 		int maxPayLoadSize = props.get("inbound.max_payload_size_kb", Defaults.MAX_PAYLOAD_SIZE_KB) * 1024;
-		Message message = new Message(mediaTypes, payload);
+		Message message = new Message(mediaTypes, queryString, payload);
 		DateTime nearestPeriodCeiling = timePeriodUtils.nearestPeriodCeiling(message.getReceived_at());
 		ChannelMetaData channelMetaData = channelCache.getChannelMetaData(channelName, true);
 

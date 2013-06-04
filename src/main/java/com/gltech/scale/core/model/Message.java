@@ -13,10 +13,12 @@ public class Message
 	@Tag(2)
 	private final int mimeTypeId;
 	@Tag(3)
-	private final byte[] payload;
+	private final String queryString;
 	@Tag(4)
-	private final long received_at;
+	private final byte[] payload;
 	@Tag(5)
+	private final long received_at;
+	@Tag(6)
 	private final boolean stored;
 
 	public Message()
@@ -24,6 +26,7 @@ public class Message
 		// This method is only to init class for de-serialization
 		this.uuid = null;
 		this.mimeTypeId = -1;
+		this.queryString = null;
 		this.payload = null;
 		this.received_at = -1;
 		this.stored = false;
@@ -33,6 +36,7 @@ public class Message
 	{
 		this.uuid = UUID.randomUUID().toString();
 		this.mimeTypeId = getIdForMediaType(mediaType);
+		this.queryString = null;
 		this.payload = new byte[0];
 		this.received_at = DateTime.now().getMillis();
 		this.stored = true;
@@ -42,6 +46,17 @@ public class Message
 	{
 		this.uuid = UUID.randomUUID().toString();
 		this.mimeTypeId = getIdForMediaType(mediaType);
+		this.queryString = null;
+		this.payload = payload;
+		this.received_at = DateTime.now().getMillis();
+		this.stored = false;
+	}
+
+	public Message(MediaType mediaType, String queryString, byte[] payload)
+	{
+		this.uuid = UUID.randomUUID().toString();
+		this.mimeTypeId = getIdForMediaType(mediaType);
+		this.queryString = queryString;
 		this.payload = payload;
 		this.received_at = DateTime.now().getMillis();
 		this.stored = false;
@@ -155,6 +170,11 @@ public class Message
 		}
 
 		throw new IllegalStateException("MediaType not found.");
+	}
+
+	public String getQueryString()
+	{
+		return queryString;
 	}
 
 	public byte[] getPayload()

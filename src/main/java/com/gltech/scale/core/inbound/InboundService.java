@@ -9,7 +9,7 @@ import java.io.OutputStream;
 
 public interface InboundService extends LifeCycle
 {
-	void addMessage(String channelName, MediaType mediaTypes, byte[] payload);
+	void addMessage(String channelName, MediaType mediaTypes, String queryString, byte[] payload);
 
 	int writeMessagesToOutputStream(String channelName, DateTime dateTime, OutputStream outputStream, int recordsWritten);
 }
