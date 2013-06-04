@@ -73,7 +73,7 @@ public class InboundResource
 		catch (DuplicateChannelException e)
 		{
 			String msg = "A channel with this name has already been created.";
-			Response.status(Response.Status.CONFLICT).entity(msg).type(MediaType.TEXT_PLAIN).build();
+			return Response.status(Response.Status.CONFLICT).entity(msg).type(MediaType.TEXT_PLAIN).build();
 		}
 	}
 
