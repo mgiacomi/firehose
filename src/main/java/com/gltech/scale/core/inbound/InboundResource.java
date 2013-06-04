@@ -1,6 +1,7 @@
 package com.gltech.scale.core.inbound;
 
 import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.storage.DuplicateChannelException;
 import com.gltech.scale.core.storage.StorageClient;
 import com.gltech.scale.core.model.ModelIO;
 import com.google.inject.Inject;
@@ -64,8 +65,16 @@ public class InboundResource
 			throw new IllegalStateException("JSON to create channel was invalid: " + new String(payload));
 		}
 
-		storageClient.putChannelMetaData(channelMetaData);
-		return Response.status(Response.Status.CREATED).build();
+		try
+		{
+			storageClient.putChannelMetaData(channelMetaData);
+			return Response.status(Response.Status.CREATED).build();
+		}
+		catch (DuplicateChannelException e)
+		{
+			String msg = "A channel with this name has already been created.";
+			Response.status(Response.Status.CONFLICT).entity(msg).type(MediaType.TEXT_PLAIN).build();
+		}
 	}
 
 	@GET
@@ -77,7 +86,7 @@ public class InboundResource
 
 		if (channelMetaData == null)
 		{
-			return Response.status(404).build();
+			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 
 		return Response.ok(modelIO.toJson(channelMetaData), MediaType.APPLICATION_JSON).build();
