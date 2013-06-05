@@ -14,9 +14,11 @@ import com.netflix.curator.test.TestingServer;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import java.math.BigDecimal;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +35,6 @@ public class CoreManualRegression
 		{
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/primary_server.properties");
-			props.set("server_host", "192.168.113.148");
 
 			TestingServer testingServer = new TestingServer(21818);
 			VoldemortTestUtil.start();
@@ -56,7 +57,6 @@ public class CoreManualRegression
 		{
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/second_server.properties");
-			props.set("server_host", "192.168.113.148");
 
 			EmbeddedServer.start(9091);
 
@@ -76,7 +76,6 @@ public class CoreManualRegression
 		{
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/monitoring.properties");
-			props.set("server_host", "192.168.113.148");
 
 			com.gltech.scale.monitoring.server.EmbeddedServer.start(9292);
 
@@ -102,6 +101,24 @@ public class CoreManualRegression
 
 			inboundRestClient.putChannelMetaData(inboundService, bmd1);
 			inboundRestClient.putChannelMetaData(inboundService, bmd2);
+		}
+	}
+
+	static public class TestWithParams
+	{
+		public static void main(String[] args) throws Exception
+		{
+			MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
+			queryParams.add("name1", "val1");
+			queryParams.add("name2", "val2");
+
+			WebResource webResource = client.resource("http://localhost:9090/inbound/test");
+			ClientResponse response = webResource.queryParams(queryParams).type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, "{}");
+
+			if (response.getStatus() != 202)
+			{
+				throw new RuntimeException("Failed : HTTP error code: " + response.getStatus());
+			}
 		}
 	}
 
