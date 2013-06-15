@@ -23,6 +23,10 @@ public interface RegistrationService
 
 	void unRegisterAsInboundService();
 
+	void registerAsOutboundService();
+
+	void unRegisterAsOutboundService();
+
 	void registerAsStorageWriter();
 
 	void unRegisterAsStorageWriter();

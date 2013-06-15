@@ -26,10 +26,12 @@ public class RegistrationServiceImpl implements RegistrationService
 	private final ServiceMetaData localServerMetaData;
 	private ServiceAdvertiser serverAdvertiser;
 	private ServiceAdvertiser inboundServiceAdvertiser;
+	private ServiceAdvertiser outboundServiceAdvertiser;
 	private ServiceAdvertiser storageWriterAdvertiser;
 	private ServiceAdvertiser aggregatorAdvertiser;
 	private ServiceCache<ServiceMetaData> serverCache;
 	private ServiceCache<ServiceMetaData> inboundServiceCache;
+	private ServiceCache<ServiceMetaData> outboundServiceCache;
 	private ServiceCache<ServiceMetaData> storageWriterCache;
 	private ServiceCache<ServiceMetaData> aggregatorCache;
 	private RandomStrategy<ServiceMetaData> randomStorageStrategy = new RandomStrategy<>();
@@ -52,6 +54,10 @@ public class RegistrationServiceImpl implements RegistrationService
 		inboundServiceCache = inboundServiceAdvertiser.getServiceCache();
 		inboundServiceCache.addListener(new InboundServiceCacheListener());
 
+		outboundServiceAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.OUTBOUND_SERVICE);
+		outboundServiceCache = outboundServiceAdvertiser.getServiceCache();
+		outboundServiceCache.addListener(new OutboundServiceCacheListener());
+
 		storageWriterAdvertiser = new ServiceAdvertiser(ServiceAdvertiser.STORAGE_WRITER);
 		storageWriterCache = storageWriterAdvertiser.getServiceCache();
 		storageWriterCache.addListener(new StorageWriterCacheListener());
@@ -64,6 +70,7 @@ public class RegistrationServiceImpl implements RegistrationService
 		{
 			serverCache.start();
 			inboundServiceCache.start();
+			outboundServiceCache.start();
 			storageWriterCache.start();
 			aggregatorCache.start();
 		}
@@ -83,6 +90,14 @@ public class RegistrationServiceImpl implements RegistrationService
 			if (localServerMetaData.equals(serviceMetaData.getPayload()))
 			{
 				roles.add("Inbound");
+			}
+		}
+
+		for (ServiceInstance<ServiceMetaData> serviceMetaData : outboundServiceCache.getInstances())
+		{
+			if (localServerMetaData.equals(serviceMetaData.getPayload()))
+			{
+				roles.add("Outbound");
 			}
 		}
 
@@ -197,6 +212,35 @@ public class RegistrationServiceImpl implements RegistrationService
 	}
 
 	@Override
+	public void registerAsOutboundService()
+	{
+		String host = props.get("server_host", Defaults.REST_HOST);
+		int port = props.get("server_port", -1);
+
+		if (port == -1)
+		{
+			throw new IllegalStateException("RegistrationService could not determine the port for the OutboundService on this host.");
+		}
+
+		try
+		{
+			outboundServiceAdvertiser.available(localServerMetaData);
+			logger.info("Registering OutboundService server host=" + host + " port=" + port);
+		}
+		catch (Exception e)
+		{
+			throw new ClusterException("Failed to register OutboundService host=" + host + " port=" + port, e);
+		}
+	}
+
+	@Override
+	public void unRegisterAsOutboundService()
+	{
+		outboundServiceAdvertiser.unavailable(localServerMetaData);
+		logger.info("Unregistered OutboundService server host=" + localServerMetaData.getListenAddress() + " port=" + localServerMetaData.getListenPort());
+	}
+
+	@Override
 	public void registerAsStorageWriter()
 	{
 		String host = props.get("storage_writer.rest_host", Defaults.REST_HOST);
@@ -290,6 +334,7 @@ public class RegistrationServiceImpl implements RegistrationService
 
 			serverAdvertiser.close();
 			inboundServiceAdvertiser.close();
+			outboundServiceAdvertiser.close();
 			storageWriterAdvertiser.close();
 			aggregatorAdvertiser.close();
 
@@ -321,6 +366,20 @@ public class RegistrationServiceImpl implements RegistrationService
 		public void cacheChanged()
 		{
 			logger.info("Registered InboundService list has been updated. " + inboundServiceCache.getInstances().size() + " InboundService(s) are active.");
+		}
+
+		@Override
+		public void stateChanged(CuratorFramework curatorFramework, ConnectionState connectionState)
+		{
+		}
+	}
+
+	private class OutboundServiceCacheListener implements ServiceCacheListener
+	{
+		@Override
+		public void cacheChanged()
+		{
+			logger.info("Registered OutboundService list has been updated. " + outboundServiceCache.getInstances().size() + " OutboundService(s) are active.");
 		}
 
 		@Override

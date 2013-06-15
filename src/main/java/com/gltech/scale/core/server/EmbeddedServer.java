@@ -3,6 +3,7 @@ package com.gltech.scale.core.server;
 import ch.qos.logback.classic.Level;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.outbound.OutboundService;
 import com.gltech.scale.core.stats.StatCallBack;
 import com.gltech.scale.core.stats.StatsManager;
 import com.google.inject.Injector;
@@ -153,6 +154,13 @@ public class EmbeddedServer
 			// Registered InboundService for shutdown
 			InboundService inboundService = injector.getInstance(InboundService.class);
 			LifeCycleManager.getInstance().add(inboundService, LifeCycle.Priority.INITIAL);
+		}
+
+		if (props.get("enable.outbound_service", false))
+		{
+			// Registered OutboundService for shutdown
+			OutboundService outboundService = injector.getInstance(OutboundService.class);
+			LifeCycleManager.getInstance().add(outboundService, LifeCycle.Priority.INITIAL);
 		}
 
 		if (props.get("enable.aggregator", false))

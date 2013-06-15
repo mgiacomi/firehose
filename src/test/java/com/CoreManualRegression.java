@@ -5,6 +5,7 @@ import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.inbound.InboundRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Defaults;
+import com.gltech.scale.core.outbound.OutboundRestClient;
 import com.gltech.scale.core.server.EmbeddedServer;
 import com.gltech.scale.util.ClientCreator;
 import com.gltech.scale.core.model.ModelIO;
@@ -172,10 +173,10 @@ public class CoreManualRegression
 			inbound.setListenAddress(props.get("inbound.rest_host", Defaults.REST_HOST));
 			inbound.setListenPort(props.get("inbound.rest_port", Defaults.REST_PORT));
 
-			InboundRestClient inboundRestClient = new InboundRestClient(new ModelIO());
+			OutboundRestClient outboundRestClient = new OutboundRestClient(new ModelIO());
 
-			System.out.println("fast: " + inboundRestClient.getMessages(inbound, "fast", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
-			System.out.println("redundant: " + inboundRestClient.getMessages(inbound, "redundant", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("fast: " + outboundRestClient.getMessages(inbound, "fast", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
+			System.out.println("redundant: " + outboundRestClient.getMessages(inbound, "redundant", TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5), TimeUnit.HOURS));
 		}
 	}
 }

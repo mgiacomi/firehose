@@ -38,12 +38,6 @@ public class InboundServiceStats implements InboundService
 	}
 
 	@Override
-	public int writeMessagesToOutputStream(String channelName, DateTime dateTime, OutputStream outputStream, int recordsWritten)
-	{
-		return inboundService.writeMessagesToOutputStream(channelName, dateTime, outputStream, recordsWritten);
-	}
-
-	@Override
 	public void shutdown()
 	{
 		inboundService.shutdown();

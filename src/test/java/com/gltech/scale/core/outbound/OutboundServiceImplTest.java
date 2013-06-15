@@ -1,38 +1,39 @@
-package com.gltech.scale.core.inbound;
+package com.gltech.scale.core.outbound;
 
-import com.gltech.scale.core.cluster.*;
+import com.gltech.scale.core.cluster.BatchPeriodMapper;
+import com.gltech.scale.core.cluster.ClusterService;
+import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
-import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.storage.ChannelCache;
 import com.gltech.scale.core.storage.StorageClient;
-import com.gltech.scale.core.model.ModelIO;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-public class InboundResourceTest
+public class OutboundServiceImplTest
 {
-	InboundService inboundService;
-	AggregatorRestClient aggregatorRestClient;
-	ChannelCache channelCache;
+	OutboundService outboundService;
+	ClusterService clusterService;
 	StorageClient storageClient;
-	ChannelCoordinator channelCoordinator;
 	ChannelMetaData channelMetaData = new ChannelMetaData("c1", ChannelMetaData.TTL_DAY, false);
 
 	@Before
 	public void setUp()
 	{
-		ClusterService clusterService = new ClusterService()
+		clusterService = new ClusterService()
 		{
 			public List<BatchPeriodMapper> getOrderedActiveBucketList()
 			{
@@ -71,12 +72,7 @@ public class InboundResourceTest
 			}
 		};
 
-		aggregatorRestClient = mock(AggregatorRestClient.class);
-		channelCache = mock(ChannelCache.class);
 		storageClient = mock(StorageClient.class);
-		channelCoordinator = mock(ChannelCoordinator.class);
-		inboundService = new InboundServiceImpl(clusterService, channelCoordinator, storageClient, aggregatorRestClient, channelCache, new TimePeriodUtils(), mock(StatsManager.class));
-
 		when(storageClient.getMessageStream(any(ChannelMetaData.class), anyString())).thenReturn(new ByteArrayInputStream("".getBytes()));
 	}
 
@@ -86,24 +82,13 @@ public class InboundResourceTest
 		ChannelCache channelCache = mock(ChannelCache.class);
 		when(channelCache.getChannelMetaData(anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(channelCache, inboundService, new ModelIO(), storageClient);
-		Response response = inboundResource.getMessagesOrRedirect("c1", 2012, 10, 12, 10, 40, 15);
-		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
+		outboundService = new OutboundServiceImpl(clusterService, storageClient, channelCache, new TimePeriodUtils());
+
+		StreamingOutput streamingOutput = outboundService.getMessages("c1", 2012, 10, 12, 10, 40, 15);
+		streamingOutput.write(new ByteArrayOutputStream());
 
 		verify(storageClient).getMessageStream(channelMetaData, "20121012104015");
-	}
-
-	@Test
-	public void testPeriodSecondBySecond2() throws Exception
-	{
-		ChannelCache channelCache = mock(ChannelCache.class);
-		when(channelCache.getChannelMetaData(anyString(), anyBoolean())).thenReturn(channelMetaData);
-
-		InboundResource inboundResource = new InboundResource(channelCache, inboundService, new ModelIO(), storageClient);
-		Response response = inboundResource.getMessagesOrRedirect("c1", 2012, 10, 12, 10, 40, 13);
-		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
-
-		verify(storageClient).getMessageStream(channelMetaData, "20121012104015");
+		verify(storageClient, times(1)).getMessageStream(any(ChannelMetaData.class), anyString());
 	}
 
 	@Test
@@ -112,9 +97,10 @@ public class InboundResourceTest
 		ChannelCache channelCache = mock(ChannelCache.class);
 		when(channelCache.getChannelMetaData(anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(channelCache, inboundService, new ModelIO(), storageClient);
-		Response response = inboundResource.getMessagesOrRedirect("c1", 2012, 10, 12, 10, 40, -1);
-		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
+		outboundService = new OutboundServiceImpl(clusterService, storageClient, channelCache, new TimePeriodUtils());
+
+		StreamingOutput streamingOutput = outboundService.getMessages("c1", 2012, 10, 12, 10, 40, -1);
+		streamingOutput.write(new ByteArrayOutputStream());
 
 		verify(storageClient).getMessageStream(channelMetaData, "20121012104000");
 		verify(storageClient).getMessageStream(channelMetaData, "20121012104005");
@@ -129,7 +115,7 @@ public class InboundResourceTest
 		verify(storageClient).getMessageStream(channelMetaData, "20121012104050");
 		verify(storageClient).getMessageStream(channelMetaData, "20121012104055");
 
-		verify(storageClient, times(12)).getMessageStream(any(ChannelMetaData.class), anyString());
+		verify(storageClient, times(60)).getMessageStream(any(ChannelMetaData.class), anyString());
 	}
 
 	@Test
@@ -138,9 +124,10 @@ public class InboundResourceTest
 		ChannelCache channelCache = mock(ChannelCache.class);
 		when(channelCache.getChannelMetaData(anyString(), anyBoolean())).thenReturn(channelMetaData);
 
-		InboundResource inboundResource = new InboundResource(channelCache, inboundService, new ModelIO(), storageClient);
-		Response response = inboundResource.getMessagesOrRedirect("c1", 2012, 10, 12, 10, -1, -1);
-		((StreamingOutput) response.getEntity()).write(new ByteArrayOutputStream());
+		outboundService = new OutboundServiceImpl(clusterService, storageClient, channelCache, new TimePeriodUtils());
+
+		StreamingOutput streamingOutput = outboundService.getMessages("c1", 2012, 10, 12, 10, -1, -1);
+		streamingOutput.write(new ByteArrayOutputStream());
 
 		verify(storageClient).getMessageStream(channelMetaData, "20121012104000");
 		verify(storageClient).getMessageStream(channelMetaData, "20121012104005");
@@ -155,7 +142,6 @@ public class InboundResourceTest
 		verify(storageClient).getMessageStream(channelMetaData, "20121012104050");
 		verify(storageClient).getMessageStream(channelMetaData, "20121012104055");
 
-		verify(storageClient, times(720)).getMessageStream(any(ChannelMetaData.class), anyString());
+		verify(storageClient, times(3600)).getMessageStream(any(ChannelMetaData.class), anyString());
 	}
-
 }
