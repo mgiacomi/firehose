@@ -28,6 +28,7 @@ var webSocketChannel = {
     _onclose : function(m) {
         this._ws = null;
         console.log("WebSocket connection closed.");
+        setTimeout(function(){webSocketChannel.init()}, 1000);
     },
 
     _onerror : function(e) {
