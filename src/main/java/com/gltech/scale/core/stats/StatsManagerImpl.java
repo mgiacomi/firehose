@@ -59,12 +59,19 @@ public class StatsManagerImpl implements StatsManager
 			{
 				public void run()
 				{
-					for (ConcurrentMap<String, StatOverTime> groupStats : stats.values())
+					try
 					{
-						for (StatOverTime statName : groupStats.values())
+						for (ConcurrentMap<String, StatOverTime> groupStats : stats.values())
 						{
-							statName.cleanOldThanTwoHours();
+							for (StatOverTime statName : groupStats.values())
+							{
+								statName.cleanOldThanTwoHours();
+							}
 						}
+					}
+					catch (Exception e)
+					{
+						logger.error("ScheduledCleanUpService Failed", e);
 					}
 				}
 			}, 0, runEveryXMinutes, TimeUnit.MINUTES);
@@ -88,10 +95,17 @@ public class StatsManagerImpl implements StatsManager
 			{
 				public void run()
 				{
-					// Loop through each callback and update the stats
-					for (StatOverTime statOverTime : callbacks.keySet())
+					try
 					{
-						statOverTime.add(callbacks.get(statOverTime).getValue());
+						// Loop through each callback and update the stats
+						for (StatOverTime statOverTime : callbacks.keySet())
+						{
+							statOverTime.add(callbacks.get(statOverTime).getValue());
+						}
+					}
+					catch (Exception e)
+					{
+						logger.error("ScheduledCallBackService Failed", e);
 					}
 				}
 			}, runEveryXSeconds, runEveryXSeconds, TimeUnit.SECONDS);

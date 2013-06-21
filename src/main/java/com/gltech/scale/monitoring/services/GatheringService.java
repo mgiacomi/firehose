@@ -100,9 +100,9 @@ public class GatheringService implements LifeCycle
 
 						logger.debug("Stats have been updated for {} of {} servers", serverStatsList.size(), futures.size());
 					}
-					catch (InterruptedException e)
+					catch (Exception e)
 					{
-						logger.error("ServerCollectorExecutor was interrupted.", e);
+						logger.error("ServerCollectorExecutor Failed.", e);
 					}
 				}
 			}, runEveryXSeconds, runEveryXSeconds, TimeUnit.SECONDS);

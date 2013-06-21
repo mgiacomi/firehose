@@ -10,8 +10,6 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -45,7 +43,7 @@ public class StatsPushSocket implements ClusterStatsCallBack
 			{
 				session.getRemote().sendString(resultsIO.toJson(clusterStats));
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
 				logger.info("Failed to write to session {}", session.toString());
 			}
@@ -75,7 +73,8 @@ public class StatsPushSocket implements ClusterStatsCallBack
 	@OnWebSocketError
 	public void onError(Session session, Throwable error)
 	{
-		System.out.println("WEBSOCKET ERROR");
+		logger.info("WebSocket Error for session {}", session, error);
+		sessions.remove(session);
 	}
 
 }

@@ -8,7 +8,6 @@ import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.registration.RegistrationService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.aggregator.PrimaryBackupSet;
-import com.gltech.scale.util.Props;
 import com.gltech.scale.util.ZkClientCreator;
 import com.netflix.curator.framework.CuratorFramework;
 import com.netflix.curator.framework.api.transaction.CuratorTransaction;
@@ -32,7 +31,6 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 	private RegistrationService registrationService;
 	private TimePeriodUtils timePeriodUtils;
 	private final ObjectMapper mapper = new ObjectMapper();
-	private Props props = Props.getProps();
 	private List<Integer> registeredSetsHist = new CopyOnWriteArrayList<>();
 	private ConcurrentMap<DateTime, AggregatorsByPeriod> aggregatorPeriodMatricesCache = new ConcurrentHashMap<>();
 	private static ScheduledExecutorService scheduledChannelCoordinatorService;
@@ -214,8 +212,15 @@ public class ChannelCoordinatorImpl implements ChannelCoordinator
 			{
 				for (String period : client.getChildren().forPath("/aggregator/periods"))
 				{
-					byte[] data = client.getData().forPath("/aggregator/periods/" + period);
-					aggregatorsByPeriods.add(mapper.readValue(new String(data), AggregatorsByPeriod.class));
+					try
+					{
+						byte[] data = client.getData().forPath("/aggregator/periods/" + period);
+						aggregatorsByPeriods.add(mapper.readValue(new String(data), AggregatorsByPeriod.class));
+					}
+					catch (KeeperException.NoNodeException nne)
+					{
+						// Just means it was cleaned up. Ignore.
+					}
 				}
 			}
 		}

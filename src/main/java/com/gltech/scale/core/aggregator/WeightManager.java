@@ -43,19 +43,26 @@ public class WeightManager implements LifeCycle
 			{
 				public void run()
 				{
-					boolean active = true;
-					int primaries = aggregator.getActiveBatches().size();
-					int backups = aggregator.getActiveBackupBatches().size();
-					int atRest = 999;
-
-					if (primaries == 0 && backups == 0)
+					try
 					{
-						active = false;
-						atRest--;
-					}
+						boolean active = true;
+						int primaries = aggregator.getActiveBatches().size();
+						int backups = aggregator.getActiveBackupBatches().size();
+						int atRest = 999;
 
-					channelCoordinator.registerWeight(active, primaries, backups, atRest);
-					logger.trace("Registering weight with ChannelCoordinator. active={}, primaries={}, backups={}, atRest={}", active, primaries, backups, atRest);
+						if (primaries == 0 && backups == 0)
+						{
+							active = false;
+							atRest--;
+						}
+
+						channelCoordinator.registerWeight(active, primaries, backups, atRest);
+						logger.trace("Registering weight with ChannelCoordinator. active={}, primaries={}, backups={}, atRest={}", active, primaries, backups, atRest);
+					}
+					catch (Exception e)
+					{
+						logger.error("ScheduledUpdateWeightsService failed.", e);
+					}
 				}
 			}, 0, runEveryXMillis, TimeUnit.MILLISECONDS);
 
