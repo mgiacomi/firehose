@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.rmi.dgc.VMID;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class BatchNIOFile implements Batch
@@ -35,7 +34,6 @@ public class BatchNIOFile implements Batch
 		Props props = Props.getProps();
 
 		File directory = new File(props.get("channel_file_dir", Defaults.CHANNEL_FILE_DIR));
-System.out.println("!!!! "+ directory.getAbsolutePath());
 		if (!directory.exists())
 		{
 			if (directory.mkdirs())
@@ -46,7 +44,7 @@ System.out.println("!!!! "+ directory.getAbsolutePath());
 
 		try
 		{
-			 File file = new File(directory, channelMetaData.getName() + "_" + nearestPeriodCeiling.toString("YYYY-MM-dd-HH-mm-ss"));
+			File file = new File(directory, channelMetaData.getName() + "_" + nearestPeriodCeiling.toString("YYYY-MM-dd-HH-mm-ss"));
 
 			int fileCounter = 0;
 			while(file.exists()) {
