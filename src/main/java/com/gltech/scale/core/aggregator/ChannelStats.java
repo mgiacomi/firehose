@@ -1,6 +1,5 @@
 package com.gltech.scale.core.aggregator;
 
-import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.AvgStatOverTime;

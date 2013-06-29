@@ -1,6 +1,7 @@
 package com.gltech.scale.core.model;
 
 import com.dyuproject.protostuff.runtime.ExplicitIdStrategy;
+import com.gltech.scale.core.aggregator.Batch;
 import com.gltech.scale.core.aggregator.PrimaryBackupSet;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.stats.results.AvgStat;
@@ -11,8 +12,8 @@ import com.gltech.scale.monitoring.model.*;
 public class Defaults
 {
 	// Core
-	static public final long KBytes = 1024L;
-	static public final int MEGABYTES = 1024 * 1024;
+	static public final int KBytes = 1024;
+	static public final int MBytes = 1024 * 1024;
 	static public final String REST_HOST = "localhost";
 	static public final int REST_PORT = 9090;
 	static public final int PERIOD_SECONDS = 1;
@@ -25,6 +26,8 @@ public class Defaults
 	static public final int WEIGHT_MANGER_REGISTER_EVERY_X_MILLIS = 500;
 	static public final int STATS_MANAGER_CLEANUP_RUN_EVERY_X_MINS = 5;
 	static public final int STATS_MANAGER_CALLBACK_RUN_EVERY_X_SECONDS = 5;
+	static public final String CHANNEL_BATCH_TYPE = "file";
+	static public final String CHANNEL_FILE_DIR = System.getProperty("java.io.tmpdir") +"/channels";
 
 	// Monitoring
 	static public final int GATHER_SERVICE_RUN_EVERY_X_SECONDS = 3;

@@ -16,7 +16,7 @@ public class WeightManager implements LifeCycle
 	private final Aggregator aggregator;
 	private final ChannelCoordinator channelCoordinator;
 	private static ScheduledExecutorService scheduledUpdateWeightsService;
-	Props props = Props.getProps();
+	private Props props = Props.getProps();
 
 	@Inject
 	public WeightManager(Aggregator aggregator, ChannelCoordinator channelCoordinator)

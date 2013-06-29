@@ -1,11 +1,12 @@
 package com.gltech.scale.core.writer;
 
+import com.gltech.scale.core.aggregator.BatchMemory;
+import com.gltech.scale.core.aggregator.BatchNIOFile;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.Message;
-import com.gltech.scale.core.model.Batch;
+import com.gltech.scale.core.aggregator.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.ModelIO;
-import com.google.protobuf.CodedOutputStream;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -19,28 +20,31 @@ import static junit.framework.Assert.assertNull;
 public class MessageStreamTest
 {
 	@Test
-	public void nextRecordTest() throws Exception
+	public void nextRecordTestMemory() throws Exception
 	{
 		ChannelMetaData channelMetaData = new ChannelMetaData("1", ChannelMetaData.TTL_DAY, true);
+		Batch batch = new BatchMemory(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
+		nextTest(batch);
+	}
+
+	@Test
+	public void nextRecordTestFile() throws Exception
+	{
+		ChannelMetaData channelMetaData = new ChannelMetaData("1", ChannelMetaData.TTL_DAY, true);
+		Batch batch = new BatchNIOFile(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
+		nextTest(batch);
+	}
+
+	private void nextTest(Batch batch) throws Exception
+	{
 		ModelIO modelIO = new ModelIO();
 
-		Batch batch = new Batch(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
 		batch.addMessage(modelIO.toBytes(new Message(MediaType.APPLICATION_JSON_TYPE, "testdata".getBytes())));
 		Thread.sleep(5);
 		batch.addMessage(modelIO.toBytes(new Message(MediaType.APPLICATION_JSON_TYPE, "testdata2".getBytes())));
 
-		assertEquals("testdata", new String(modelIO.toMessage(batch.getMessages().get(0)).getPayload()));
-		assertEquals("testdata2", new String(modelIO.toMessage(batch.getMessages().get(1)).getPayload()));
-
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(bos);
-
-		for (byte[] bytes : batch.getMessages())
-		{
-			codedOutputStream.writeRawVarint32(bytes.length);
-			codedOutputStream.writeRawBytes(bytes);
-		}
-		codedOutputStream.flush();
+		batch.writeMessages(bos);
 
 		MessageStream messageStream = new MessageInputStream("test", new ByteArrayInputStream(bos.toByteArray()));
 
@@ -49,5 +53,7 @@ public class MessageStreamTest
 		assertEquals("testdata2", new String(messageStream.getCurrentMessage().getPayload()));
 		messageStream.nextRecord();
 		assertNull(messageStream.getCurrentMessage());
+
+		batch.clear();
 	}
 }

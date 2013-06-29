@@ -104,8 +104,14 @@ public class BatchStreamsManager
 					linkedBuffer.clear();
 
 					bytesWritten += messageBytes;
-					bytesWrittenStat.add(messageBytes);
-					messagesWrittenStat.increment();
+					if (bytesWrittenStat != null)
+					{
+						bytesWrittenStat.add(messageBytes);
+					}
+					if (messagesWrittenStat != null)
+					{
+						messagesWrittenStat.increment();
+					}
 				}
 			}
 		}
@@ -130,7 +136,7 @@ public class BatchStreamsManager
 			}
 		}
 
-		logger.info("Completed stream merge: {}, streams merged={}, processed messages={}, total messages={}, size={}mb", customerBatchPeriod, totalStreams, processedMessages.size(), recordsReceived, bytesWritten / Defaults.MEGABYTES);
+		logger.info("Completed stream merge: {}, streams merged={}, processed messages={}, total messages={}, size={}mb", customerBatchPeriod, totalStreams, processedMessages.size(), recordsReceived, bytesWritten / Defaults.MBytes);
 
 		return processedMessages.size();
 	}

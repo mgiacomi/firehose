@@ -1,7 +1,5 @@
 package com.gltech.scale.core.aggregator;
 
-import com.gltech.scale.core.model.Message;
-import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.model.ChannelMetaData;
 import org.joda.time.DateTime;
 

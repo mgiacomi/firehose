@@ -1,7 +1,6 @@
 package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
-import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.stats.StatsManager;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
@@ -52,7 +51,7 @@ public class AggregatorImpl implements Aggregator
 
 		if (channel == null)
 		{
-			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils), statsManager);
+			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService), statsManager);
 			channel = channels.putIfAbsent(channelMetaData, newChannel);
 			if (channel == null)
 			{
@@ -74,7 +73,7 @@ public class AggregatorImpl implements Aggregator
 		if (channel == null)
 		{
 			logger.info("Creating Channel: " + channelName);
-			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService, timePeriodUtils), statsManager);
+			Channel newChannel = new ChannelStats(new ChannelImpl(channelMetaData, clusterService), statsManager);
 			channel = channels.putIfAbsent(channelMetaData, newChannel);
 			if (channel == null)
 			{
@@ -149,7 +148,7 @@ public class AggregatorImpl implements Aggregator
 
 				if (batch != null)
 				{
-					long messagesWritten = batchMessagesToStream(outputStream, batch);
+					long messagesWritten = batch.writeMessages(outputStream);
 					logger.warn("Collected {} primary messages from batch: {}", messagesWritten, channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 					return messagesWritten;
 				}
@@ -179,7 +178,7 @@ public class AggregatorImpl implements Aggregator
 
 				if (batch != null)
 				{
-					long messagesWritten = batchMessagesToStream(outputStream, batch);
+					long messagesWritten = batch.writeMessages(outputStream);
 					logger.warn("Collected {} backup messages from batch: {}", messagesWritten, channelMetaData.getName() + "|" + nearestPeriodCeiling.toString(DateTimeFormat.forPattern("yyyyMMddHHmmss")));
 					return messagesWritten;
 				}
@@ -191,28 +190,6 @@ public class AggregatorImpl implements Aggregator
 		}
 
 		return 0;
-	}
-
-	private long batchMessagesToStream(OutputStream outputStream, Batch batch)
-	{
-		CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(outputStream);
-
-		try
-		{
-			for (byte[] bytes : batch.getMessages())
-			{
-				codedOutputStream.writeRawVarint32(bytes.length);
-				codedOutputStream.writeRawBytes(bytes);
-
-			}
-			codedOutputStream.flush();
-		}
-		catch (IOException e)
-		{
-			throw Throwables.propagate(e);
-		}
-
-		return batch.getMessages().size();
 	}
 
 	@Override

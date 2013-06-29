@@ -153,7 +153,7 @@ public class AwsS3Store implements Storage
 		String key = keyNameWithUniquePrefix(channelMetaData.getName(), id);
 
 		// Set part size to 5 MB.
-		int partSize = 5 * Defaults.MEGABYTES;
+		int partSize = 5 * Defaults.MBytes;
 
 		// Create a list of UploadPartResponse objects. You get one of these for each part upload.
 		List<PartETag> partETags = new ArrayList<>();
@@ -273,7 +273,7 @@ public class AwsS3Store implements Storage
 					.withInputStream(streamPart.getInputStream())
 					.withPartSize(streamPart.getSize());
 
-			logger.debug("Completed S3 Part Upload key={}, part={}, size={}mb", key, part, streamPart.getSize() / Defaults.MEGABYTES);
+			logger.debug("Completed S3 Part Upload key={}, part={}, size={}mb", key, part, streamPart.getSize() / Defaults.MBytes);
 
 			// Upload part and add response to our list.
 			return s3Client.uploadPart(uploadRequest).getPartETag();

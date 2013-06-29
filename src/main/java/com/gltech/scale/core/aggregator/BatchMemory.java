@@ -1,14 +1,20 @@
-package com.gltech.scale.core.model;
+package com.gltech.scale.core.aggregator;
 
+import com.gltech.scale.core.model.BatchMetaData;
+import com.gltech.scale.core.model.ChannelMetaData;
+import com.google.common.base.Throwables;
+import com.google.protobuf.CodedOutputStream;
 import org.joda.time.DateTime;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class Batch
+public class BatchMemory implements Batch
 {
 	private DateTime nearestPeriodCeiling;
 	private DateTime firstMessageTime;
@@ -17,12 +23,13 @@ public class Batch
 	private AtomicLong bytes = new AtomicLong(0);
 	private ChannelMetaData channelMetaData;
 
-	public Batch(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
+	public BatchMemory(ChannelMetaData channelMetaData, DateTime nearestPeriodCeiling)
 	{
 		this.channelMetaData = channelMetaData;
 		this.nearestPeriodCeiling = nearestPeriodCeiling;
 	}
 
+	@Override
 	public void addMessage(byte[] message)
 	{
 		messages.add(message);
@@ -35,31 +42,66 @@ public class Batch
 		}
 	}
 
+	@Override
+	public long writeMessages(OutputStream outputStream)
+	{
+		CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(outputStream);
+
+		try
+		{
+			for (byte[] bytes : messages)
+			{
+				codedOutputStream.writeRawVarint32(bytes.length);
+				codedOutputStream.writeRawBytes(bytes);
+
+			}
+			codedOutputStream.flush();
+		}
+		catch (IOException e)
+		{
+			throw Throwables.propagate(e);
+		}
+
+		return messages.size();
+	}
+
+	@Override
+	public void clear()
+	{
+		// No need to do anything for this implementation.  GC will take care of it.
+	}
+
+	@Override
 	public ChannelMetaData getChannelMetaData()
 	{
 		return channelMetaData;
 	}
 
-	public List<byte[]> getMessages()
+	@Override
+	public long getMessages()
 	{
-		return Collections.unmodifiableList(new ArrayList<>(messages));
+		return messages.size();
 	}
 
+	@Override
 	public long getBytes()
 	{
 		return bytes.get();
 	}
 
+	@Override
 	public DateTime getLastMessageTime()
 	{
 		return lastMessageTime;
 	}
 
+	@Override
 	public DateTime getFirstMessageTime()
 	{
 		return firstMessageTime;
 	}
 
+	@Override
 	public BatchMetaData getMetaData()
 	{
 		return new BatchMetaData(nearestPeriodCeiling, messages.size(), bytes.get(), channelMetaData);
@@ -70,7 +112,7 @@ public class Batch
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		Batch that = (Batch) o;
+		BatchMemory that = (BatchMemory) o;
 
 		if (channelMetaData != null ? !channelMetaData.equals(that.channelMetaData) : that.channelMetaData != null)
 			return false;

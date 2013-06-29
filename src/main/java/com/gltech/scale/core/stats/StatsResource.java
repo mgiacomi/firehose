@@ -1,12 +1,11 @@
 package com.gltech.scale.core.stats;
 
 import com.gltech.scale.core.aggregator.Aggregator;
-import com.gltech.scale.core.model.Batch;
+import com.gltech.scale.core.aggregator.Batch;
 import com.gltech.scale.monitoring.model.ResultsIO;
 import com.gltech.scale.monitoring.model.ServerStats;
 import com.gltech.scale.util.Props;
 import com.google.inject.Inject;
-import com.sun.istack.internal.Nullable;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

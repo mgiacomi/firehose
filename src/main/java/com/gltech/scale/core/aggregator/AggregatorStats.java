@@ -1,7 +1,6 @@
 package com.gltech.scale.core.aggregator;
 
 import com.gltech.scale.core.model.BatchMetaData;
-import com.gltech.scale.core.model.Batch;
 import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.stats.CountStatOverTime;
 import com.gltech.scale.core.stats.StatCallBack;
@@ -91,7 +90,7 @@ public class AggregatorStats implements Aggregator
 				long total = 0;
 				for (Batch batch : aggregator.getActiveBatches())
 				{
-					total += batch.getMessages().size();
+					total += batch.getMessages();
 				}
 				return total;
 			}
@@ -103,7 +102,7 @@ public class AggregatorStats implements Aggregator
 				long total = 0;
 				for (Batch batch : aggregator.getActiveBackupBatches())
 				{
-					total += batch.getMessages().size();
+					total += batch.getMessages();
 				}
 				return total;
 			}
