@@ -5,6 +5,11 @@ import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.dyuproject.protostuff.Schema;
 import com.dyuproject.protostuff.runtime.ExplicitIdStrategy;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
+import com.gltech.scale.core.aggregator.Batch;
+import com.gltech.scale.core.aggregator.BatchMemory;
+import com.gltech.scale.core.aggregator.BatchNIOFile;
+import com.gltech.scale.core.cluster.TimePeriodUtils;
+import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Message;
 import com.ning.compress.lzf.LZFEncoder;
 import com.ning.compress.lzf.LZFInputStream;
@@ -19,6 +24,34 @@ import java.util.UUID;
 public class PerformanceRegression
 {
 	private static final long MegaBytes = 1024L * 1024L;
+
+	@Test
+	public void writeToMemory()
+	{
+		ChannelMetaData channelMetaData = new ChannelMetaData("1", ChannelMetaData.TTL_DAY, true);
+		Batch batch = new BatchMemory(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
+
+		String str = "lafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmf";
+		System.out.println("message size: "+ str.getBytes().length);
+		for(int i = 0; i<500000;i++)
+		{
+			batch.addMessage(str.getBytes());
+		}
+	}
+
+	@Test
+	public void writeToFile()
+	{
+		ChannelMetaData channelMetaData = new ChannelMetaData("1", ChannelMetaData.TTL_DAY, true);
+		Batch batch = new BatchNIOFile(channelMetaData, TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5));
+
+		String str = "lafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmflafjs;lakjsd;flkja;sdlfja;lsdfkjoiwuep2 rupqnfaswd cnh29r3nu p2 fhwn9\t2rnu9\t2pfwjp9\t2rn9\t2pmr \t2p98\t9Y84\t293RC9M2 RP9U \tN p9qfmoiqvhwnfmqiufoqinhmoiqhucmf";
+		System.out.println("message size: "+ str.getBytes().length);
+		for(int i = 0; i<500000;i++)
+		{
+			batch.addMessage(str.getBytes());
+		}
+	}
 
 	@Test
 	public void writeProtoStuffToFile() throws Exception

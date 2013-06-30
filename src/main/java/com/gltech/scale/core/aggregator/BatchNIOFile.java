@@ -94,7 +94,7 @@ public class BatchNIOFile implements Batch
 	public void addMessage(byte[] message)
 	{
 		byte[] header = getRawVarint32(message.length);
-		ByteBuffer buffer = ByteBuffer.allocateDirect(header.length + message.length);
+		ByteBuffer buffer = ByteBuffer.allocate(header.length + message.length);
 		buffer.clear();
 		buffer.put(header);
 		buffer.put(message);
