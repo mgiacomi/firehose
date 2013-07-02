@@ -143,10 +143,7 @@ public class RegistrationServiceImpl implements RegistrationService
 	@Override
 	public void registerAsServer()
 	{
-		String host = props.get("server_host", Defaults.REST_HOST);
-		int port = props.get("server_port", -1);
-
-		if (port == -1)
+		if (localServerMetaData.getListenPort() == -1)
 		{
 			throw new IllegalStateException("RegistrationService could not determine the port for the Server on this host.");
 		}
@@ -154,11 +151,11 @@ public class RegistrationServiceImpl implements RegistrationService
 		try
 		{
 			serverAdvertiser.available(localServerMetaData);
-			logger.info("Registering Server server host=" + host + " port=" + port);
+			logger.info("Registering Server server host={} port={}", localServerMetaData.getListenAddress(), localServerMetaData.getListenPort());
 		}
 		catch (Exception e)
 		{
-			throw new ClusterException("Failed to register Server host=" + host + " port=" + port, e);
+			throw new ClusterException("Failed to register Server host=" + localServerMetaData.getListenAddress() + " port=" + localServerMetaData.getListenPort(), e);
 		}
 	}
 

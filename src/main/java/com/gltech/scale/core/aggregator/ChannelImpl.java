@@ -40,7 +40,7 @@ public class ChannelImpl implements Channel
 			clusterService.registerBatch(channelMetaData, nearestPeriodCeiling);
 
 			Batch newBatch;
-			if("memory".equals(props.get("CHANNEL_BATCH_TYPE", Defaults.CHANNEL_BATCH_TYPE)))
+			if("memory".equals(props.get("channel_batch_type", Defaults.CHANNEL_BATCH_TYPE)))
 			{
 				newBatch = new BatchMemory(channelMetaData, nearestPeriodCeiling);
 			}
@@ -73,7 +73,7 @@ public class ChannelImpl implements Channel
 			clusterService.registerBatch(channelMetaData, nearestPeriodCeiling);
 
 			Batch newBatch;
-			if("memory".equals(props.get("CHANNEL_BATCH_TYPE", Defaults.CHANNEL_BATCH_TYPE)))
+			if("memory".equals(props.get("channel_batch_type", Defaults.CHANNEL_BATCH_TYPE)))
 			{
 				newBatch = new BatchMemory(channelMetaData, nearestPeriodCeiling);
 			}

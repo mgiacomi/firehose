@@ -36,17 +36,16 @@ public class Defaults
 	{
 		ExplicitIdStrategy.Registry registry = new ExplicitIdStrategy.Registry();
 		registry.registerPojo(Message.class, 1);
-		registry.registerPojo(Batch.class, 2);
-		registry.registerPojo(ChannelMetaData.class, 3);
-		registry.registerPojo(GroupStats.class, 4);
-		registry.registerPojo(AvgStat.class, 5);
-		registry.registerPojo(OverTime.class, 6);
-		registry.registerPojo(ServerStats.class, 7);
-		registry.registerPojo(AggregateOverTime.class, 8);
-		registry.registerPojo(ClusterStats.class, 9);
-		registry.registerPojo(BatchStatus.class, 10);
-		registry.registerPojo(ServiceMetaData.class, 11);
-		registry.registerPojo(PrimaryBackupSet.class, 12);
+		registry.registerPojo(ChannelMetaData.class, 2);
+		registry.registerPojo(GroupStats.class, 3);
+		registry.registerPojo(AvgStat.class, 4);
+		registry.registerPojo(OverTime.class, 5);
+		registry.registerPojo(ServerStats.class, 6);
+		registry.registerPojo(AggregateOverTime.class, 7);
+		registry.registerPojo(ClusterStats.class, 8);
+		registry.registerPojo(BatchStatus.class, 9);
+		registry.registerPojo(ServiceMetaData.class, 10);
+		registry.registerPojo(PrimaryBackupSet.class, 11);
 		registry.registerPojo(PeriodStatus.class, 13);
 	}
 }
