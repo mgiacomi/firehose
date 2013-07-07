@@ -68,7 +68,7 @@ public class PerformanceRegression
 		for (int i = 0; i < items; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			ProtostuffIOUtil.writeDelimitedTo(fos, new Message(MediaType.APPLICATION_JSON_TYPE, testString.getBytes()), schema, linkedBuffer);
+			ProtostuffIOUtil.writeDelimitedTo(fos, new Message(MediaType.APPLICATION_JSON_TYPE, null, testString.getBytes()), schema, linkedBuffer);
 			linkedBuffer.clear();
 		}
 
@@ -92,7 +92,7 @@ public class PerformanceRegression
 		for (int i = 0; i < items; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			byte[] data = ProtostuffIOUtil.toByteArray(new Message(MediaType.APPLICATION_JSON_TYPE, testString.getBytes()), schema, linkedBuffer);
+			byte[] data = ProtostuffIOUtil.toByteArray(new Message(MediaType.APPLICATION_JSON_TYPE, null, testString.getBytes()), schema, linkedBuffer);
 			fos.write(LZFEncoder.encode(data));
 			linkedBuffer.clear();
 		}
@@ -117,7 +117,7 @@ public class PerformanceRegression
 		for (int i = 0; i < items; i++)
 		{
 			String testString = i + "asdf123asdf123asdf123asdf132asdf132asdf132a1sdf321asdf312adsf31asdf312adsf31asdf31asd";
-			byte[] data = ProtostuffIOUtil.toByteArray(new Message(MediaType.APPLICATION_JSON_TYPE, testString.getBytes()), schema, linkedBuffer);
+			byte[] data = ProtostuffIOUtil.toByteArray(new Message(MediaType.APPLICATION_JSON_TYPE, null, testString.getBytes()), schema, linkedBuffer);
 			fos.write(data);
 			linkedBuffer.clear();
 		}

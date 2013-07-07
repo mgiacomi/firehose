@@ -2,7 +2,7 @@ package com.gltech.scale.util;
 
 import com.sun.jersey.api.client.Client;
 
-public class ClientCreator
+public class RestClientCreator
 {
 	private static final Client cachedClient = createNew();
 

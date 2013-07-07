@@ -3,7 +3,7 @@ package com.gltech.scale.core.stats;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.monitoring.model.ResultsIO;
 import com.gltech.scale.monitoring.model.ServerStats;
-import com.gltech.scale.util.ClientCreator;
+import com.gltech.scale.util.RestClientCreator;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.sun.jersey.api.client.Client;
@@ -16,7 +16,7 @@ import java.io.IOException;
 
 public class StatsRestClient
 {
-	private final Client client = ClientCreator.createCached();
+	private final Client client = RestClientCreator.createCached();
 	private ResultsIO resultsIO;
 
 	@Inject

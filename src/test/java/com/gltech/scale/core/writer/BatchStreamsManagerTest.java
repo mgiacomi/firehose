@@ -49,23 +49,23 @@ public class BatchStreamsManagerTest
 		ModelIO modelIO = new ModelIO();
 		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 
-		Message e1 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata0".getBytes());
+		Message e1 = new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata0".getBytes());
 		Thread.sleep(10);
-		Message e2 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata1".getBytes());
+		Message e2 = new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata1".getBytes());
 		Thread.sleep(10);
-		Message e3 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata2".getBytes());
+		Message e3 = new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata2".getBytes());
 		Thread.sleep(10);
-		Message e4 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata3".getBytes());
+		Message e4 = new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata3".getBytes());
 		Thread.sleep(10);
-		Message e5 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata4".getBytes());
+		Message e5 = new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata4".getBytes());
 		Thread.sleep(10);
-		Message e6 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata5".getBytes());
+		Message e6 = new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata5".getBytes());
 		Thread.sleep(10);
-		Message e7 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata6".getBytes());
+		Message e7 = new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata6".getBytes());
 		Thread.sleep(10);
-		Message e8 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata7".getBytes());
+		Message e8 = new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata7".getBytes());
 		Thread.sleep(10);
-		Message e9 = new Message(MediaType.APPLICATION_JSON_TYPE, "testdata8".getBytes());
+		Message e9 = new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata8".getBytes());
 
 		batch1.addMessage(modelIO.toBytes(e3));
 		batch1.addMessage(modelIO.toBytes(e5));

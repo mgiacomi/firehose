@@ -97,7 +97,7 @@ public class AggregatorIntegrationTest
 
 		// Test injecting fake events to the aggregator to make sure they are collected too.
 		AggregatorRestClient aggregatorClient = new AggregatorRestClient(new ModelIO());
-		Message backupMessage = new Message(MediaType.APPLICATION_JSON_TYPE, "event from failed server".getBytes());
+		Message backupMessage = new Message(MediaType.APPLICATION_JSON_TYPE, null, "event from failed server".getBytes());
 		aggregatorClient.postBackupMessage(aggregator, "test1", DateTime.now(), backupMessage);
 
 		Thread.sleep(5000);

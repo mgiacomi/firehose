@@ -15,7 +15,7 @@ public class ModelIOTest
 	public void testMessage()
 	{
 		ModelIO modelIO = new ModelIO();
-		Message before = new Message(MediaType.APPLICATION_JSON_TYPE, "message test 1".getBytes());
+		Message before = new Message(MediaType.APPLICATION_JSON_TYPE, null, "message test 1".getBytes());
 		String messageJson = modelIO.toJson(before);
 		Message after = modelIO.toMessage(messageJson);
 		assertEquals(before, after);

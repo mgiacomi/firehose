@@ -5,7 +5,7 @@ import com.gltech.scale.core.aggregator.BatchMemory;
 import com.gltech.scale.core.aggregator.BatchNIOFile;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.model.ChannelMetaData;
-import com.gltech.scale.util.ClientCreator;
+import com.gltech.scale.util.RestClientCreator;
 import com.gltech.scale.util.Props;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -21,7 +21,7 @@ public class LoadClient
 {
 	static public class Test
 	{
-		static private final Client client = ClientCreator.createCached();
+		static private final Client client = RestClientCreator.createCached();
 
 		public static void main(String[] args) throws Exception
 		{

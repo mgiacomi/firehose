@@ -7,7 +7,7 @@ import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.outbound.OutboundRestClient;
 import com.gltech.scale.core.server.EmbeddedServer;
-import com.gltech.scale.util.ClientCreator;
+import com.gltech.scale.util.RestClientCreator;
 import com.gltech.scale.core.model.ModelIO;
 import com.gltech.scale.util.Props;
 import com.gltech.scale.voldemort.VoldemortTestUtil;
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CoreManualRegression
 {
-	static private final Client client = ClientCreator.createCached();
+	static private final Client client = RestClientCreator.createCached();
 	static private ChannelMetaData bmd1 = new ChannelMetaData("fast", ChannelMetaData.TTL_DAY, false);
 	static private ChannelMetaData bmd2 = new ChannelMetaData("redundant", ChannelMetaData.TTL_DAY, true);
 

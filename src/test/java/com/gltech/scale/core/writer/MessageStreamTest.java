@@ -39,9 +39,9 @@ public class MessageStreamTest
 	{
 		ModelIO modelIO = new ModelIO();
 
-		batch.addMessage(modelIO.toBytes(new Message(MediaType.APPLICATION_JSON_TYPE, "testdata".getBytes())));
+		batch.addMessage(modelIO.toBytes(new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata".getBytes())));
 		Thread.sleep(5);
-		batch.addMessage(modelIO.toBytes(new Message(MediaType.APPLICATION_JSON_TYPE, "testdata2".getBytes())));
+		batch.addMessage(modelIO.toBytes(new Message(MediaType.APPLICATION_JSON_TYPE, null, "testdata2".getBytes())));
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		batch.writeMessages(bos);

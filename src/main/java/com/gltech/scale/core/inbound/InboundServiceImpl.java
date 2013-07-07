@@ -65,7 +65,7 @@ public class InboundServiceImpl implements InboundService
 		if (payload.length > maxPayLoadSize)
 		{
 			addOverSizedMessageTimeStat.startTimer();
-			message = new Message(MediaType.APPLICATION_JSON_TYPE);
+			message = new Message(MediaType.APPLICATION_JSON_TYPE, queryString, new byte[0]);
 			storageClient.putMessage(channelMetaData, message.getUuid(), payload);
 			addOverSizedMessageTimeStat.stopTimer();
 			logger.debug("Pre-storing message payload data to data store: channelName={} uuid={} bytes={}", channelName, message.getUuid(), payload.length);

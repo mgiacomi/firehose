@@ -19,7 +19,7 @@ public class MessageTest
 		registry.registerPojo(Message.class, 1);
 		Schema<Message> schema = RuntimeSchema.getSchema(Message.class);
 
-		Message before = new Message(MediaType.APPLICATION_JSON_TYPE, "my test string".getBytes());
+		Message before = new Message(MediaType.APPLICATION_JSON_TYPE, "test=yes", "my test string".getBytes());
 		byte[] json = JsonIOUtil.toByteArray(before, schema, false);
 
 		Message after = new Message();
@@ -27,6 +27,7 @@ public class MessageTest
 
 		assertEquals(before.getUuid(), after.getUuid());
 		assertEquals(before.getMimeTypeId(), after.getMimeTypeId());
+		assertEquals(before.getQueryString(), after.getQueryString());
 		assertEquals(new String(before.getPayload()), new String(after.getPayload()));
 		assertEquals(before.getReceived_at().getMillis(), after.getReceived_at().getMillis());
 	}

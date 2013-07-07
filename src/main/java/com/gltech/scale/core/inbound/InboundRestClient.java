@@ -4,7 +4,7 @@ import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.BucketMetaDataException;
 import com.gltech.scale.core.storage.DuplicateChannelException;
-import com.gltech.scale.util.ClientCreator;
+import com.gltech.scale.util.RestClientCreator;
 import com.gltech.scale.core.model.ModelIO;
 import com.google.inject.Inject;
 import com.sun.jersey.api.NotFoundException;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class InboundRestClient
 {
-	private final Client client = ClientCreator.createCached();
+	private final Client client = RestClientCreator.createCached();
 	private ModelIO modelIO;
 
 	@Inject

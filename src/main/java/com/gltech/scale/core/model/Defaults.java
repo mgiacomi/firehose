@@ -7,6 +7,8 @@ import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.stats.results.AvgStat;
 import com.gltech.scale.core.stats.results.GroupStats;
 import com.gltech.scale.core.stats.results.OverTime;
+import com.gltech.scale.core.websocket.SocketRequest;
+import com.gltech.scale.core.websocket.SocketResponse;
 import com.gltech.scale.monitoring.model.*;
 
 public class Defaults
@@ -47,5 +49,7 @@ public class Defaults
 		registry.registerPojo(ServiceMetaData.class, 10);
 		registry.registerPojo(PrimaryBackupSet.class, 11);
 		registry.registerPojo(PeriodStatus.class, 13);
+		registry.registerPojo(SocketRequest.class, 14);
+		registry.registerPojo(SocketResponse.class, 15);
 	}
 }

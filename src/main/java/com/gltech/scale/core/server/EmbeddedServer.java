@@ -1,11 +1,13 @@
 package com.gltech.scale.core.server;
 
 import ch.qos.logback.classic.Level;
+import com.gltech.scale.core.aggregator.AggregatorSocketHandler;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.outbound.OutboundService;
 import com.gltech.scale.core.stats.StatCallBack;
 import com.gltech.scale.core.stats.StatsManager;
+import com.gltech.scale.monitoring.server.StatsPushHandler;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
@@ -21,6 +23,7 @@ import com.sun.management.OperatingSystemMXBean;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -121,9 +124,24 @@ public class EmbeddedServer
 		// This is not needed if web.xml is used instead.
 		servletContextHandler.addServlet(DefaultServlet.class, "/");
 
+		// WebSocket handler (Aggregator)
+		AggregatorSocketHandler aggregatorSocketHandler = new AggregatorSocketHandler(injector);
+		ContextHandler aggregatorContextHandler = new ContextHandler();
+		aggregatorContextHandler.setContextPath("/socket/aggregator");
+		aggregatorContextHandler.setHandler(aggregatorSocketHandler);
+
 		// Bind all resources
 		HandlerCollection handlerList = new HandlerCollection();
-		handlerList.setHandlers(new Handler[]{statsHandler, servletContextHandler});
+
+		if (props.get("enable.aggregator", false))
+		{
+			handlerList.setHandlers(new Handler[]{aggregatorSocketHandler, statsHandler, servletContextHandler});
+		}
+		else
+		{
+			handlerList.setHandlers(new Handler[]{statsHandler, servletContextHandler});
+		}
+
 		server.setHandler(handlerList);
 
 		// Handle all non jersey services here

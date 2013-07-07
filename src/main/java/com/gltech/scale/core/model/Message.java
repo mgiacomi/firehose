@@ -32,26 +32,6 @@ public class Message
 		this.stored = false;
 	}
 
-	public Message(MediaType mediaType)
-	{
-		this.uuid = UUID.randomUUID().toString();
-		this.mimeTypeId = getIdForMediaType(mediaType);
-		this.queryString = null;
-		this.payload = new byte[0];
-		this.received_at = DateTime.now().getMillis();
-		this.stored = true;
-	}
-
-	public Message(MediaType mediaType, byte[] payload)
-	{
-		this.uuid = UUID.randomUUID().toString();
-		this.mimeTypeId = getIdForMediaType(mediaType);
-		this.queryString = null;
-		this.payload = payload;
-		this.received_at = DateTime.now().getMillis();
-		this.stored = false;
-	}
-
 	public Message(MediaType mediaType, String queryString, byte[] payload)
 	{
 		this.uuid = UUID.randomUUID().toString();
