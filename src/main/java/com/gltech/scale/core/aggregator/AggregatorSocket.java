@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public class AggregatorSocket
 	public void onMessage(Session session, InputStream inputStream)
 	{
 		SocketRequest socketRequest = socketIO.toSocketRequest(inputStream);
-		DateTime period = new DateTime(socketRequest.getHeader("nearestPeriodCeiling"));
+		DateTime period = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(socketRequest.getHeader("nearestPeriodCeiling"));
 		String channelName = socketRequest.getHeader("channelName");
 		byte[] data = socketRequest.getData();
 		String mode = socketRequest.getHeader("mode");

@@ -7,12 +7,12 @@ import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.storage.StorageClient;
+import com.gltech.scale.core.websocket.AggregatorClient;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
 import com.gltech.scale.core.aggregator.PrimaryBackupSet;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
-import com.gltech.scale.core.aggregator.AggregatorRestClient;
 import com.gltech.scale.core.model.ChannelMetaData;
 import com.gltech.scale.core.storage.ChannelCache;
 import com.gltech.scale.util.Props;
@@ -28,21 +28,21 @@ public class InboundServiceImpl implements InboundService
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;
 	private StorageClient storageClient;
-	private AggregatorRestClient aggregatorRestClient;
 	private ChannelCache channelCache;
+	private AggregatorClient aggregatorClient;
 	private TimePeriodUtils timePeriodUtils;
 	private AvgStatOverTime addOverSizedMessageTimeStat;
 	private Props props = Props.getProps();
 
 	@Inject
-	public InboundServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, StorageClient storageClient, AggregatorRestClient aggregatorRestClient, ChannelCache channelCache, TimePeriodUtils timePeriodUtils, StatsManager statsManager)
+	public InboundServiceImpl(ClusterService clusterService, ChannelCoordinator channelCoordinator, StorageClient storageClient, ChannelCache channelCache, TimePeriodUtils timePeriodUtils, StatsManager statsManager, AggregatorClient aggregatorClient)
 	{
 		this.clusterService = clusterService;
 		this.channelCoordinator = channelCoordinator;
 		this.storageClient = storageClient;
-		this.aggregatorRestClient = aggregatorRestClient;
 		this.channelCache = channelCache;
 		this.timePeriodUtils = timePeriodUtils;
+		this.aggregatorClient = aggregatorClient;
 
 		// Register the inbound service with the coordination service
 		clusterService.getRegistrationService().registerAsInboundService();
@@ -78,13 +78,9 @@ public class InboundServiceImpl implements InboundService
 		{
 			// This gets a primary and backup aggregator.  Each call with round robin though available sets.
 			PrimaryBackupSet primaryBackupSet = aggregatorsByPeriod.nextPrimaryBackupSet();
-			aggregatorRestClient.postMessage(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling, message);
+			aggregatorClient.sendMessage(primaryBackupSet.getPrimary(), primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling, message);
 
-			if (primaryBackupSet.getBackup() != null)
-			{
-				aggregatorRestClient.postBackupMessage(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling, message);
-			}
-			else
+			if (primaryBackupSet.getBackup() == null)
 			{
 				logger.error("BucketMetaData requires double write redundancy, but no backup aggregators are available.");
 			}
@@ -93,7 +89,7 @@ public class InboundServiceImpl implements InboundService
 		{
 			// This gets an aggregator.  Each call with round robin though all (primary and backup) rope managers.
 			ServiceMetaData aggregator = aggregatorsByPeriod.next();
-			aggregatorRestClient.postMessage(aggregator, channelName, nearestPeriodCeiling, message);
+			aggregatorClient.sendMessage(aggregator, channelName, nearestPeriodCeiling, message);
 		}
 	}
 

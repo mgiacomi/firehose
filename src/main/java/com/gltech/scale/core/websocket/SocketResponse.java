@@ -103,4 +103,13 @@ public class SocketResponse
 	{
 		return data;
 	}
+
+	public String toString()
+	{
+		return "SocketResponse{" +
+				"id=" + id +
+				", responseType=" + responseType +
+				", data=" + data +
+				'}';
+	}
 }

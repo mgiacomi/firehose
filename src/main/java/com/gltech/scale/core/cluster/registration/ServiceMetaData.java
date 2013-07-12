@@ -89,7 +89,7 @@ public class ServiceMetaData
 
 	public String toString()
 	{
-		return "AggregatorMetaData{" +
+		return "ServiceMetaData{" +
 				"workerId=" + workerId +
 				", listenAddress='" + listenAddress + '\'' +
 				", listenPort=" + listenPort +

@@ -21,7 +21,7 @@ public class AggregatorSocketTest
 		AggregatorSocket socket = new AggregatorSocket(socketState, new SocketIO());
 		socket.onConnect(getSession());
 
-		ResponseCallback callback = new ResponseCallback();
+		ResponseCallback callback = new ResponseCallback(serviceMetaData);
 		socket.send(1234, "test".getBytes(), callback);
 
 		SocketResponse response = new SocketResponse(1234, SocketResponse.ACK);

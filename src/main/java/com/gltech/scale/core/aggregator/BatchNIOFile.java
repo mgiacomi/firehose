@@ -44,11 +44,11 @@ public class BatchNIOFile implements Batch
 
 		try
 		{
-			File file = new File(directory, channelMetaData.getName() + "_" + nearestPeriodCeiling.toString("YYYY-MM-dd-HH-mm-ss"));
+			File file = new File(directory, channelMetaData.getName() + "_" + nearestPeriodCeiling.toString("yyyy-MM-dd-HH-mm-ss"));
 
 			int fileCounter = 0;
 			while(file.exists()) {
-				file = new File(directory, channelMetaData.getName() + "_" + nearestPeriodCeiling.toString("YYYY-MM-dd-HH-mm-ss") +"."+ fileCounter++);
+				file = new File(directory, channelMetaData.getName() + "_" + nearestPeriodCeiling.toString("yyyy-MM-dd-HH-mm-ss") +"."+ fileCounter++);
 			}
 
 			this.file = file;

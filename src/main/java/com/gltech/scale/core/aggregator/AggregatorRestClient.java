@@ -30,7 +30,7 @@ public class AggregatorRestClient
 
 	public void postMessage(ServiceMetaData aggregator, String channelName, DateTime dateTime, Message message)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/message/" + channelName + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss");
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/message/" + channelName + "/" + dateTime.toString("yyyy/MM/dd/HH/mm/ss");
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, modelIO.toBytes(message));
 
@@ -42,7 +42,7 @@ public class AggregatorRestClient
 
 	public void postBackupMessage(ServiceMetaData aggregator, String channelName, DateTime dateTime, Message message)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/backup/message/" + channelName + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss");
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/backup/message/" + channelName + "/" + dateTime.toString("yyyy/MM/dd/HH/mm/ss");
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, modelIO.toBytes(message));
 
@@ -56,7 +56,7 @@ public class AggregatorRestClient
 	{
 		try
 		{
-			String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/messages";
+			String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/" + dateTime.toString("yyyy/MM/dd/HH/mm/ss") + "/messages";
 			WebResource webResource = client.resource(url);
 			ClientResponse response = webResource.accept(MediaType.APPLICATION_OCTET_STREAM_TYPE).get(ClientResponse.class);
 
@@ -75,7 +75,7 @@ public class AggregatorRestClient
 
 	public InputStream getBackupBatchMessagesStream(ServiceMetaData aggregator, String channelName, DateTime dateTime)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/backup/messages";
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/" + dateTime.toString("yyyy/MM/dd/HH/mm/ss") + "/backup/messages";
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.accept(MediaType.APPLICATION_OCTET_STREAM_TYPE).get(ClientResponse.class);
 
@@ -89,7 +89,7 @@ public class AggregatorRestClient
 
 	public void clearBatch(ServiceMetaData aggregator, String channelName, DateTime dateTime)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/clear";
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/" + dateTime.toString("yyyy/MM/dd/HH/mm/ss") + "/clear";
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON_TYPE).delete(ClientResponse.class);
 
@@ -101,7 +101,7 @@ public class AggregatorRestClient
 
 	public BatchMetaData getBatchMetaData(ServiceMetaData aggregator, String channelName, DateTime dateTime)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/batch/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/metadata";
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/batch/" + dateTime.toString("yyyy/MM/dd/HH/mm/ss") + "/metadata";
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
 
@@ -115,7 +115,7 @@ public class AggregatorRestClient
 
 	public BatchMetaData getBackupBatchMetaData(ServiceMetaData aggregator, String channelName, DateTime dateTime)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/backup/batch/" + dateTime.toString("YYYY/MM/dd/HH/mm/ss") + "/metadata";
+		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/" + channelName + "/backup/batch/" + dateTime.toString("yyyy/MM/dd/HH/mm/ss") + "/metadata";
 		WebResource webResource = client.resource(url);
 		ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
 

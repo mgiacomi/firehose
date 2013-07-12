@@ -81,19 +81,19 @@ public class InboundRestClient
 
 		if (timeUnit.equals(TimeUnit.SECONDS))
 		{
-			url = url + dateTime.toString("YYYY/MM/dd/HH/mm/ss");
+			url = url + dateTime.toString("yyyy/MM/dd/HH/mm/ss");
 		}
 		else if (timeUnit.equals(TimeUnit.MINUTES))
 		{
-			url = url + dateTime.toString("YYYY/MM/dd/HH/mm");
+			url = url + dateTime.toString("yyyy/MM/dd/HH/mm");
 		}
 		else if (timeUnit.equals(TimeUnit.HOURS))
 		{
-			url = url + dateTime.toString("YYYY/MM/dd/HH");
+			url = url + dateTime.toString("yyyy/MM/dd/HH");
 		}
 		else if (timeUnit.equals(TimeUnit.DAYS))
 		{
-			url = url + dateTime.toString("YYYY/MM/dd");
+			url = url + dateTime.toString("yyyy/MM/dd");
 		}
 		else
 		{
