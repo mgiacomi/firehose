@@ -45,11 +45,14 @@ public class ResponseCallback
 
 	public boolean logErrors()
 	{
+		boolean error = false;
+
 		if (primaryResponse != null)
 		{
 			if (primaryResponse.isError())
 			{
-				logger.error("Response error from primary aggregator {}.  Error={}", primary, primaryResponse.getData());
+				logger.error("Response error from primary aggregator {}.  Error={}", primary, new String(primaryResponse.getData()));
+				error = true;
 			}
 
 			try
@@ -59,6 +62,7 @@ public class ResponseCallback
 			catch (Exception e)
 			{
 				logger.error("Failed to get future for primary aggregator {}", primary, e);
+				error = true;
 			}
 		}
 
@@ -66,7 +70,8 @@ public class ResponseCallback
 		{
 			if (backupResponse.isError())
 			{
-				logger.error("Response error from backup aggregator {}.  Error={}", backup, backupResponse.getData());
+				logger.error("Response error from backup aggregator {}.  Error={}", backup, new String(backupResponse.getData()));
+				error = true;
 			}
 
 			try
@@ -76,10 +81,11 @@ public class ResponseCallback
 			catch (Exception e)
 			{
 				logger.error("Failed to get future for backup aggregator {}", backup, e);
+				error = true;
 			}
 		}
 
-		return false;
+		return error;
 	}
 
 	public void setRequestFuture(UUID workerId, Future<Void> future)
@@ -88,13 +94,14 @@ public class ResponseCallback
 		{
 			primaryRequestFuture = future;
 		}
-
-		if (backup != null && workerId.equals(backup.getWorkerId()))
+		else if (backup != null && workerId.equals(backup.getWorkerId()))
 		{
 			backupRequestFuture = future;
 		}
-
-		throw new RuntimeException("Could not find ServiceMetaData for workerId: " + workerId);
+		else
+		{
+			throw new RuntimeException("Could not find ServiceMetaData for workerId: " + workerId);
+		}
 	}
 
 	public void setResponse(UUID workerId, SocketResponse response)
@@ -103,13 +110,14 @@ public class ResponseCallback
 		{
 			primaryResponse = response;
 		}
-
-		if (backup != null && workerId.equals(backup.getWorkerId()))
+		else if (backup != null && workerId.equals(backup.getWorkerId()))
 		{
 			backupResponse = response;
 		}
-
-		throw new RuntimeException("Could not find ServiceMetaData for workerId: " + workerId);
+		else
+		{
+			throw new RuntimeException("Could not find ServiceMetaData for workerId: " + workerId);
+		}
 	}
 
 	public ServiceMetaData getPrimary()

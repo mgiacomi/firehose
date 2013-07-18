@@ -3,13 +3,17 @@ package com.gltech.scale.core.websocket;
 import static org.mockito.Mockito.*;
 
 import static org.junit.Assert.*;
+
+import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import org.eclipse.jetty.websocket.api.*;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 import java.util.concurrent.Future;
 
 public class AggregatorSocketTest
@@ -17,12 +21,15 @@ public class AggregatorSocketTest
 	@Test
 	public void testSend() throws Exception
 	{
+		ServiceMetaData serviceMetaData = mock(ServiceMetaData.class);
+		when(serviceMetaData.getWorkerId()).thenReturn(UUID.randomUUID());
+
 		SocketState socketState = mock(SocketState.class);
-		AggregatorSocket socket = new AggregatorSocket(socketState, new SocketIO());
+		AggregatorSocket socket = new AggregatorSocket(serviceMetaData.getWorkerId(), socketState, new SocketIO());
 		socket.onConnect(getSession());
 
-		ResponseCallback callback = new ResponseCallback(serviceMetaData);
-		socket.send(1234, "test".getBytes(), callback);
+		ResponseCallback callback = new ResponseCallback(serviceMetaData, null);
+		socket.send(1234, "channel", DateTime.now(), "test".getBytes(), callback);
 
 		SocketResponse response = new SocketResponse(1234, SocketResponse.ACK);
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(response.getByteBuffer().array());
@@ -33,26 +40,26 @@ public class AggregatorSocketTest
 
 		assertTrue(callback.hasResponse());
 		assertTrue(response.isAck());
-		assertEquals(response.getId(), callback.getResponses().get(0).getId());
 	}
 
 	@Test
 	public void testSocketState() throws Exception
 	{
+		ServiceMetaData serviceMetaData = mock(ServiceMetaData.class);
 		Session session = getSession();
 		SocketState socketState = mock(SocketState.class);
-		AggregatorSocket socket = new AggregatorSocket(socketState, new SocketIO());
+		AggregatorSocket socket = new AggregatorSocket(serviceMetaData.getWorkerId(), socketState, new SocketIO());
 
 		socket.onConnect(session);
-		verify(socketState).onConnect(session);
+		verify(socketState).onConnect(serviceMetaData.getWorkerId(), session);
 
 		String reason = "becase I'm testing it";
 		socket.onClose(session, 123, reason);
-		verify(socketState).onClose(session, 123, reason);
+		verify(socketState).onClose(serviceMetaData.getWorkerId(), session, 123, reason);
 
 		IllegalStateException error = new IllegalStateException("I love creating errors");
 		socket.onError(session, error);
-		verify(socketState).onError(session, error);
+		verify(socketState).onError(serviceMetaData.getWorkerId(), session, error);
 	}
 
 	private Session getSession()
