@@ -33,7 +33,6 @@ var webSocketChannel = {
 
     _onerror : function(e) {
         console.log("WebSocket connection error. "+ e);
-        alert(e);
     },
 
     _send : function(user, message) {

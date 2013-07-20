@@ -70,15 +70,7 @@ public class AggregatorClientWebSocket implements AggregatorClient
 				return;
 			}
 
-			//Thread.yield();
-			try
-			{
-				Thread.sleep(100);
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
+			Thread.yield();
 		}
 
 		callback.logErrors();
