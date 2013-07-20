@@ -44,21 +44,21 @@ public class AggregatorClient
 		ResponseCallback callback = new ResponseCallback(primary, backup);
 
 		AggregatorSocket primarySocket = socketManager.getAggregatorSocket(primary);
-		primarySocket.send(id, channelName, nearestPeriodCeiling, messageBytes, callback);
+		primarySocket.sendPrimary(id, channelName, nearestPeriodCeiling, messageBytes, callback);
 
 		if (backup != null)
 		{
 			AggregatorSocket backupSocket = socketManager.getAggregatorSocket(backup);
-			backupSocket.send(id, channelName, nearestPeriodCeiling, messageBytes, callback);
+			backupSocket.sendBackup(id, channelName, nearestPeriodCeiling, messageBytes, callback);
 		}
 
-		long timer = System.nanoTime();
 		double elapseSeconds = 0;
 		int waitResponseSeconds = props.get("inbound.socket_wait_response_secs", Defaults.INBOUND_SOCKET_WAIT_RESPONSE_SECS);
+		long timer = System.nanoTime();
 
 		while (elapseSeconds < waitResponseSeconds)
 		{
-			elapseSeconds = (double) (System.nanoTime() - timer) / 1000000000.0;
+			elapseSeconds = (double) ((System.nanoTime() - timer)) / 1000000000.0;
 
 			if (callback.hasResponse() && callback.gotAck())
 			{
@@ -66,7 +66,15 @@ public class AggregatorClient
 				return;
 			}
 
-			Thread.yield();
+			//Thread.yield();
+			try
+			{
+				Thread.sleep(100);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
 		}
 
 		callback.logErrors();

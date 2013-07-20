@@ -4,6 +4,7 @@ import com.gltech.scale.core.websocket.SocketIO;
 import com.gltech.scale.core.websocket.SocketRequest;
 import com.gltech.scale.core.websocket.SocketResponse;
 import com.google.inject.Inject;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.joda.time.DateTime;
@@ -11,7 +12,9 @@ import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -38,31 +41,46 @@ public class AggregatorSocket
 	}
 
 	@OnWebSocketMessage
-	public void onMessage(Session session, InputStream inputStream)
+	public void onMessage(Session session, byte buffer[], int offset, int length)
 	{
-		SocketRequest socketRequest = socketIO.toSocketRequest(inputStream);
+		byte[] requestData = new byte[length];
+		System.arraycopy(buffer, offset, requestData, 0, length);
+
+		SocketRequest socketRequest = socketIO.toSocketRequest(requestData);
 		DateTime period = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(socketRequest.getHeader("nearestPeriodCeiling"));
 		String channelName = socketRequest.getHeader("channelName");
-		byte[] data = socketRequest.getData();
 		String mode = socketRequest.getHeader("mode");
+		byte[] data = socketRequest.getData();
 
 		try
 		{
-			if("primary".equalsIgnoreCase(mode))
+			if ("primary".equalsIgnoreCase(mode))
 			{
 				aggregator.addMessage(channelName, data, period);
 			}
-			if("backup".equalsIgnoreCase(mode))
+			else if ("backup".equalsIgnoreCase(mode))
 			{
 				aggregator.addBackupMessage(channelName, data, period);
 			}
+			else {
+				throw new RuntimeException("Mode must be either set to 'primary' or 'backup'.  Message was ignored.");
+			}
 
-			session.getRemote().sendBytesByFuture(new SocketResponse(0, SocketResponse.ACK).getByteBuffer());
+			ByteBuffer response = new SocketResponse(socketRequest.getId(), SocketResponse.ACK).getByteBuffer();
+			session.getRemote().sendBytes(response);
 		}
 		catch (Exception e)
 		{
-			SocketResponse socketResponse = new SocketResponse(0, SocketResponse.ERROR, e.getMessage().getBytes());
-			session.getRemote().sendBytesByFuture(socketResponse.getByteBuffer());
+			SocketResponse socketResponse = new SocketResponse(socketRequest.getId(), SocketResponse.ERROR, e.getMessage().getBytes());
+
+			try
+			{
+				session.getRemote().sendBytes(socketResponse.getByteBuffer());
+			}
+			catch (IOException ioe)
+			{
+				logger.error("Failed to return error back over WebSocket {}", session.getRemoteAddress(), ioe);
+			}
 		}
 	}
 

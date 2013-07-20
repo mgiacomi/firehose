@@ -3,20 +3,17 @@ package com.gltech.scale.core.websocket;
 import com.google.common.base.Throwables;
 import com.google.common.collect.MapMaker;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.*;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 
+@WebSocket
 public class AggregatorSocket
 {
 	private static final Logger logger = LoggerFactory.getLogger(AggregatorSocket.class);
@@ -33,11 +30,22 @@ public class AggregatorSocket
 		this.socketIO = socketIO;
 	}
 
-	public void send(int id, String channelName, DateTime nearestPeriodCeiling, byte[] message, ResponseCallback callback)
+	public void sendPrimary(int id, String channelName, DateTime nearestPeriodCeiling, byte[] message, ResponseCallback callback)
+	{
+		send(id, channelName, nearestPeriodCeiling, "primary", message, callback);
+	}
+
+	public void sendBackup(int id, String channelName, DateTime nearestPeriodCeiling, byte[] message, ResponseCallback callback)
+	{
+		send(id, channelName, nearestPeriodCeiling, "backup", message, callback);
+	}
+
+	private void send(int id, String channelName, DateTime nearestPeriodCeiling, String mode, byte[] message, ResponseCallback callback)
 	{
 		try
 		{
 			SocketRequest request = new SocketRequest(id, message);
+			request.addHeader("mode", mode);
 			request.addHeader("channelName", channelName);
 			request.addHeader("nearestPeriodCeiling", nearestPeriodCeiling.toString("yyyyMMddHHmmss"));
 
@@ -55,17 +63,27 @@ public class AggregatorSocket
 	}
 
 	@OnWebSocketMessage
-	public void onMessage(InputStream inputStream)
+	public void onMessage(byte buffer[], int offset, int length)
 	{
-		SocketResponse response = new SocketResponse(inputStream);
-
 		try
 		{
-			callbackMap.get(response.getId()).setResponse(workerId, response);
+			byte[] responseData = new byte[length];
+			System.arraycopy(buffer, offset, responseData, 0, length);
+
+			SocketResponse response = new SocketResponse(responseData);
+
+			try
+			{
+				callbackMap.get(response.getId()).setResponse(workerId, response);
+			}
+			catch (NullPointerException e)
+			{
+				// If we get an NPE it just means the reference has been garbage collected which is fine.
+			}
 		}
-		catch (NullPointerException e)
+		catch (Exception e)
 		{
-			// If we get an NPE it just means the reference has been garbage collected which is fine.
+			logger.error("Failed to read SocketResponse.", e);
 		}
 	}
 

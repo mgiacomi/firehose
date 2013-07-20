@@ -36,7 +36,7 @@ public class AggregatorRestClient
 
 		if (response.getStatus() != 202)
 		{
-			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() +" - "+ url);
+			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() + " - " + url);
 		}
 	}
 
@@ -48,7 +48,7 @@ public class AggregatorRestClient
 
 		if (response.getStatus() != 202)
 		{
-			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() +" - "+ url);
+			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() + " - " + url);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class AggregatorRestClient
 
 			if (response.getStatus() != 200)
 			{
-				throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() +" - "+ url);
+				throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() + " - " + url);
 			}
 
 			return response.getEntityInputStream();
@@ -81,7 +81,7 @@ public class AggregatorRestClient
 
 		if (response.getStatus() != 200)
 		{
-			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() +" - "+ url);
+			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() + " - " + url);
 		}
 
 		return response.getEntityInputStream();
@@ -95,7 +95,7 @@ public class AggregatorRestClient
 
 		if (response.getStatus() != 200)
 		{
-			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() +" - "+ url);
+			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() + " - " + url);
 		}
 	}
 
@@ -107,7 +107,7 @@ public class AggregatorRestClient
 
 		if (response.getStatus() != 200)
 		{
-			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() +" - "+ url);
+			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() + " - " + url);
 		}
 
 		return modelIO.toBatchMetaData(response.getEntity(String.class));
@@ -121,7 +121,7 @@ public class AggregatorRestClient
 
 		if (response.getStatus() != 200)
 		{
-			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() +" - "+ url);
+			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() + " - " + url);
 		}
 
 		return modelIO.toBatchMetaData(response.getEntity(String.class));

@@ -49,7 +49,6 @@ public class SocketResponseTest
 
 	private SocketResponse toAndBack(SocketResponse response)
 	{
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(response.getByteBuffer().array());
-		return new SocketResponse(inputStream);
+		return new SocketResponse(response.getByteBuffer().array());
 	}
 }

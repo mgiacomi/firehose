@@ -28,27 +28,18 @@ public class SocketResponse
 	private final int responseType;
 	private final byte[] data;
 
-	public SocketResponse(InputStream inputStream)
+	public SocketResponse(byte[] bytes)
 	{
-		try
+		if (bytes.length < 5)
 		{
-			byte[] bytes = IOUtils.toByteArray(inputStream);
-
-			if(bytes.length < 5)
-			{
-				throw new RuntimeException("Malformed response with only "+ bytes.length +" bytes.");
-			}
-
-			ByteBuffer buffer = ByteBuffer.wrap(bytes);
-			this.id = buffer.getInt();
-			this.responseType = buffer.get();
-			this.data = new byte[bytes.length-5];
-			buffer.get(this.data);
+			throw new RuntimeException("Malformed response with only " + bytes.length + " bytes.");
 		}
-		catch (IOException e)
-		{
-			throw Throwables.propagate(e);
-		}
+
+		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		this.id = buffer.getInt();
+		this.responseType = buffer.get();
+		this.data = new byte[bytes.length - 5];
+		buffer.get(this.data);
 	}
 
 
@@ -66,15 +57,18 @@ public class SocketResponse
 		this.data = data;
 	}
 
-	public ByteBuffer getByteBuffer() {
-		ByteBuffer buffer = ByteBuffer.allocate(5+ data.length);
+	public ByteBuffer getByteBuffer()
+	{
+		ByteBuffer buffer = ByteBuffer.allocate(5 + data.length);
 		buffer.putInt(id);
-		buffer.put((byte)responseType);
+		buffer.put((byte) responseType);
 
-		if(data.length > 0)
+		if (data.length > 0)
 		{
 			buffer.put(data);
 		}
+
+		buffer.rewind();
 
 		return buffer;
 	}

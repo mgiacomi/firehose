@@ -29,14 +29,12 @@ public class AggregatorSocketTest
 		socket.onConnect(getSession());
 
 		ResponseCallback callback = new ResponseCallback(serviceMetaData, null);
-		socket.send(1234, "channel", DateTime.now(), "test".getBytes(), callback);
-
-		SocketResponse response = new SocketResponse(1234, SocketResponse.ACK);
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(response.getByteBuffer().array());
+		socket.sendPrimary(1234, "channel", DateTime.now(), "test".getBytes(), callback);
 
 		assertFalse(callback.hasResponse());
 
-		socket.onMessage(inputStream);
+		SocketResponse response = new SocketResponse(1234, SocketResponse.ACK);
+		socket.onMessage(response.getByteBuffer().array(), 0, response.getByteBuffer().array().length);
 
 		assertTrue(callback.hasResponse());
 		assertTrue(response.isAck());

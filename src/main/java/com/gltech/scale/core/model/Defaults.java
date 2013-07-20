@@ -30,7 +30,7 @@ public class Defaults
 	static public final int STATS_MANAGER_CLEANUP_RUN_EVERY_X_MINS = 5;
 	static public final int STATS_MANAGER_CALLBACK_RUN_EVERY_X_SECONDS = 5;
 	static public final String CHANNEL_BATCH_TYPE = "file";
-	static public final String CHANNEL_FILE_DIR = System.getProperty("java.io.tmpdir") +"/channels";
+	static public final String CHANNEL_FILE_DIR = System.getProperty("java.io.tmpdir") + "/channels";
 
 	// Monitoring
 	static public final int GATHER_SERVICE_RUN_EVERY_X_SECONDS = 3;

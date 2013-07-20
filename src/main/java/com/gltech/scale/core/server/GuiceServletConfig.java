@@ -14,6 +14,8 @@ import com.gltech.scale.core.storage.providers.ThrowAwayStore;
 import com.gltech.scale.core.storage.providers.VoldemortStore;
 import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.stats.StatsManagerImpl;
+import com.gltech.scale.core.websocket.SocketManager;
+import com.gltech.scale.core.websocket.SocketManagerImpl;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -70,6 +72,7 @@ public class GuiceServletConfig extends GuiceServletContextListener
 					if (props.get("enable.inbound_service", false))
 					{
 						bind(InboundResource.class);
+						bind(SocketManager.class).to(SocketManagerImpl.class).in(Singleton.class);
 						bind(InboundService.class).to(InboundServiceStats.class).in(Singleton.class);
 						bind(InboundService.class).annotatedWith(Names.named(InboundServiceStats.BASE)).to(InboundServiceImpl.class).in(Singleton.class);
 					}

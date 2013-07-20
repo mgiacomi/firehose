@@ -40,7 +40,7 @@ public class ChannelImpl implements Channel
 			clusterService.registerBatch(channelMetaData, nearestPeriodCeiling);
 
 			Batch newBatch;
-			if("memory".equals(props.get("channel_batch_type", Defaults.CHANNEL_BATCH_TYPE)))
+			if ("memory".equals(props.get("channel_batch_type", Defaults.CHANNEL_BATCH_TYPE)))
 			{
 				newBatch = new BatchMemory(channelMetaData, nearestPeriodCeiling);
 			}
@@ -73,7 +73,7 @@ public class ChannelImpl implements Channel
 			clusterService.registerBatch(channelMetaData, nearestPeriodCeiling);
 
 			Batch newBatch;
-			if("memory".equals(props.get("channel_batch_type", Defaults.CHANNEL_BATCH_TYPE)))
+			if ("memory".equals(props.get("channel_batch_type", Defaults.CHANNEL_BATCH_TYPE)))
 			{
 				newBatch = new BatchMemory(channelMetaData, nearestPeriodCeiling);
 			}
@@ -125,7 +125,7 @@ public class ChannelImpl implements Channel
 	@Override
 	public void clear(DateTime nearestPeriodCeiling)
 	{
-		if(batches.containsKey(nearestPeriodCeiling))
+		if (batches.containsKey(nearestPeriodCeiling))
 		{
 			batches.get(nearestPeriodCeiling).clear();
 			batches.remove(nearestPeriodCeiling);
@@ -136,7 +136,7 @@ public class ChannelImpl implements Channel
 	@Override
 	public void clearBackup(DateTime nearestPeriodCeiling)
 	{
-		if(backupBatches.containsKey(nearestPeriodCeiling))
+		if (backupBatches.containsKey(nearestPeriodCeiling))
 		{
 			backupBatches.get(nearestPeriodCeiling).clear();
 			backupBatches.remove(nearestPeriodCeiling);
