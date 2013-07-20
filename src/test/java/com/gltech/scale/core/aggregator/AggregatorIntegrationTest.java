@@ -96,9 +96,9 @@ public class AggregatorIntegrationTest
 		DateTime first = DateTime.now();
 
 		// Test injecting fake events to the aggregator to make sure they are collected too.
-		AggregatorRestClient aggregatorClient = new AggregatorRestClient(new ModelIO());
+		AggregatorClientRest aggregatorClientRest = new AggregatorClientRest(new ModelIO());
 		Message backupMessage = new Message(MediaType.APPLICATION_JSON_TYPE, null, "event from failed server".getBytes());
-		aggregatorClient.postBackupMessage(aggregator, "test1", DateTime.now(), backupMessage);
+		aggregatorClientRest.sendMessage(aggregator, "test1", DateTime.now(), backupMessage);
 
 		Thread.sleep(5000);
 
@@ -109,7 +109,7 @@ public class AggregatorIntegrationTest
 		DateTime second = DateTime.now();
 
 		// Get first set of messages
-		InputStream inputStream = aggregatorClient.getBatchMessagesStream(aggregator, "test1", first);
+		InputStream inputStream = aggregatorClientRest.getBatchMessagesStream(aggregator, "test1", first);
 		CodedInputStream codedInputStream = CodedInputStream.newInstance(inputStream);
 
 		List<Message> messages = new ArrayList<>();
@@ -130,7 +130,7 @@ public class AggregatorIntegrationTest
 		}
 
 		// Get Second set of messages
-		inputStream = aggregatorClient.getBatchMessagesStream(aggregator, "test1", second);
+		inputStream = aggregatorClientRest.getBatchMessagesStream(aggregator, "test1", second);
 		codedInputStream = CodedInputStream.newInstance(inputStream);
 
 		messages = new ArrayList<>();
@@ -151,7 +151,7 @@ public class AggregatorIntegrationTest
 		}
 
 		// Get backup messages
-		inputStream = aggregatorClient.getBackupBatchMessagesStream(aggregator, "test", first);
+		inputStream = aggregatorClientRest.getBackupBatchMessagesStream(aggregator, "test", first);
 		codedInputStream = CodedInputStream.newInstance(inputStream);
 
 		messages = new ArrayList<>();

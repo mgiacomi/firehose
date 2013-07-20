@@ -16,39 +16,59 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 
-public class AggregatorRestClient
+public class AggregatorClientRest implements AggregatorClient
 {
-	private static final Logger logger = LoggerFactory.getLogger(AggregatorRestClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(AggregatorClientRest.class);
 	private final Client client = RestClientCreator.createCached();
 	private ModelIO modelIO;
 
 	@Inject
-	public AggregatorRestClient(ModelIO modelIO)
+	public AggregatorClientRest(ModelIO modelIO)
 	{
 		this.modelIO = modelIO;
 	}
 
-	public void postMessage(ServiceMetaData aggregator, String channelName, DateTime dateTime, Message message)
+	@Override
+	public void sendMessage(ServiceMetaData primary, String channelName, DateTime nearestPeriodCeiling, Message message)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/message/" + channelName + "/" + dateTime.toString("yyyy/MM/dd/HH/mm/ss");
-		WebResource webResource = client.resource(url);
-		ClientResponse response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, modelIO.toBytes(message));
-
-		if (response.getStatus() != 202)
-		{
-			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() + " - " + url);
-		}
+		sendMessage(primary, null, channelName, nearestPeriodCeiling, message);
 	}
 
-	public void postBackupMessage(ServiceMetaData aggregator, String channelName, DateTime dateTime, Message message)
+	@Override
+	public void sendMessage(ServiceMetaData primary, ServiceMetaData backup, String channelName, DateTime nearestPeriodCeiling, Message message)
 	{
-		String url = "http://" + aggregator.getListenAddress() + ":" + aggregator.getListenPort() + "/aggregator/backup/message/" + channelName + "/" + dateTime.toString("yyyy/MM/dd/HH/mm/ss");
+		String primaryError = null;
+		String backupError = null;
+
+		byte[] data = modelIO.toBytes(message);
+
+		String url = "http://" + primary.getListenAddress() + ":" + primary.getListenPort() + "/aggregator/message/" + channelName + "/" + nearestPeriodCeiling.toString("yyyy/MM/dd/HH/mm/ss");
 		WebResource webResource = client.resource(url);
-		ClientResponse response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, modelIO.toBytes(message));
+		ClientResponse response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, data);
 
 		if (response.getStatus() != 202)
 		{
-			throw new RuntimeException("Failed : HTTP error code: " + response.getStatus() + " - " + url);
+			primaryError = "Failed : HTTP error code: " + response.getStatus() + " - " + url;
+			logger.error(primaryError);
+		}
+
+		if(backup != null)
+		{
+			url = "http://" + backup.getListenAddress() + ":" + backup.getListenPort() + "/aggregator/backup/message/" + channelName + "/" + nearestPeriodCeiling.toString("yyyy/MM/dd/HH/mm/ss");
+			webResource = client.resource(url);
+			response = webResource.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(ClientResponse.class, data);
+
+			if (response.getStatus() != 202)
+			{
+				backupError = "Failed : HTTP error code: " + response.getStatus() + " - " + url;
+				logger.error(backupError);
+			}
+		}
+
+
+		if(primaryError != null && backupError != null)
+		{
+			throw new RuntimeException("Primary and backup aggregators failed to accept message");
 		}
 	}
 

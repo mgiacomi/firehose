@@ -11,7 +11,7 @@ import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.aggregator.PrimaryBackupSet;
-import com.gltech.scale.core.aggregator.AggregatorRestClient;
+import com.gltech.scale.core.aggregator.AggregatorClientRest;
 import com.gltech.scale.core.model.ChannelMetaData;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -27,7 +27,7 @@ public class BatchWriterImpl implements BatchWriter
 	private static final Logger logger = LoggerFactory.getLogger(BatchWriterImpl.class);
 	private DateTime nearestPeriodCeiling;
 	private ChannelMetaData channelMetaData;
-	private AggregatorRestClient aggregatorRestClient;
+	private AggregatorClientRest aggregatorClientRest;
 	private StorageClient storageClient;
 	private ClusterService clusterService;
 	private ChannelCoordinator channelCoordinator;
@@ -37,9 +37,9 @@ public class BatchWriterImpl implements BatchWriter
 	private CountStatOverTime bytesWrittenStat;
 
 	@Inject
-	public BatchWriterImpl(AggregatorRestClient aggregatorRestClient, StorageClient storageClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
+	public BatchWriterImpl(AggregatorClientRest aggregatorClientRest, StorageClient storageClient, ClusterService clusterService, ChannelCoordinator channelCoordinator)
 	{
-		this.aggregatorRestClient = aggregatorRestClient;
+		this.aggregatorClientRest = aggregatorClientRest;
 		this.storageClient = storageClient;
 		this.clusterService = clusterService;
 		this.channelCoordinator = channelCoordinator;
@@ -78,13 +78,13 @@ public class BatchWriterImpl implements BatchWriter
 			{
 				if (channelMetaData.isRedundant())
 				{
-					BatchMetaData primaryMetaData = aggregatorRestClient.getBatchMetaData(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
+					BatchMetaData primaryMetaData = aggregatorClientRest.getBatchMetaData(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
 
 					aggregators.add(primaryBackupSet.getPrimary());
 
 					if (primaryBackupSet.getBackup() != null)
 					{
-						BatchMetaData backupMetaData = aggregatorRestClient.getBackupBatchMetaData(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
+						BatchMetaData backupMetaData = aggregatorClientRest.getBackupBatchMetaData(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
 
 						// If there is any discrepancy between the primary and backup rope for a double write bucket,
 						// then pull both and let BatchStreamsManager figure it out. Otherwise only primary is used.
@@ -113,7 +113,7 @@ public class BatchWriterImpl implements BatchWriter
 			// Register aggregator streams with the stream manager.
 			for (ServiceMetaData aggregator : aggregators)
 			{
-				InputStream aggregatorStream = aggregatorRestClient.getBatchMessagesStream(aggregator, channelName, nearestPeriodCeiling);
+				InputStream aggregatorStream = aggregatorClientRest.getBatchMessagesStream(aggregator, channelName, nearestPeriodCeiling);
 				batchStreamsManager.registerInputStream(aggregatorStream);
 			}
 
@@ -139,7 +139,7 @@ public class BatchWriterImpl implements BatchWriter
 				// Aggregator can now remove the batch
 				try
 				{
-					aggregatorRestClient.clearBatch(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
+					aggregatorClientRest.clearBatch(primaryBackupSet.getPrimary(), channelName, nearestPeriodCeiling);
 				}
 				catch (Exception e)
 				{
@@ -150,7 +150,7 @@ public class BatchWriterImpl implements BatchWriter
 				{
 					try
 					{
-						aggregatorRestClient.clearBatch(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
+						aggregatorClientRest.clearBatch(primaryBackupSet.getBackup(), channelName, nearestPeriodCeiling);
 					}
 					catch (Exception e)
 					{

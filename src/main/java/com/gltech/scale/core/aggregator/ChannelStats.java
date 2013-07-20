@@ -5,14 +5,12 @@ import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.stats.StatCallBack;
 import com.gltech.scale.core.stats.StatsManager;
-import com.gltech.scale.util.Props;
 import org.joda.time.DateTime;
 
 import java.util.Collection;
 
 public class ChannelStats implements Channel
 {
-	private Props props = Props.getProps();
 	private final Channel channel;
 	private AvgStatOverTime addMessageSizeStat;
 	private AvgStatOverTime addBackupMessageSizeStat;
@@ -124,6 +122,7 @@ public class ChannelStats implements Channel
 	public void addBackupMessage(byte[] bytes, DateTime nearestPeriodCeiling)
 	{
 		channel.addBackupMessage(bytes, nearestPeriodCeiling);
+System.out.println(addBackupMessageSizeStat +" : "+ (bytes == null));
 		addBackupMessageSizeStat.add(bytes.length);
 	}
 
