@@ -21,13 +21,11 @@ public class AggregatorSocket
 	private SocketState socketState;
 	private UUID workerId;
 	private Session session;
-	private SocketIO socketIO;
 
-	public AggregatorSocket(UUID workerId, SocketState socketState, SocketIO socketIO)
+	public AggregatorSocket(UUID workerId, SocketState socketState)
 	{
 		this.workerId = workerId;
 		this.socketState = socketState;
-		this.socketIO = socketIO;
 	}
 
 	public void sendPrimary(int id, String channelName, DateTime nearestPeriodCeiling, byte[] message, ResponseCallback callback)
@@ -42,18 +40,16 @@ public class AggregatorSocket
 
 	private void send(int id, String channelName, DateTime nearestPeriodCeiling, String mode, byte[] message, ResponseCallback callback)
 	{
+		int mode_i = "primary".equalsIgnoreCase(mode) ? 0 : 1;
+
 		try
 		{
-			SocketRequest request = new SocketRequest(id, message);
-			request.addHeader("mode", mode);
-			request.addHeader("channelName", channelName);
-			request.addHeader("nearestPeriodCeiling", nearestPeriodCeiling.toString("yyyyMMddHHmmss"));
+			SocketRequest request = new SocketRequest(id, mode_i, channelName, nearestPeriodCeiling, message);
 
 			// Register our callback for returning response
 			callbackMap.put(id, callback);
 
-			ByteBuffer buffer = ByteBuffer.wrap(socketIO.toBytes(request));
-			Future<Void> future = session.getRemote().sendBytesByFuture(buffer);
+			Future<Void> future = session.getRemote().sendBytesByFuture(request.getByteBuffer());
 			callback.setRequestFuture(workerId, future);
 		}
 		catch (Exception e)

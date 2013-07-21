@@ -5,7 +5,6 @@ import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.lifecycle.LifeCycle;
 import com.gltech.scale.util.Props;
 import com.google.common.base.Throwables;
-import com.google.inject.Inject;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -22,14 +21,7 @@ public class SocketManagerImpl implements SocketManager, SocketState, LifeCycle
 	private static final Logger logger = LoggerFactory.getLogger(SocketManagerImpl.class);
 	private ConcurrentMap<UUID, AggregatorSocketData> aggregatorMap = new ConcurrentHashMap<>();
 	private static final Object socketCreationLock = new Object();
-	private SocketIO socketIO;
 	private Props props = Props.getProps();
-
-	@Inject
-	public SocketManagerImpl(SocketIO socketIO)
-	{
-		this.socketIO = socketIO;
-	}
 
 	@Override
 	public AggregatorSocket getAggregatorSocket(ServiceMetaData serviceMetaData)
@@ -45,7 +37,7 @@ public class SocketManagerImpl implements SocketManager, SocketState, LifeCycle
 					{
 						String destUri = "ws://" + serviceMetaData.getListenAddress() + ":" + serviceMetaData.getListenPort() + "/socket/aggregator";
 						WebSocketClient client = new WebSocketClient();
-						AggregatorSocket socket = new AggregatorSocket(serviceMetaData.getWorkerId(), this, socketIO);
+						AggregatorSocket socket = new AggregatorSocket(serviceMetaData.getWorkerId(), this);
 
 						try
 						{

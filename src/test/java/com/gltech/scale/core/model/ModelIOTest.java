@@ -1,10 +1,7 @@
 package com.gltech.scale.core.model;
 
-import com.gltech.scale.core.model.Message;
-
 import static junit.framework.Assert.*;
 
-import com.gltech.scale.core.model.ModelIO;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;

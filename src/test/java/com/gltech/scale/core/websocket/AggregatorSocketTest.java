@@ -9,7 +9,6 @@ import org.eclipse.jetty.websocket.api.*;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -25,7 +24,7 @@ public class AggregatorSocketTest
 		when(serviceMetaData.getWorkerId()).thenReturn(UUID.randomUUID());
 
 		SocketState socketState = mock(SocketState.class);
-		AggregatorSocket socket = new AggregatorSocket(serviceMetaData.getWorkerId(), socketState, new SocketIO());
+		AggregatorSocket socket = new AggregatorSocket(serviceMetaData.getWorkerId(), socketState);
 		socket.onConnect(getSession());
 
 		ResponseCallback callback = new ResponseCallback(serviceMetaData, null);
@@ -46,7 +45,7 @@ public class AggregatorSocketTest
 		ServiceMetaData serviceMetaData = mock(ServiceMetaData.class);
 		Session session = getSession();
 		SocketState socketState = mock(SocketState.class);
-		AggregatorSocket socket = new AggregatorSocket(serviceMetaData.getWorkerId(), socketState, new SocketIO());
+		AggregatorSocket socket = new AggregatorSocket(serviceMetaData.getWorkerId(), socketState);
 
 		socket.onConnect(session);
 		verify(socketState).onConnect(serviceMetaData.getWorkerId(), session);

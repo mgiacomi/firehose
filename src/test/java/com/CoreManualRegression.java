@@ -38,7 +38,7 @@ public class CoreManualRegression
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/primary_server.properties");
 
 			TestingServer testingServer = new TestingServer(21818);
-			VoldemortTestUtil.start();
+			//VoldemortTestUtil.start();
 
 			EmbeddedServer.start(9090);
 
@@ -129,7 +129,7 @@ public class CoreManualRegression
 		{
 			try
 			{
-				CreateBuckets.main(null);
+//				CreateBuckets.main(null);
 			}
 			catch (Exception e)
 			{
@@ -143,8 +143,10 @@ public class CoreManualRegression
 			int counter = 0;
 			while (true)
 			{
-				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "fast", String.valueOf(counter + "a"));
-				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "redundant", String.valueOf(counter + "b"));
+				postEvent("http://localhost:9090", "fast", String.valueOf(counter + "a"));
+//				postEvent("http://localhost:9090", "redundant", String.valueOf(counter + "b"));
+//				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "fast", String.valueOf(counter + "a"));
+//				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "redundant", String.valueOf(counter + "b"));
 //				Thread.sleep(5);
 				counter++;
 			}

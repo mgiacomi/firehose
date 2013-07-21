@@ -1,19 +1,14 @@
 package com.gltech.scale.core.aggregator;
 
-import com.gltech.scale.core.websocket.SocketIO;
 import com.gltech.scale.core.websocket.SocketRequest;
 import com.gltech.scale.core.websocket.SocketResponse;
 import com.google.inject.Inject;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -24,13 +19,11 @@ public class AggregatorSocket
 	private static final Logger logger = LoggerFactory.getLogger(AggregatorSocket.class);
 	private final Set<Session> sessions = new CopyOnWriteArraySet<>();
 	private Aggregator aggregator;
-	private SocketIO socketIO;
 
 	@Inject
-	public AggregatorSocket(Aggregator aggregator, SocketIO socketIO)
+	public AggregatorSocket(Aggregator aggregator)
 	{
 		this.aggregator = aggregator;
-		this.socketIO = socketIO;
 	}
 
 	@OnWebSocketConnect
@@ -46,32 +39,24 @@ public class AggregatorSocket
 		byte[] requestData = new byte[length];
 		System.arraycopy(buffer, offset, requestData, 0, length);
 
-		SocketRequest socketRequest = socketIO.toSocketRequest(requestData);
-		DateTime period = DateTimeFormat.forPattern("yyyyMMddHHmmss").parseDateTime(socketRequest.getHeader("nearestPeriodCeiling"));
-		String channelName = socketRequest.getHeader("channelName");
-		String mode = socketRequest.getHeader("mode");
-		byte[] data = socketRequest.getData();
+		SocketRequest request = new SocketRequest(requestData);
 
 		try
 		{
-			if ("primary".equalsIgnoreCase(mode))
+			if (request.isPrimary())
 			{
-				aggregator.addMessage(channelName, data, period);
-			}
-			else if ("backup".equalsIgnoreCase(mode))
-			{
-				aggregator.addBackupMessage(channelName, data, period);
+				aggregator.addMessage(request.getChannelName(), request.getData(), request.getPeriod());
 			}
 			else {
-				throw new RuntimeException("Mode must be either set to 'primary' or 'backup'.  Message was ignored.");
+				aggregator.addBackupMessage(request.getChannelName(), request.getData(), request.getPeriod());
 			}
 
-			ByteBuffer response = new SocketResponse(socketRequest.getId(), SocketResponse.ACK).getByteBuffer();
+			ByteBuffer response = new SocketResponse(request.getId(), SocketResponse.ACK).getByteBuffer();
 			session.getRemote().sendBytes(response);
 		}
 		catch (Exception e)
 		{
-			SocketResponse socketResponse = new SocketResponse(socketRequest.getId(), SocketResponse.ERROR, e.getMessage().getBytes());
+			SocketResponse socketResponse = new SocketResponse(request.getId(), SocketResponse.ERROR, e.getMessage().getBytes());
 
 			try
 			{
