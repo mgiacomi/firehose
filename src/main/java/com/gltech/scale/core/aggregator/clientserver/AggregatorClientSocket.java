@@ -1,5 +1,9 @@
-package com.gltech.scale.core.websocket;
+package com.gltech.scale.core.aggregator.clientserver;
 
+import com.gltech.scale.core.websocket.ResponseCallback;
+import com.gltech.scale.core.websocket.SocketRequest;
+import com.gltech.scale.core.websocket.SocketResponse;
+import com.gltech.scale.core.websocket.SocketState;
 import com.google.common.base.Throwables;
 import com.google.common.collect.MapMaker;
 import org.eclipse.jetty.websocket.api.Session;
@@ -8,21 +12,20 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.ByteBuffer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 
 @WebSocket
-public class AggregatorSocket
+public class AggregatorClientSocket
 {
-	private static final Logger logger = LoggerFactory.getLogger(AggregatorSocket.class);
+	private static final Logger logger = LoggerFactory.getLogger(AggregatorClientSocket.class);
 	private ConcurrentMap<Integer, ResponseCallback> callbackMap = new MapMaker().concurrencyLevel(16).weakValues().makeMap();
 	private SocketState socketState;
 	private UUID workerId;
 	private Session session;
 
-	public AggregatorSocket(UUID workerId, SocketState socketState)
+	public AggregatorClientSocket(UUID workerId, SocketState socketState)
 	{
 		this.workerId = workerId;
 		this.socketState = socketState;

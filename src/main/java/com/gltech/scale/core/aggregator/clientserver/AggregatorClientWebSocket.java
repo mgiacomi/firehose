@@ -1,4 +1,4 @@
-package com.gltech.scale.core.aggregator;
+package com.gltech.scale.core.aggregator.clientserver;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.Defaults;
@@ -7,6 +7,7 @@ import com.gltech.scale.core.model.ModelIO;
 import com.gltech.scale.core.websocket.ResponseCallback;
 import com.gltech.scale.core.websocket.SocketManager;
 import com.gltech.scale.util.Props;
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -47,13 +48,13 @@ public class AggregatorClientWebSocket implements AggregatorClient
 		byte[] messageBytes = modelIO.toBytes(message);
 		ResponseCallback callback = new ResponseCallback(primary, backup);
 
-		com.gltech.scale.core.websocket.AggregatorSocket primarySocket = socketManager.getAggregatorSocket(primary);
-		primarySocket.sendPrimary(id, channelName, nearestPeriodCeiling, messageBytes, callback);
+		AggregatorClientSocket primaryClientSocket = socketManager.getAggregatorSocket(primary);
+		primaryClientSocket.sendPrimary(id, channelName, nearestPeriodCeiling, messageBytes, callback);
 
 		if (backup != null)
 		{
-			com.gltech.scale.core.websocket.AggregatorSocket backupSocket = socketManager.getAggregatorSocket(backup);
-			backupSocket.sendBackup(id, channelName, nearestPeriodCeiling, messageBytes, callback);
+			AggregatorClientSocket backupClientSocket = socketManager.getAggregatorSocket(backup);
+			backupClientSocket.sendBackup(id, channelName, nearestPeriodCeiling, messageBytes, callback);
 		}
 
 		double elapseSeconds = 0;
@@ -70,7 +71,14 @@ public class AggregatorClientWebSocket implements AggregatorClient
 				return;
 			}
 
-			Thread.yield();
+			try
+			{
+				Thread.sleep(1);
+			}
+			catch (InterruptedException e)
+			{
+				throw Throwables.propagate(e);
+			}
 		}
 
 		callback.logErrors();

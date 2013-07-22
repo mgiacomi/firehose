@@ -1,5 +1,6 @@
 package com.gltech.scale.core.aggregator;
 
+import com.gltech.scale.core.aggregator.clientserver.AggregatorClientRest;
 import com.gltech.scale.core.inbound.InboundRestClient;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.model.Message;

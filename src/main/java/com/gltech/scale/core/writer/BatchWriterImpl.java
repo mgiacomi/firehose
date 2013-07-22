@@ -11,7 +11,7 @@ import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.aggregator.PrimaryBackupSet;
-import com.gltech.scale.core.aggregator.AggregatorClientRest;
+import com.gltech.scale.core.aggregator.clientserver.AggregatorClientRest;
 import com.gltech.scale.core.model.ChannelMetaData;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;

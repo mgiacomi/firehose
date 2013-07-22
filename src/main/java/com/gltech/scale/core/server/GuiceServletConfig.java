@@ -1,5 +1,8 @@
 package com.gltech.scale.core.server;
 
+import com.gltech.scale.core.aggregator.clientserver.AggregatorClient;
+import com.gltech.scale.core.aggregator.clientserver.AggregatorClientRest;
+import com.gltech.scale.core.aggregator.clientserver.AggregatorClientWebSocket;
 import com.gltech.scale.core.cluster.*;
 import com.gltech.scale.core.inbound.InboundServiceImpl;
 import com.gltech.scale.core.inbound.InboundServiceStats;

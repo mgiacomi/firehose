@@ -1,13 +1,12 @@
 package com.gltech.scale.core.server;
 
 import ch.qos.logback.classic.Level;
-import com.gltech.scale.core.aggregator.AggregatorSocketHandler;
+import com.gltech.scale.core.aggregator.clientserver.AggregatorServerSocketHandler;
 import com.gltech.scale.core.cluster.ChannelCoordinator;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.core.outbound.OutboundService;
 import com.gltech.scale.core.stats.StatCallBack;
 import com.gltech.scale.core.stats.StatsManager;
-import com.gltech.scale.monitoring.server.StatsPushHandler;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
@@ -125,17 +124,17 @@ public class EmbeddedServer
 		servletContextHandler.addServlet(DefaultServlet.class, "/");
 
 		// WebSocket handler (Aggregator)
-		AggregatorSocketHandler aggregatorSocketHandler = new AggregatorSocketHandler(injector);
+		AggregatorServerSocketHandler aggregatorServerSocketHandler = new AggregatorServerSocketHandler(injector);
 		ContextHandler aggregatorContextHandler = new ContextHandler();
 		aggregatorContextHandler.setContextPath("/socket/aggregator");
-		aggregatorContextHandler.setHandler(aggregatorSocketHandler);
+		aggregatorContextHandler.setHandler(aggregatorServerSocketHandler);
 
 		// Bind all resources
 		HandlerCollection handlerList = new HandlerCollection();
 
 		if (props.get("enable.aggregator", false))
 		{
-			handlerList.setHandlers(new Handler[]{aggregatorSocketHandler, statsHandler, servletContextHandler});
+			handlerList.setHandlers(new Handler[]{aggregatorServerSocketHandler, statsHandler, servletContextHandler});
 		}
 		else
 		{

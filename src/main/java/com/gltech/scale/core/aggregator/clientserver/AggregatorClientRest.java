@@ -1,4 +1,4 @@
-package com.gltech.scale.core.aggregator;
+package com.gltech.scale.core.aggregator.clientserver;
 
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.BatchMetaData;

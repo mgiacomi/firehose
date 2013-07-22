@@ -1,5 +1,6 @@
-package com.gltech.scale.core.aggregator;
+package com.gltech.scale.core.aggregator.clientserver;
 
+import com.gltech.scale.core.aggregator.Aggregator;
 import com.gltech.scale.core.websocket.SocketRequest;
 import com.gltech.scale.core.websocket.SocketResponse;
 import com.google.inject.Inject;
@@ -14,14 +15,14 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @WebSocket
-public class AggregatorSocket
+public class AggregatorServerSocket
 {
-	private static final Logger logger = LoggerFactory.getLogger(AggregatorSocket.class);
+	private static final Logger logger = LoggerFactory.getLogger(AggregatorServerSocket.class);
 	private final Set<Session> sessions = new CopyOnWriteArraySet<>();
 	private Aggregator aggregator;
 
 	@Inject
-	public AggregatorSocket(Aggregator aggregator)
+	public AggregatorServerSocket(Aggregator aggregator)
 	{
 		this.aggregator = aggregator;
 	}

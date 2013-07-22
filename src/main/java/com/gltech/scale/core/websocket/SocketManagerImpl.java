@@ -1,5 +1,6 @@
 package com.gltech.scale.core.websocket;
 
+import com.gltech.scale.core.aggregator.clientserver.AggregatorClientSocket;
 import com.gltech.scale.core.cluster.registration.ServiceMetaData;
 import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.lifecycle.LifeCycle;
@@ -24,7 +25,7 @@ public class SocketManagerImpl implements SocketManager, SocketState, LifeCycle
 	private Props props = Props.getProps();
 
 	@Override
-	public AggregatorSocket getAggregatorSocket(ServiceMetaData serviceMetaData)
+	public AggregatorClientSocket getAggregatorSocket(ServiceMetaData serviceMetaData)
 	{
 		int retries = 3;
 		while (retries > 0)
@@ -37,16 +38,16 @@ public class SocketManagerImpl implements SocketManager, SocketState, LifeCycle
 					{
 						String destUri = "ws://" + serviceMetaData.getListenAddress() + ":" + serviceMetaData.getListenPort() + "/socket/aggregator";
 						WebSocketClient client = new WebSocketClient();
-						AggregatorSocket socket = new AggregatorSocket(serviceMetaData.getWorkerId(), this);
+						AggregatorClientSocket clientSocket = new AggregatorClientSocket(serviceMetaData.getWorkerId(), this);
 
 						try
 						{
 							client.start();
 							URI echoUri = new URI(destUri);
 							ClientUpgradeRequest request = new ClientUpgradeRequest();
-							client.connect(socket, echoUri, request);
+							client.connect(clientSocket, echoUri, request);
 
-							AggregatorSocketData aggregatorSocketData = new AggregatorSocketData(socket, client);
+							AggregatorSocketData aggregatorSocketData = new AggregatorSocketData(clientSocket, client);
 							aggregatorMap.put(serviceMetaData.getWorkerId(), aggregatorSocketData);
 
 							double elapseSeconds = 0;
@@ -61,7 +62,7 @@ public class SocketManagerImpl implements SocketManager, SocketState, LifeCycle
 								{
 									if (aggregatorSocketData.session != null && aggregatorSocketData.session.isOpen())
 									{
-										return aggregatorSocketData.aggregatorSocket;
+										return aggregatorSocketData.aggregatorClientSocket;
 									}
 								}
 								catch (NullPointerException e)
@@ -86,7 +87,7 @@ public class SocketManagerImpl implements SocketManager, SocketState, LifeCycle
 			{
 				if (aggregatorMap.get(serviceMetaData.getWorkerId()).session != null && aggregatorMap.get(serviceMetaData.getWorkerId()).session.isOpen())
 				{
-					return aggregatorMap.get(serviceMetaData.getWorkerId()).aggregatorSocket;
+					return aggregatorMap.get(serviceMetaData.getWorkerId()).aggregatorClientSocket;
 				}
 			}
 			catch (NullPointerException e)
@@ -148,13 +149,13 @@ public class SocketManagerImpl implements SocketManager, SocketState, LifeCycle
 
 	private class AggregatorSocketData
 	{
-		private AggregatorSocket aggregatorSocket;
+		private AggregatorClientSocket aggregatorClientSocket;
 		private WebSocketClient webSocketClient;
 		private Session session;
 
-		private AggregatorSocketData(AggregatorSocket aggregatorSocket, WebSocketClient webSocketClient)
+		private AggregatorSocketData(AggregatorClientSocket aggregatorClientSocket, WebSocketClient webSocketClient)
 		{
-			this.aggregatorSocket = aggregatorSocket;
+			this.aggregatorClientSocket = aggregatorClientSocket;
 			this.webSocketClient = webSocketClient;
 		}
 	}

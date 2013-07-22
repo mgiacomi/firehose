@@ -7,7 +7,7 @@ import com.gltech.scale.core.model.Message;
 import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.stats.StatsManager;
 import com.gltech.scale.core.storage.StorageClient;
-import com.gltech.scale.core.aggregator.AggregatorClient;
+import com.gltech.scale.core.aggregator.clientserver.AggregatorClient;
 import com.google.inject.Inject;
 import com.gltech.scale.core.cluster.ClusterService;
 import com.gltech.scale.core.cluster.TimePeriodUtils;
