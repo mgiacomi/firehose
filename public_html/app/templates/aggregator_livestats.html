@@ -47,7 +47,7 @@
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalMin1') / 60) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalMin5') / 300) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalMin30') / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalHour2') / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddMessage_Count.totalHour2') / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Backup Messages Per/Sec:</strong></td>
@@ -55,7 +55,7 @@
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalMin1') / 60) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalMin5') / 300) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalMin30') / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalHour2') / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.AddBackupMessage_Count.totalHour2') / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Avg Messages Size:</strong></td>
@@ -127,7 +127,7 @@
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin1.total') / 60) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin5.total') / 300) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgMin30.total') / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgHour2.total') / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.MessagesCollectedPerBatch_Avg.avgHour2.total') / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Backup Messages Collected Per/Sec:</strong></td>
@@ -135,7 +135,7 @@
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin1.total') / 60) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin5.total') / 300) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgMin30.total') / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgHour2.total') / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Aggregator.BackupMessagesCollectedPerBatch_Avg.avgHour2.total') / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Active Batches:</strong></td>
@@ -288,7 +288,7 @@
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min1 / 60) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min5 / 300) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min30 / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.hour2 / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.hour2 / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Backup Messages Per/Sec:</strong></td>
@@ -296,7 +296,7 @@
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.min1 / 60) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.min5 / 300) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.min30 / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.hour2 / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddBackupMessage_Count.hour2 / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Avg Messages Size:</strong></td>
@@ -368,7 +368,7 @@
 				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min1.total / 60) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min5.total / 300) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.min30.total / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.hour2.total / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.MessagesCollectedPerBatch_Avg.hour2.total / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Backup Messages Collected Per/Sec:</strong></td>
@@ -376,7 +376,7 @@
 				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min1.total / 60) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min5.total / 300) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.min30.total / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.hour2.total / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.avgStats.BackupMessagesCollectedPerBatch_Avg.hour2.total / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Active Batches:</strong></td>

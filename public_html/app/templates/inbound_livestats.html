@@ -39,7 +39,7 @@
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin1') / 60) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin5') / 300) %></td>
 				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalMin30') / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalHour2') / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(getStat(aggregateStats, 'Inbound.AddMessage_Count.totalHour2') / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Avg Messages Size:</strong></td>
@@ -145,7 +145,7 @@
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min1 / 60) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min5 / 300) %></td>
 				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.min30 / 1800) %></td>
-				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.hour2 / 6400) %></td>
+				<td align="right"><%= roundedWithCommas(server.groupStat.countStats.AddMessage_Count.hour2 / 7200) %></td>
 			</tr>
 			<tr>
 				<td><strong>Avg Messages Size:</strong></td>
