@@ -4,10 +4,8 @@ import com.gltech.scale.core.stats.AvgStatOverTime;
 import com.gltech.scale.core.stats.StatsManager;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
-import org.joda.time.DateTime;
 
 import javax.ws.rs.core.MediaType;
-import java.io.OutputStream;
 
 public class InboundServiceStats implements InboundService
 {
