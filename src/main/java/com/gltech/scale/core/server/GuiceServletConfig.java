@@ -79,13 +79,13 @@ public class GuiceServletConfig extends GuiceServletContextListener
 						bind(InboundService.class).to(InboundServiceStats.class).in(Singleton.class);
 						bind(InboundService.class).annotatedWith(Names.named(InboundServiceStats.BASE)).to(InboundServiceImpl.class).in(Singleton.class);
 
-						if("websockets".equalsIgnoreCase(props.get("inbound_service.aggregator_connection", "rest")))
+						if("rest".equalsIgnoreCase(props.get("inbound_service.aggregator_connection", "websocket")))
 						{
-							bind(AggregatorClient.class).to(AggregatorClientWebSocket.class).in(Singleton.class);
+							bind(AggregatorClient.class).to(AggregatorClientRest.class).in(Singleton.class);
 						}
 						else
 						{
-							bind(AggregatorClient.class).to(AggregatorClientRest.class).in(Singleton.class);
+							bind(AggregatorClient.class).to(AggregatorClientWebSocket.class).in(Singleton.class);
 						}
 					}
 
