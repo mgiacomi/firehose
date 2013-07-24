@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class CountStatOverTime implements StatOverTime
 {
-	private ConcurrentMap<DateTime, AtomicLong> countsBy5SecPeriods = new ConcurrentHashMap<>();
+	private ConcurrentMap<DateTime, AtomicLong> countsBySecs = new ConcurrentHashMap<>();
 	private final ThreadLocal<Long> startTime = new ThreadLocal<>();
 	private String statName;
 	private String unitOfMeasure;
@@ -50,13 +50,13 @@ public class CountStatOverTime implements StatOverTime
 
 	void add(long count, DateTime dateTime)
 	{
-		DateTime period = TimePeriodUtils.nearestPeriodCeiling(dateTime, 5);
-		AtomicLong atomicTotal = countsBy5SecPeriods.get(period);
+		DateTime period = TimePeriodUtils.nearestPeriodCeiling(dateTime, 1);
+		AtomicLong atomicTotal = countsBySecs.get(period);
 
 		if (atomicTotal == null)
 		{
 			AtomicLong newAtomicTotal = new AtomicLong(0);
-			atomicTotal = countsBy5SecPeriods.putIfAbsent(period, newAtomicTotal);
+			atomicTotal = countsBySecs.putIfAbsent(period, newAtomicTotal);
 			if (atomicTotal == null)
 			{
 				atomicTotal = newAtomicTotal;
@@ -90,39 +90,39 @@ public class CountStatOverTime implements StatOverTime
 
 	public long getCountOverSeconds(int seconds)
 	{
-		return getTotalCount(seconds / 5 + 1);
+		return getTotalCount(seconds);
 	}
 
 	public long getCountOverMinutes(int minutes)
 	{
-		return getTotalCount(minutes * 12);
+		return getTotalCount(minutes * 60);
 	}
 
 	public long getCountOverHours(int hour)
 	{
-		return getTotalCount(60 * 12 * hour);
+		return getTotalCount(60 * 60 * hour);
 	}
 
 	long getTotalCount(int loops)
 	{
-		if (loops > 1440)
+		if (loops > 7200)
 		{
 			throw new IllegalArgumentException("You can only query 2 hours back in time.");
 		}
 
-		DateTime period = TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5);
+		DateTime period = TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 1);
 		long counter = 0;
 
 		for (int i = 0; i < loops; i++)
 		{
-			AtomicLong atomicLong = countsBy5SecPeriods.get(period);
+			period = period.minusSeconds(1);
+
+			AtomicLong atomicLong = countsBySecs.get(period);
 
 			if (atomicLong != null)
 			{
 				counter += atomicLong.get();
 			}
-
-			period = period.minusSeconds(5);
 		}
 
 		return counter;
@@ -131,12 +131,12 @@ public class CountStatOverTime implements StatOverTime
 	@Override
 	public void cleanOldThanTwoHours()
 	{
-		for (DateTime period : countsBy5SecPeriods.keySet())
+		for (DateTime period : countsBySecs.keySet())
 		{
-			DateTime twoHoursAgo = DateTime.now().minusHours(2);
+			DateTime twoHoursAgo = DateTime.now().minusHours(2).minusMinutes(1);
 			if (period.isAfter(twoHoursAgo))
 			{
-				countsBy5SecPeriods.remove(twoHoursAgo);
+				countsBySecs.remove(twoHoursAgo);
 			}
 		}
 	}

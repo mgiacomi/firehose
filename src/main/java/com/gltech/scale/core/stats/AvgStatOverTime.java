@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class AvgStatOverTime implements StatOverTime
 {
-	private ConcurrentMap<DateTime, AtomicLong> totalsBy5SecPeriods = new ConcurrentHashMap<>();
+	private ConcurrentMap<DateTime, AtomicLong> totalsBySecs = new ConcurrentHashMap<>();
 	private final ThreadLocal<Long> startTime = new ThreadLocal<>();
 	private final CountStatOverTime countStatOverTime;
 	private String statName;
@@ -31,7 +31,6 @@ public class AvgStatOverTime implements StatOverTime
 		countStatOverTime.setUnitOfMeasure(unitOfMeasure);
 	}
 
-
 	@Override
 	public void startTimer()
 	{
@@ -51,13 +50,13 @@ public class AvgStatOverTime implements StatOverTime
 
 	void add(long total, DateTime dateTime)
 	{
-		DateTime period = TimePeriodUtils.nearestPeriodCeiling(dateTime, 5);
-		AtomicLong atomicTotal = totalsBy5SecPeriods.get(period);
+		DateTime period = TimePeriodUtils.nearestPeriodCeiling(dateTime, 1);
+		AtomicLong atomicTotal = totalsBySecs.get(period);
 
 		if (atomicTotal == null)
 		{
 			AtomicLong newAtomicTotal = new AtomicLong(0);
-			atomicTotal = totalsBy5SecPeriods.putIfAbsent(period, newAtomicTotal);
+			atomicTotal = totalsBySecs.putIfAbsent(period, newAtomicTotal);
 			if (atomicTotal == null)
 			{
 				atomicTotal = newAtomicTotal;
@@ -87,39 +86,39 @@ public class AvgStatOverTime implements StatOverTime
 
 	public AvgStat getAvgOverSeconds(int seconds)
 	{
-		return getAverage(seconds / 5 + 1);
+		return getAverage(seconds);
 	}
 
 	public AvgStat getAvgOverMinutes(int minutes)
 	{
-		return getAverage(minutes * 12);
+		return getAverage(minutes * 60);
 	}
 
 	public AvgStat getAvgOverHours(int hour)
 	{
-		return getAverage(60 * 12 * hour);
+		return getAverage(60 * 60 * hour);
 	}
 
 	private AvgStat getAverage(int loops)
 	{
-		if (loops > 1440)
+		if (loops > 7200)
 		{
 			throw new IllegalArgumentException("You can only query 2 hours back in time.");
 		}
 
-		DateTime period = TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 5);
+		DateTime period = TimePeriodUtils.nearestPeriodCeiling(DateTime.now(), 1);
 		long total = 0;
 
 		for (int i = 0; i < loops; i++)
 		{
-			AtomicLong atomicLong = totalsBy5SecPeriods.get(period);
+			period = period.minusSeconds(1);
+
+			AtomicLong atomicLong = totalsBySecs.get(period);
 
 			if (atomicLong != null)
 			{
 				total += atomicLong.get();
 			}
-
-			period = period.minusSeconds(5);
 		}
 
 		long counter = countStatOverTime.getTotalCount(loops);
@@ -129,12 +128,12 @@ public class AvgStatOverTime implements StatOverTime
 	@Override
 	public void cleanOldThanTwoHours()
 	{
-		for (DateTime period : totalsBy5SecPeriods.keySet())
+		for (DateTime period : totalsBySecs.keySet())
 		{
-			DateTime twoHoursAgo = DateTime.now().minusHours(2);
+			DateTime twoHoursAgo = DateTime.now().minusHours(2).minusMinutes(1);
 			if (period.isAfter(twoHoursAgo))
 			{
-				totalsBy5SecPeriods.remove(twoHoursAgo);
+				totalsBySecs.remove(twoHoursAgo);
 			}
 		}
 

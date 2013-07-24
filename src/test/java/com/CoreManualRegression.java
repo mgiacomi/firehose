@@ -149,7 +149,7 @@ public class CoreManualRegression
 //				postEvent("http://localhost:9090", "redundant", String.valueOf(counter + "b"));
 //				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "fast", String.valueOf(counter + "a"));
 //				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "redundant", String.valueOf(counter + "b"));
-//				Thread.sleep(5);
+				Thread.sleep(5);
 				counter++;
 			}
 		}

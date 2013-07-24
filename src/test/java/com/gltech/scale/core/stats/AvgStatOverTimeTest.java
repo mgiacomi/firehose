@@ -8,6 +8,63 @@ import org.junit.Test;
 public class AvgStatOverTimeTest
 {
 	@Test
+	public void testCounter() throws Exception
+	{
+		AvgStatOverTime stat = new AvgStatOverTime("SIZE", "");
+		stat.activateCountStat("Counter", "");
+		DateTime dateTime = DateTime.now().minusSeconds(1);
+
+		stat.add(10, dateTime);
+		stat.add(40, dateTime);
+		stat.add(100, dateTime);
+
+		assertEquals(3, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(3, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(3, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(3, stat.getCountStatOverTime().getCountOverSeconds(5));
+
+		// 4 seconds back
+		dateTime = dateTime.minusSeconds(1);
+
+		stat.add(10, dateTime);
+		stat.add(40, dateTime);
+		stat.add(100, dateTime);
+
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+
+		// 3 seconds back
+		dateTime = dateTime.minusSeconds(4);
+
+		stat.add(10, dateTime);
+		stat.add(40, dateTime);
+		stat.add(100, dateTime);
+
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+
+		// 3 seconds back
+		dateTime = dateTime.minusSeconds(3);
+
+		stat.add(10, dateTime);
+		stat.add(40, dateTime);
+		stat.add(100, dateTime);
+
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+		assertEquals(6, stat.getCountStatOverTime().getCountOverSeconds(5));
+
+		assertEquals(12, stat.getCountStatOverTime().getCountOverMinutes(1));
+		assertEquals(12, stat.getCountStatOverTime().getCountOverHours(1));
+		assertEquals(12, stat.getCountStatOverTime().getCountOverHours(2));
+	}
+
+	@Test
 	public void testAverager() throws Exception
 	{
 		AvgStatOverTime stat = new AvgStatOverTime("SIZE", "");
