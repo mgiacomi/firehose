@@ -6,6 +6,7 @@ import com.gltech.scale.core.model.Defaults;
 import com.gltech.scale.lifecycle.LifeCycle;
 import com.gltech.scale.util.Props;
 import com.google.common.base.Throwables;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -37,7 +38,16 @@ public class SocketManagerImpl implements SocketManager, SocketState, LifeCycle
 					if (!aggregatorMap.containsKey(serviceMetaData.getWorkerId()))
 					{
 						String destUri = "ws://" + serviceMetaData.getListenAddress() + ":" + serviceMetaData.getListenPort() + "/socket/aggregator";
+
+						// Create our own thread pool as default max connection is 200, which is generally to low
+						int maxConnections = props.get("inbound.socket_max_client_connections", Defaults.INBOUND_SOCKET_MAX_CLIENT_CONNECTIONS);
+						QueuedThreadPool threadPool = new QueuedThreadPool(maxConnections);
+						threadPool.setName("WebSocket QueuedThreadPool @ "+ threadPool.hashCode());
+
+						// Create WebSocketClient and set our thread pool before start is called.
 						WebSocketClient client = new WebSocketClient();
+						client.setExecutor(threadPool);
+
 						AggregatorClientSocket clientSocket = new AggregatorClientSocket(serviceMetaData.getWorkerId(), this);
 
 						try
