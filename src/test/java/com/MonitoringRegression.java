@@ -42,7 +42,7 @@ public class MonitoringRegression
 			Props props = Props.getProps();
 			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/monitoring.properties");
 
-			com.gltech.scale.monitoring.server.EmbeddedServer.start(9090);
+			com.gltech.scale.monitoring.server.EmbeddedServer.start(9093);
 
 			while (true)
 			{

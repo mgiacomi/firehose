@@ -118,7 +118,6 @@ public class EmbeddedServer
 		final GatheringService gatheringService = injector.getInstance(GatheringService.class);
 		gatheringService.start();
 		LifeCycleManager.getInstance().add(gatheringService, LifeCycle.Priority.FINAL);
-
 	}
 
 	public static synchronized void stop() throws Exception

@@ -35,8 +35,8 @@ public class CoreManualRegression
 		public static void main(String[] args) throws Exception
 		{
 			Props props = Props.getProps();
-			//props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/primary_server.properties");
-			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/no-inbound.properties");
+			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/primary_server.properties");
+//			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/no-inbound.properties");
 
 			TestingServer testingServer = new TestingServer(21818);
 			//VoldemortTestUtil.start();
@@ -58,8 +58,8 @@ public class CoreManualRegression
 		public static void main(String[] args) throws Exception
 		{
 			Props props = Props.getProps();
-			//props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/second_server.properties");
-			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/inbound-only.properties");
+			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/second_server.properties");
+//			props.loadFromFile(System.getProperty("user.dir") + "/src/test/resources/inbound-only.properties");
 
 			EmbeddedServer.start(9091);
 
@@ -145,10 +145,10 @@ public class CoreManualRegression
 			int counter = 0;
 			while (true)
 			{
-				postEvent("http://localhost:9091", "fast", String.valueOf(counter + "a"));
+//				postEvent("http://localhost:9091", "fast", String.valueOf(counter + "a"));
 //				postEvent("http://localhost:9090", "redundant", String.valueOf(counter + "b"));
-//				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "fast", String.valueOf(counter + "a"));
-//				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "redundant", String.valueOf(counter + "b"));
+				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "fast", String.valueOf(counter + "a"));
+				postEvent("http://localhost:909" + new BigDecimal(rand.nextFloat()).setScale(0, BigDecimal.ROUND_HALF_UP), "redundant", String.valueOf(counter + "b"));
 				Thread.sleep(5);
 				counter++;
 			}
